@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { createLazyFileRoute } from '@tanstack/react-router'
-import { createFunction, getChildren, getFunction } from '../services/backend'
+import { createFunction, deleteFunction, getChildren, getFunction } from '../services/backend'
 import { useState } from 'react'
 
 export const Route = createLazyFileRoute('/')({
@@ -32,14 +32,22 @@ function Index() {
     },
   })
 
-  const { mutate } = useMutation({
+  const { mutate: addChild } = useMutation({
     mutationFn: createFunction,
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: ['functions'],
       })
     },
+  })
 
+  const { mutate: removeFunction } = useMutation({
+    mutationFn: deleteFunction,
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ['functions'],
+      })
+    },
   })
 
   return (
@@ -50,7 +58,7 @@ function Index() {
       </button>
       <form onSubmit={(e) => {
         e.preventDefault()
-        mutate({
+        addChild({
           name: e.target.elements.name.value,
           parentId: selectedFunctionId,
         })
@@ -66,6 +74,9 @@ function Index() {
           <li key={child.id}>
             <button onClick={() => setSelectedFunctionId(child.id)}>
               {child.name} (click to select)
+            </button>
+            <button onClick={() => removeFunction(child.id)}>
+              Delete
             </button>
           </li>
         ))}
