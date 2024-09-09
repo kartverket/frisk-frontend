@@ -58,19 +58,24 @@ function Index() {
       </button>
       <form onSubmit={(e) => {
         e.preventDefault()
+        const form = e.target as HTMLFormElement;
+        const nameElement = form.elements.namedItem('name') as HTMLInputElement | null;
+        if (!nameElement) return;
         addChild({
-          name: e.target.elements.name.value,
+          name: nameElement.value,
           parentId: selectedFunctionId,
         })
         // clear form
-        e.target.elements.name.value = ''
+        nameElement.value = ''
       }}>
         <input type="text" name="name" required />
         <button type="submit">Create child function</button>
       </form>
       <p>Children:</p>
       <ul>
-        {children?.map((child) => (
+        {/* TODO: fix type error */}
+        {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+        {children?.map((child: any) => (
           <li key={child.id}>
             <button onClick={() => setSelectedFunctionId(child.id)}>
               {child.name} (click to select)
