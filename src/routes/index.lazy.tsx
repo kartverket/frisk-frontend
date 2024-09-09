@@ -30,10 +30,10 @@ function Index() {
       <p>Here are your functions:</p>
       <ul>
         {functions?.map((f) => (
-          <li key={f.path}>{f.name}</li>
+          <li key={f.path}>{f.name}: {f.path} <button onClick={() => mutate({ name: f.name + "child" + (Math.random() * 100).toFixed(0), parentId: f.id })}>Create child function</button></li>
+
         ))}
       </ul>
-      <button onClick={() => mutate({ name: 'New Function' + (Math.random() * 100).toFixed(0), parentId: 1 })}>Create new function</button>
     </div>
   )
 }
