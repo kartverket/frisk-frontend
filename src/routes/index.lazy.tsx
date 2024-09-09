@@ -20,7 +20,6 @@ function Index() {
       const functionData = await getFunction(id)
       return functionData
     },
-    enabled: !!selectedFunctionId,
   })
 
   const { data: children } = useQuery({
@@ -31,7 +30,6 @@ function Index() {
       const children = await getChildren(id)
       return children
     },
-    enabled: !!selectedFunctionId,
   })
 
   const { mutate } = useMutation({
