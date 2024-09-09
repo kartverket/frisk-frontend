@@ -20,6 +20,23 @@ export async function getFunctions() {
   return await response.json();
 }
 
+export async function getFunction(id: number) {
+  const response = await fetchFromBackend(`${BACKEND_URL}/functions/${id}`, {
+    method: "GET",
+  });
+  return await response.json();
+}
+
+export async function getChildren(id: number) {
+  const response = await fetchFromBackend(
+    `${BACKEND_URL}/functions/${id}/children`,
+    {
+      method: "GET",
+    }
+  );
+  return await response.json();
+}
+
 export async function createFunction({
   name,
   parentId,
