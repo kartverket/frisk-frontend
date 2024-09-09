@@ -10,6 +10,9 @@ async function fetchFromBackend(path: string, options: RequestInit) {
       Authorization: `Bearer ${BEARER_TOKEN}`,
     },
   });
+  if (!response.ok) {
+    throw new Error(`Backend error: ${response.status} ${response.statusText}`);
+  }
   return response;
 }
 
