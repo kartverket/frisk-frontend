@@ -2,8 +2,8 @@ const BACKEND_URL = import.meta.env.BACKEND_URL ?? "http://localhost:8080";
 const BEARER_TOKEN = import.meta.env.BEARER_TOKEN ?? "test123";
 
 // backend fetcher that appends the Bearer token to the request
-async function fetchFromBackend(url: string, options: RequestInit) {
-  const response = await fetch(url, {
+async function fetchFromBackend(path: string, options: RequestInit) {
+  const response = await fetch(`${BACKEND_URL}${path}`, {
     ...options,
     headers: {
       ...options.headers,
@@ -14,26 +14,23 @@ async function fetchFromBackend(url: string, options: RequestInit) {
 }
 
 export async function getFunctions() {
-  const response = await fetchFromBackend(`${BACKEND_URL}/functions`, {
+  const response = await fetchFromBackend(`/functions`, {
     method: "GET",
   });
   return await response.json();
 }
 
 export async function getFunction(id: number) {
-  const response = await fetchFromBackend(`${BACKEND_URL}/functions/${id}`, {
+  const response = await fetchFromBackend(`/functions/${id}`, {
     method: "GET",
   });
   return await response.json();
 }
 
 export async function getChildren(id: number) {
-  const response = await fetchFromBackend(
-    `${BACKEND_URL}/functions/${id}/children`,
-    {
-      method: "GET",
-    }
-  );
+  const response = await fetchFromBackend(`/functions/${id}/children`, {
+    method: "GET",
+  });
   return await response.json();
 }
 
@@ -44,7 +41,7 @@ export async function createFunction({
   name: string;
   parentId: number;
 }) {
-  await fetchFromBackend(`${BACKEND_URL}/functions`, {
+  await fetchFromBackend(`/functions`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -54,7 +51,7 @@ export async function createFunction({
 }
 
 export async function deleteFunction(id: number) {
-  await fetchFromBackend(`${BACKEND_URL}/functions/${id}`, {
+  await fetchFromBackend(`/functions/${id}`, {
     method: "DELETE",
   });
 }
