@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { createLazyFileRoute } from '@tanstack/react-router'
-import { createFunction, getChildren, getFunction, getFunctions } from '../services/backend'
+import { createFunction, getChildren, getFunction } from '../services/backend'
 import { useState } from 'react'
 
 export const Route = createLazyFileRoute('/')({
@@ -47,7 +47,6 @@ function Index() {
   return (
     <div className="p-2">
       <p>Function: {func?.name}: {func?.path}</p>
-      <p>Children:</p>
       <button disabled={!func?.parentId} onClick={() => setSelectedFunctionId(func.parentId)}>
         Go to parent
       </button>
@@ -57,10 +56,13 @@ function Index() {
           name: e.target.elements.name.value,
           parentId: selectedFunctionId,
         })
+        // clear form
+        e.target.elements.name.value = ''
       }}>
         <input type="text" name="name" required />
         <button type="submit">Create child function</button>
       </form>
+      <p>Children:</p>
       <ul>
         {children?.map((child) => (
           <li key={child.id}>
