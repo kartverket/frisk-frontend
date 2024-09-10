@@ -2,28 +2,35 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { BackendFunction, createFunction, deleteFunction, getChildren, getFunction } from "../services/backend"
 
 
-export function useFunction(functionId: number) {
+type UseFunctionOpts = {
+  ignoreThis?: boolean
+  ignoreChildren?: boolean
+}
+
+export function useFunction(functionId: number, opts?: UseFunctionOpts) {
   const queryClient = useQueryClient()
 
-  const { data: func } = useQuery({
+  const func = useQuery({
     queryKey: ['functions', functionId],
     queryFn: async () => {
       const functionData = await getFunction(functionId)
       return functionData
     },
+    enabled: !opts?.ignoreThis,
   })
 
 
 
-  const { data: children } = useQuery({
+  const children = useQuery({
     queryKey: ['functions', functionId, 'children'],
     queryFn: async () => {
       const children = await getChildren(functionId)
       return children
     },
+    enabled: !opts?.ignoreChildren,
   })
 
-  const { mutate: addChild } = useMutation({
+  const addChild = useMutation({
     mutationFn: createFunction,
     onMutate: async (_newFunction) => {
 
@@ -37,7 +44,7 @@ export function useFunction(functionId: number) {
       const newFunction: BackendFunction = {
         ..._newFunction,
         id: randomNegativeNumber,
-        path: func?.path + `.${randomNegativeNumber}`,
+        path: `${func.data?.path}.${randomNegativeNumber}`,
       }
       if (previousChildren) {
         queryClient.setQueryData<BackendFunction[]>(['functions', functionId, 'children'], [...previousChildren, newFunction]);
@@ -57,9 +64,9 @@ export function useFunction(functionId: number) {
     },
   })
 
-  const { mutate: removeChild } = useMutation({
+  const removeChild = useMutation({
     mutationFn: deleteFunction,
-    onMutate: async (functionId) => {
+    onMutate: async (childId) => {
       await queryClient.cancelQueries({
         queryKey: ['functions', functionId, 'children'],
       });
@@ -67,7 +74,7 @@ export function useFunction(functionId: number) {
       const previousChildren = queryClient.getQueryData<BackendFunction[]>(['functions', functionId, 'children']);
 
       if (previousChildren) {
-        queryClient.setQueryData<BackendFunction[]>(['functions', functionId, 'children'], previousChildren.filter((child) => child.id !== functionId));
+        queryClient.setQueryData<BackendFunction[]>(['functions', functionId, 'children'], previousChildren.filter((child) => child.id !== childId));
       } else {
         queryClient.setQueryData<BackendFunction[]>(['functions', functionId, 'children'], []);
       }
