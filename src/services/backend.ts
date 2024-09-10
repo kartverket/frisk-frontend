@@ -16,21 +16,21 @@ async function fetchFromBackend(path: string, options: RequestInit) {
   return response;
 }
 
-export async function getFunctions() {
+export async function getFunctions(): Promise<BackendFunction[]> {
   const response = await fetchFromBackend(`/functions`, {
     method: "GET",
   });
   return await response.json();
 }
 
-export async function getFunction(id: number) {
+export async function getFunction(id: number): Promise<BackendFunction> {
   const response = await fetchFromBackend(`/functions/${id}`, {
     method: "GET",
   });
   return await response.json();
 }
 
-export async function getChildren(id: number) {
+export async function getChildren(id: number): Promise<BackendFunction[]> {
   const response = await fetchFromBackend(`/functions/${id}/children`, {
     method: "GET",
   });
@@ -58,3 +58,10 @@ export async function deleteFunction(id: number) {
     method: "DELETE",
   });
 }
+
+export type BackendFunction = {
+  id: number;
+  name: string;
+  path: string;
+  parentId: number | null;
+};
