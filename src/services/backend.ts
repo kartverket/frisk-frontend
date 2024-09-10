@@ -43,14 +43,16 @@ export async function createFunction({
 }: {
   name: string;
   parentId: number;
-}) {
-  await fetchFromBackend(`/functions`, {
+}): Promise<BackendFunction> {
+  const response = await fetchFromBackend(`/functions`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
     body: JSON.stringify({ name, parentId }),
   });
+
+  return await response.json();
 }
 
 export async function deleteFunction(id: number) {

@@ -2,6 +2,7 @@ import { useMemo } from "react"
 import { useFunction } from "../hooks/use-function"
 import { BackendFunction } from "../services/backend"
 import { Link } from "@tanstack/react-router"
+import { Route } from "../routes"
 
 type FunctionFolderProps = {
   functionId: number
@@ -14,6 +15,8 @@ export function FunctionFolder({ functionId, selectedFunction, handleDeletedFunc
 
   const { func, children, addChild, removeChild } = useFunction(functionId);
 
+  const navigate = Route.useNavigate();
+
   return (
     <div className="p-2">
       <h2 className="text-xl font-bold">
@@ -24,10 +27,10 @@ export function FunctionFolder({ functionId, selectedFunction, handleDeletedFunc
         const form = e.target as HTMLFormElement;
         const nameElement = form.elements.namedItem('name') as HTMLInputElement | null;
         if (!nameElement) return;
-        addChild.mutate({
+        addChild.mutateAsync({
           name: nameElement.value,
           parentId: functionId,
-        })
+        }).then((f) => navigate({ search: { id: f.id } }))
         // clear form
         nameElement.value = ''
       }}>
