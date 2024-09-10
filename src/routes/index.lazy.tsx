@@ -13,21 +13,17 @@ function Index() {
   const [selectedFunctionId, setSelectedFunctionId] = useState<number>(1)
 
   const { data: func } = useQuery({
-    queryKey: ['functions', selectedFunctionId] as const,
-    queryFn: async ({ queryKey }) => {
-      const [, id] = queryKey
-      if (!id) return
-      const functionData = await getFunction(id)
+    queryKey: ['functions', selectedFunctionId],
+    queryFn: async () => {
+      const functionData = await getFunction(selectedFunctionId)
       return functionData
     },
   })
 
   const { data: children } = useQuery({
-    queryKey: ['functions', selectedFunctionId, 'children'] as const,
-    queryFn: async ({ queryKey }) => {
-      const [, id] = queryKey
-      if (!id) return
-      const children = await getChildren(id)
+    queryKey: ['functions', selectedFunctionId, 'children'],
+    queryFn: async () => {
+      const children = await getChildren(selectedFunctionId)
       return children
     },
   })
