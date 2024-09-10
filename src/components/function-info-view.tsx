@@ -1,21 +1,16 @@
-import { useFunction } from "../hooks/use-function"
-import { Breadcrumbs } from "./breadcrumbs"
+import { BackendFunction } from "../services/backend"
 
 
 type FunctionInfoViewProps = {
-  functionId: number
+  func: BackendFunction
 }
 
-export function FunctionInfoView({ functionId }: FunctionInfoViewProps) {
-  const { func } = useFunction(functionId, {
-    ignoreChildren: true,
-  })
+export function FunctionInfoView({ func }: FunctionInfoViewProps) {
   return (
     <div className="p-2">
-      {func.data?.path && <Breadcrumbs path={func.data.path} />}
-      <p>Function id: {func.data?.id}</p>
-      <p>Function name: {func.data?.name}</p>
-      <p>Parent id: {func.data?.parentId}</p>
+      <p>Function id: {func.id}</p>
+      <p>Function name: {func.name}</p>
+      <p>Parent id: {func.parentId}</p>
     </div>
   )
 }
