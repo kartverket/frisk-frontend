@@ -43,7 +43,7 @@ function Index() {
 
   return (
     <div className="flex flex-col gap-2">
-      <Breadcrumbs functionId={id} />
+      <Breadcrumbs path={path} />
       <FunctionInfoView functionId={id} />
       <FunctionColumnView path={path} />
     </div>
