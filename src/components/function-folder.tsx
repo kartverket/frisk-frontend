@@ -10,7 +10,9 @@ type FunctionFolderProps = {
 }
 
 export function FunctionFolder({ functionId, selectedFunctionIds }: FunctionFolderProps) {
-  const { func, children, addChild, removeChild } = useFunction(functionId);
+  const { func, children, addChild, removeChild } = useFunction(functionId, {
+    includeChildren: true
+  });
 
   const navigate = Route.useNavigate();
 

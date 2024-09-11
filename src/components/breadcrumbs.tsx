@@ -26,9 +26,7 @@ type BreadcrumbItemProps = {
   functionId: number;
 }
 function BreadcrumbItem({ functionId }: BreadcrumbItemProps) {
-  const { func } = useFunction(functionId, {
-    ignoreChildren: true,
-  });
+  const { func } = useFunction(functionId);
 
   if (!func.data) return <div className="w-24 h-6 bg-gray-400 animate-pulse rounded-sm"></div>;
 

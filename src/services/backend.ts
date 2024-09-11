@@ -61,6 +61,47 @@ export async function deleteFunction(id: number) {
   });
 }
 
+export async function createDependency({
+  functionId,
+  dependencyFunctionId,
+}: {
+  functionId: number;
+  dependencyFunctionId: number;
+}): Promise<{ functionId: number; dependencyFunctionId: number }> {
+  const response = await fetchFromBackend(
+    `/functions/${functionId}/dependencies`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ functionId, dependencyFunctionId }),
+    }
+  );
+
+  return await response.json();
+}
+
+export async function getDependencies(functionId: number): Promise<number[]> {
+  const response = await fetchFromBackend(
+    `/functions/${functionId}/dependencies`,
+    {
+      method: "GET",
+    }
+  );
+  return await response.json();
+}
+
+export async function getDependents(functionId: number): Promise<number[]> {
+  const response = await fetchFromBackend(
+    `/functions/${functionId}/dependents`,
+    {
+      method: "GET",
+    }
+  );
+  return await response.json();
+}
+
 export type BackendFunction = {
   id: number;
   name: string;

@@ -25,9 +25,7 @@ function Index() {
   const idArray = path.split('.').map((part) => parseInt(part));
   const id = idArray.pop() ?? 1;
 
-  const { func } = useFunction(id, {
-    ignoreChildren: true,
-  });
+  const { func } = useFunction(id);
 
   useEffect(() => {
     if (func.error) {

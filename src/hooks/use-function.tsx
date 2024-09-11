@@ -1,10 +1,11 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
-import { BackendFunction, createFunction, deleteFunction, getChildren, getFunction } from "../services/backend"
+import { BackendFunction, createFunction, deleteFunction, getChildren, getDependencies, getDependents, getFunction } from "../services/backend"
 
 
 type UseFunctionOpts = {
-  ignoreThis?: boolean
-  ignoreChildren?: boolean
+  includeChildren?: boolean
+  includeDependencies?: boolean
+  includeDependents?: boolean
 }
 
 export function useFunction(functionId: number, opts?: UseFunctionOpts) {
@@ -16,10 +17,7 @@ export function useFunction(functionId: number, opts?: UseFunctionOpts) {
       const functionData = await getFunction(functionId)
       return functionData
     },
-    enabled: !opts?.ignoreThis,
   })
-
-
 
   const children = useQuery({
     queryKey: ['functions', functionId, 'children'],
@@ -32,7 +30,35 @@ export function useFunction(functionId: number, opts?: UseFunctionOpts) {
       }
       return children
     },
-    enabled: !opts?.ignoreChildren,
+    enabled: opts?.includeChildren,
+  })
+
+  const dependencies = useQuery({
+    queryKey: ['functions', functionId, 'dependencies'],
+    queryFn: async () => {
+      const dependencyIds = await getDependencies(functionId)
+      const dependencies = await Promise.all(dependencyIds.map(async (dependencyId) => await getFunction(dependencyId)))
+      // Set all dependencies in the query cache
+      for (const dependency of dependencies) {
+        queryClient.setQueryData<BackendFunction>(['functions', dependency.id], dependency);
+      }
+      return dependencies
+    },
+    enabled: opts?.includeDependencies,
+  })
+
+  const dependents = useQuery({
+    queryKey: ['functions', functionId, 'dependents'],
+    queryFn: async () => {
+      const dependentIds = await getDependents(functionId)
+      const dependents = await Promise.all(dependentIds.map(async (dependentId) => await getFunction(dependentId)))
+      // Set all dependents in the query cache
+      for (const dependent of dependents) {
+        queryClient.setQueryData<BackendFunction>(['functions', dependent.id], dependent);
+      }
+      return dependents
+    },
+    enabled: opts?.includeDependents,
   })
 
   const addChild = useMutation({
@@ -105,5 +131,7 @@ export function useFunction(functionId: number, opts?: UseFunctionOpts) {
     children,
     addChild,
     removeChild,
+    dependencies,
+    dependents,
   }
 }
