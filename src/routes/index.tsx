@@ -4,9 +4,14 @@ import { FunctionInfoView } from '../components/function-info-view';
 import { Breadcrumbs } from '../components/breadcrumbs';
 import { object, string } from 'zod';
 import { zodSearchValidator } from '@tanstack/router-zod-adapter';
+import { useFunction } from '../hooks/use-function';
+import { useEffect } from 'react';
 
 const functionSearchSchema = object({
-  path: string().default("1"),
+  path: string()
+    .refine((arg) => arg.split('.').every((part) => parseInt(part) >= 0))
+    .catch('1')
+    .default('1'),
 });
 
 export const Route = createFileRoute('/')({
@@ -16,7 +21,25 @@ export const Route = createFileRoute('/')({
 
 function Index() {
   const { path } = Route.useSearch();
-  const id = path.split('.').map((part) => parseInt(part)).pop() ?? 1;
+  const navigate = Route.useNavigate();
+  const idArray = path.split('.').map((part) => parseInt(part));
+  const id = idArray.pop() ?? 1;
+
+  const { func } = useFunction(id, {
+    ignoreChildren: true,
+  });
+
+  useEffect(() => {
+    if (func.error) {
+      // if function id is invalid, navigate to parent until it is valid
+      const parentPath = idArray.slice().join('.');
+      navigate({
+        search: {
+          path: parentPath,
+        },
+      })
+    }
+  }, [func.error, navigate, idArray]);
 
   return (
     <div className="flex flex-col gap-2">
