@@ -13,7 +13,7 @@ export function Breadcrumbs({ path }: BreadcrumbsProps) {
   return (
     <div className="flex gap-2 font-bold">
       {ids?.map((id) => (
-        <BredcrumbItem key={id} functionId={id} />
+        <BreadcrumbItem key={id} functionId={id} />
       ))}
     </div>
   );
@@ -22,7 +22,7 @@ export function Breadcrumbs({ path }: BreadcrumbsProps) {
 type BreadcrumbItemProps = {
   functionId: number;
 }
-function BredcrumbItem({ functionId }: BreadcrumbItemProps) {
+function BreadcrumbItem({ functionId }: BreadcrumbItemProps) {
   const { func } = useFunction(functionId, {
     ignoreChildren: true,
   });
