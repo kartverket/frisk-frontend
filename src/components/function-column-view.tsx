@@ -1,19 +1,17 @@
 import { useMemo } from "react";
-import { BackendFunction } from "../services/backend";
 import { FunctionFolder } from "./function-folder";
 
 type FunctionColumnViewProps = {
-  selectedFunctionPath: string
-  handleDeletedFunction: (deletedFunction: BackendFunction) => void
+  path: string
 }
 
-export function FunctionColumnView({ selectedFunctionPath, handleDeletedFunction }: FunctionColumnViewProps) {
-  const selectedFunctionIds = useMemo(() => selectedFunctionPath.split('.').map((part) => parseInt(part)), [selectedFunctionPath]);
+export function FunctionColumnView({ path }: FunctionColumnViewProps) {
+  const selectedFunctionIds = useMemo(() => path.split('.').map((part) => parseInt(part)), [path]);
 
   return (
     <div className="flex gap-2">
       {selectedFunctionIds?.map((id) => (
-        <FunctionFolder key={id} functionId={id} selectedFunctionIds={selectedFunctionIds} handleDeletedFunction={handleDeletedFunction} />
+        <FunctionFolder key={id} functionId={id} selectedFunctionIds={selectedFunctionIds} />
       ))}
     </div>
   );

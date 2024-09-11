@@ -2,17 +2,30 @@ import { useFunction } from "../hooks/use-function"
 import { BackendFunction } from "../services/backend"
 import { Link } from "@tanstack/react-router"
 import { Route } from "../routes"
+import { useCallback } from "react"
 
 type FunctionFolderProps = {
   functionId: number
   selectedFunctionIds: number[]
-  handleDeletedFunction: (deletedFunction: BackendFunction) => void
 }
 
-export function FunctionFolder({ functionId, selectedFunctionIds, handleDeletedFunction }: FunctionFolderProps) {
+export function FunctionFolder({ functionId, selectedFunctionIds }: FunctionFolderProps) {
   const { func, children, addChild, removeChild } = useFunction(functionId);
 
   const navigate = Route.useNavigate();
+
+
+  const handleDeletedFunction = useCallback((deletedFunction: BackendFunction) => {
+    if (selectedFunctionIds.includes(deletedFunction.id)) {
+      const deletedFunctionParentPath = deletedFunction.path.split('.').slice(0, -1).join('.');
+      navigate({
+        search: {
+          path: deletedFunctionParentPath ?? "1",
+        },
+      })
+      return;
+    }
+  }, [selectedFunctionIds, navigate]);
 
   return (
     <div className="p-2">
