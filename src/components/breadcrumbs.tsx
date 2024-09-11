@@ -13,10 +13,10 @@ export function Breadcrumbs({ path }: BreadcrumbsProps) {
   return (
     <div className="flex gap-2 font-bold p-2">
       {ids?.map((id) => (
-        <>
-          <BreadcrumbItem key={id} functionId={id} />
+        <div key={id} className="flex gap-2">
+          <BreadcrumbItem functionId={id} />
           <span className="text-gray-400 text-sm">/</span>
-        </>
+        </div>
       ))}
     </div>
   );
