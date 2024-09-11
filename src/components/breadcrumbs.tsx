@@ -11,9 +11,12 @@ export function Breadcrumbs({ path }: BreadcrumbsProps) {
   const ids = path.split('.').map((id) => parseInt(id));
 
   return (
-    <div className="flex gap-2 font-bold">
+    <div className="flex gap-2 font-bold p-2">
       {ids?.map((id) => (
-        <BreadcrumbItem key={id} functionId={id} />
+        <>
+          <BreadcrumbItem key={id} functionId={id} />
+          <span className="text-gray-400 text-sm">/</span>
+        </>
       ))}
     </div>
   );
