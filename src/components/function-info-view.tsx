@@ -10,9 +10,9 @@ export function FunctionInfoView({ functionId }: FunctionInfoViewProps) {
   });
   return (
     <div className="p-2">
-      {func.data ? <p>Function id: {func.data.id}</p> : <div className="w-24 h-6 bg-gray-400 animate-pulse rounded-sm"></div>}
-      {func.data ? <p>Function name: {func.data.name}</p> : <div className="w-24 h-6 bg-gray-400 animate-pulse rounded-sm"></div>}
-      {func.data ? <p>Parent id: {func.data.parentId}</p> : <div className="w-24 h-6 bg-gray-400 animate-pulse rounded-sm"></div>}
+      {func.data ? <p>Funksjonsnavn: {func.data.name}</p> : <div className="w-24 h-6 bg-gray-400 animate-pulse rounded-sm"></div>}
+      <p>Avhengigheter: (liste med avhengigheter)</p>
+      <p>(Annen metadata)</p>
     </div>
   )
 }
