@@ -3,17 +3,20 @@ import { Link } from "@tanstack/react-router"
 
 
 type BreadcrumbsProps = {
-  path: string
+  functionId: number
 }
 
-export function Breadcrumbs({ path }: BreadcrumbsProps) {
-  const parts = path.split('.').map((part) => parseInt(part));
+export function Breadcrumbs({ functionId }: BreadcrumbsProps) {
+  const { func } = useFunction(functionId, {
+    ignoreChildren: true,
+  });
+  const ids = func.data?.path.split('.').map((id) => parseInt(id));
 
   return (
     <div className="flex gap-2 font-bold">
-      {parts.map((part) => (
-        <BredcrumbItem key={part} functionId={part} />
-      ))}
+      {ids?.map((id) => (
+        <BredcrumbItem key={id} functionId={id} />
+      )) ?? <div className="w-24 h-6 bg-gray-400 animate-pulse rounded-sm"></div>}
     </div>
   );
 }
@@ -29,6 +32,6 @@ function BredcrumbItem({ functionId }: BreadcrumbItemProps) {
   if (!func.data) return null;
 
   return (
-    <Link to="/" search={{ id: func.data.id }}>{func.data?.name}</Link>
+    <Link to="/" search={{ path: func.data.path }}>{func.data?.name}</Link>
   );
 }

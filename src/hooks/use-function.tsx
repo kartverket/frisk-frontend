@@ -25,6 +25,11 @@ export function useFunction(functionId: number, opts?: UseFunctionOpts) {
     queryKey: ['functions', functionId, 'children'],
     queryFn: async () => {
       const children = await getChildren(functionId)
+
+      // Set all children in the query cache
+      for (const child of children) {
+        queryClient.setQueryData<BackendFunction>(['functions', child.id], child);
+      }
       return children
     },
     enabled: !opts?.ignoreChildren,
@@ -84,9 +89,12 @@ export function useFunction(functionId: number, opts?: UseFunctionOpts) {
     onError: (_, __, context) => {
       queryClient.setQueryData<BackendFunction[]>(['functions', functionId, 'children'], context?.previousChildren);
     },
-    onSettled: () => {
+    onSettled: (_, __, childId) => {
       queryClient.invalidateQueries({
         queryKey: ['functions', functionId, 'children'],
+      })
+      queryClient.invalidateQueries({
+        queryKey: ['functions', childId],
       })
     },
   })

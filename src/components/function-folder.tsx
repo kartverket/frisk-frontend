@@ -1,4 +1,3 @@
-import { useMemo } from "react"
 import { useFunction } from "../hooks/use-function"
 import { BackendFunction } from "../services/backend"
 import { Link } from "@tanstack/react-router"
@@ -6,13 +5,11 @@ import { Route } from "../routes"
 
 type FunctionFolderProps = {
   functionId: number
-  selectedFunction: BackendFunction
+  selectedFunctionIds: number[]
   handleDeletedFunction: (deletedFunction: BackendFunction) => void
 }
 
-export function FunctionFolder({ functionId, selectedFunction, handleDeletedFunction }: FunctionFolderProps) {
-  const selectedFunctionIds = useMemo(() => selectedFunction.path.split('.').map((part) => parseInt(part)), [selectedFunction]);
-
+export function FunctionFolder({ functionId, selectedFunctionIds, handleDeletedFunction }: FunctionFolderProps) {
   const { func, children, addChild, removeChild } = useFunction(functionId);
 
   const navigate = Route.useNavigate();
@@ -20,7 +17,7 @@ export function FunctionFolder({ functionId, selectedFunction, handleDeletedFunc
   return (
     <div className="p-2">
       <h2 className="text-xl font-bold">
-        {func.data?.name}
+        {func.data?.name ?? <div className="w-24 h-6 bg-gray-400 animate-pulse rounded-sm"></div>}
       </h2>
       <form onSubmit={(e) => {
         e.preventDefault()
@@ -30,7 +27,7 @@ export function FunctionFolder({ functionId, selectedFunction, handleDeletedFunc
         addChild.mutateAsync({
           name: nameElement.value,
           parentId: functionId,
-        }).then((f) => navigate({ search: { id: f.id } }))
+        }).then((f) => navigate({ search: { path: f.path } }))
         // clear form
         nameElement.value = ''
       }}>
@@ -40,14 +37,14 @@ export function FunctionFolder({ functionId, selectedFunction, handleDeletedFunc
       <ul className="flex flex-col">
         {children.isLoading && (
           <>
-            <li className="w-24 h-6 bg-gray-400 animate-pulse rounded-sm"></li>
-            <li className="w-24 h-6 bg-gray-400 animate-pulse rounded-sm"></li>
-            <li className="w-24 h-6 bg-gray-400 animate-pulse rounded-sm"></li>
+            <li className="w-24 h-6 p-2 bg-gray-400 animate-pulse rounded-sm"></li>
+            <li className="w-24 h-6 p-2 bg-gray-400 animate-pulse rounded-sm"></li>
+            <li className="w-24 h-6 p-2 bg-gray-400 animate-pulse rounded-sm"></li>
           </>
         )}
         {children.data?.map((child) => (
           <li key={child.id + child.name + child.parentId + child.path} className={`flex p-2 justify-between gap-2 ${selectedFunctionIds.includes(child.id) ? 'bg-green-200' : ''}`}>
-            <Link className="w-full text-start" to="/" search={{ id: child.id }}>
+            <Link className="w-full text-start" to="/" search={{ path: child.path }}>
               {child.name}
             </Link>
 
