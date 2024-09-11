@@ -32,20 +32,23 @@ export function FunctionFolder({ functionId, selectedFunctionIds }: FunctionFold
       <h2 className="text-xl font-bold">
         {func.data?.name ?? <div className="w-24 h-6 bg-gray-400 animate-pulse rounded-sm"></div>}
       </h2>
-      <form onSubmit={(e) => {
-        e.preventDefault()
-        const form = e.target as HTMLFormElement;
-        const nameElement = form.elements.namedItem('name') as HTMLInputElement | null;
-        if (!nameElement) return;
-        addChild.mutateAsync({
-          name: nameElement.value,
-          parentId: functionId,
-        }).then((f) => navigate({ search: { path: f.path } }))
-        // clear form
-        nameElement.value = ''
-      }}>
+      <form
+        className="flex"
+        onSubmit={(e) => {
+          e.preventDefault()
+          const form = e.target as HTMLFormElement;
+          const nameElement = form.elements.namedItem('name') as HTMLInputElement | null;
+          if (!nameElement) return;
+          addChild.mutateAsync({
+            name: nameElement.value,
+            parentId: functionId,
+          }).then((f) => navigate({ search: { path: f.path } }))
+          // clear form
+          nameElement.value = ''
+        }}
+      >
         <input type="text" name="name" placeholder="Navn" required />
-        <button type="submit">Legg til</button>
+        <button className="whitespace-nowrap" type="submit">Legg til</button>
       </form>
       <ul className="flex flex-col">
         {children.isLoading && (

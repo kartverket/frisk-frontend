@@ -9,7 +9,7 @@ export function FunctionColumnView({ path }: FunctionColumnViewProps) {
   const selectedFunctionIds = useMemo(() => path.split('.').map((part) => parseInt(part)), [path]);
 
   return (
-    <div className="flex gap-2">
+    <div className="flex gap-2 w-full overflow-scroll">
       {selectedFunctionIds?.map((id) => (
         <FunctionFolder key={id} functionId={id} selectedFunctionIds={selectedFunctionIds} />
       ))}
