@@ -1,5 +1,6 @@
 import { useFunction } from "../hooks/use-function";
 import { Link } from "@tanstack/react-router"
+import { Route } from "../routes";
 
 
 type BreadcrumbsProps = {
@@ -32,6 +33,6 @@ function BredcrumbItem({ functionId }: BreadcrumbItemProps) {
   if (!func.data) return null;
 
   return (
-    <Link to="/" search={{ path: func.data.path }}>{func.data?.name}</Link>
+    <Link to={Route.to} search={{ path: func.data.path }}>{func.data?.name}</Link>
   );
 }

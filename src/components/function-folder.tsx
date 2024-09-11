@@ -57,7 +57,7 @@ export function FunctionFolder({ functionId, selectedFunctionIds }: FunctionFold
         )}
         {children.data?.map((child) => (
           <li key={child.id + child.name + child.parentId + child.path} className={`flex p-2 justify-between gap-2 ${selectedFunctionIds.includes(child.id) ? 'bg-green-200' : ''}`}>
-            <Link className="w-full text-start" to="/" search={{ path: child.path }}>
+            <Link className="w-full text-start" to={Route.to} search={{ path: child.path }}>
               {child.name}
             </Link>
 
