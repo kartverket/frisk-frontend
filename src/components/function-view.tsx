@@ -1,4 +1,4 @@
-import { Route } from "../routes";
+import { Route } from "@/routes";
 import { FunctionEditView } from "./function-edit-view";
 import { FunctionInfoView } from "./function-info-view";
 import { Link } from "@tanstack/react-router";

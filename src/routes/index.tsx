@@ -1,11 +1,11 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { FunctionColumnView } from '../components/function-column-view'
-import { Breadcrumbs } from '../components/breadcrumbs';
+import { Breadcrumbs } from '@/components/breadcrumbs';
 import { boolean, object, string } from 'zod';
 import { zodSearchValidator } from '@tanstack/router-zod-adapter';
-import { useFunction } from '../hooks/use-function';
+import { useFunction } from '@/hooks/use-function';
 import { useEffect } from 'react';
-import { FunctionView } from '../components/function-view';
+import { FunctionView } from '@/components/function-view';
 
 const functionSearchSchema = object({
   path: string()

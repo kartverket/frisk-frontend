@@ -1,6 +1,6 @@
 import { useQueryClient } from "@tanstack/react-query";
-import { useFunction } from "../hooks/use-function";
-import { BackendFunction } from "../services/backend";
+import { useFunction } from "@/hooks/use-function";
+import { BackendFunction } from "@/services/backend";
 
 type FunctionEditViewProps = {
   functionId: number;

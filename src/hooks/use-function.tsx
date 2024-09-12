@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
-import { BackendFunction, createFunction, deleteFunction, getChildren, getDependencies, getDependents, getFunction } from "../services/backend"
+import { BackendFunction, createFunction, deleteFunction, getChildren, getDependencies, getDependents, getFunction } from "@/services/backend"
 
 
 type UseFunctionOpts = {

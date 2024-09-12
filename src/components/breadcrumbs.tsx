@@ -1,6 +1,6 @@
-import { useFunction } from "../hooks/use-function";
+import { useFunction } from "@/hooks/use-function";
 import { Link } from "@tanstack/react-router"
-import { Route } from "../routes";
+import { Route } from "@/routes";
 
 
 type BreadcrumbsProps = {
