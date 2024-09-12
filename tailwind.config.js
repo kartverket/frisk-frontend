@@ -12,6 +12,9 @@ export default {
           50: "#F5F2F2",
         },
       },
+      fontFamily: {
+        mulish: ["Mulish", "sans-serif"],
+      },
     },
   },
   plugins: [],

@@ -7,8 +7,10 @@ const queryClient = new QueryClient()
 export const Route = createRootRoute({
   component: () => (
     <QueryClientProvider client={queryClient}>
-      <Header />
-      <Outlet />
+      <div className='font-mulish'>
+        <Header />
+        <Outlet />
+      </div>
     </QueryClientProvider>
   ),
 });
