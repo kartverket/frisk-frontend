@@ -1,6 +1,7 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { useFunction } from "@/hooks/use-function";
 import { BackendFunction } from "@/services/backend";
+import { Button } from "./ui/button";
 
 type FunctionEditViewProps = {
   functionId: number;
@@ -40,7 +41,7 @@ export function FunctionEditView({ functionId, onEditComplete }: FunctionEditVie
     }}>
       <input type="text" name="name" placeholder="Navn" required defaultValue={func.data?.name} />
       <textarea name="description" placeholder="Beskrivelse" defaultValue={func.data?.description ?? ""} />
-      <button type="submit">Lagre</button>
+      <Button variant="default" type="submit">Lagre</Button>
     </form>
   )
 }

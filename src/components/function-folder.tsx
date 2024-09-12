@@ -4,6 +4,8 @@ import { Link } from "@tanstack/react-router"
 import { Route } from "@/routes"
 import { useCallback } from "react"
 import { cn } from "@/lib/utils"
+import { Button } from "./ui/button"
+import { Input } from "./ui/input"
 
 type FunctionFolderProps = {
   functionId: number
@@ -51,8 +53,8 @@ export function FunctionFolder({ functionId, selectedFunctionIds }: FunctionFold
           nameElement.value = ''
         }}
       >
-        <input type="text" name="name" placeholder="Navn" required />
-        <button className="whitespace-nowrap" type="submit">Legg til</button>
+        <Input type="text" name="name" placeholder="Navn" required />
+        <Button variant="default" type="submit">Legg til</Button>
       </form>
       <ul className="flex flex-col">
         {children.isLoading && (
@@ -68,15 +70,15 @@ export function FunctionFolder({ functionId, selectedFunctionIds }: FunctionFold
               {child.name}
             </Link>
 
-            <button
-              className='disabled:opacity-50 bg-red-500 text-white rounded-sm px-2 hover:bg-red-600'
+            <Button
+              variant="destructive"
               disabled={child.id < 0}
               onClick={() => {
                 removeChild.mutate(child.id)
                 handleDeletedFunction(child)
               }}>
               Slett
-            </button>
+            </Button>
           </li>
         ))}
       </ul>

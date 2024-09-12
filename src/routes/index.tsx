@@ -6,6 +6,7 @@ import { zodSearchValidator } from '@tanstack/router-zod-adapter';
 import { useFunction } from '@/hooks/use-function';
 import { useEffect } from 'react';
 import { FunctionView } from '@/components/function-view';
+import { Main } from '@/components/main';
 
 const functionSearchSchema = object({
   path: string()
@@ -42,10 +43,10 @@ function Index() {
   }, [func.error, navigate, idArray]);
 
   return (
-    <div className="flex flex-col gap-2">
+    <Main className="flex flex-col gap-2">
       <Breadcrumbs path={path} />
       <FunctionView functionId={id} />
       <FunctionColumnView path={path} />
-    </div>
+    </Main>
   )
 }
