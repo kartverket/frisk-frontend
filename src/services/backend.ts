@@ -39,17 +39,15 @@ export async function getChildren(id: number): Promise<BackendFunction[]> {
 
 export async function createFunction({
   name,
+  description,
   parentId,
-}: {
-  name: string;
-  parentId: number;
-}): Promise<BackendFunction> {
+}: BackendFunctionCreate): Promise<BackendFunction> {
   const response = await fetchFromBackend(`/functions`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({ name, parentId }),
+    body: JSON.stringify({ name, description, parentId }),
   });
 
   return await response.json();
@@ -105,6 +103,9 @@ export async function getDependents(functionId: number): Promise<number[]> {
 export type BackendFunction = {
   id: number;
   name: string;
+  description: string | null;
   path: string;
   parentId: number | null;
 };
+
+type BackendFunctionCreate = Omit<BackendFunction, "id" | "path">;

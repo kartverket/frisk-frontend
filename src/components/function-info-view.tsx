@@ -11,9 +11,11 @@ export function FunctionInfoView({ functionId }: FunctionInfoViewProps) {
     includeDependencies: true,
     includeDependents: true,
   });
+
   return (
     <div className="p-2">
       {func.data ? <p>Funksjonsnavn: {func.data.name}</p> : <div className="w-24 h-6 bg-gray-400 animate-pulse rounded-sm"></div>}
+      {func.data ? <p>Beskrivelse: {func.data.description}</p> : <div className="w-24 h-6 bg-gray-400 animate-pulse rounded-sm"></div>}
       <p className="font-bold">Bruker</p>
       {dependencies.data?.map((dependency) => (
         <div key={dependency.id}>

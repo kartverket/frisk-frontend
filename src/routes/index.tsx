@@ -1,17 +1,18 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { FunctionColumnView } from '../components/function-column-view'
-import { FunctionInfoView } from '../components/function-info-view';
 import { Breadcrumbs } from '../components/breadcrumbs';
-import { object, string } from 'zod';
+import { boolean, object, string } from 'zod';
 import { zodSearchValidator } from '@tanstack/router-zod-adapter';
 import { useFunction } from '../hooks/use-function';
 import { useEffect } from 'react';
+import { FunctionView } from '../components/function-view';
 
 const functionSearchSchema = object({
   path: string()
     .refine((arg) => arg.split('.').every((part) => parseInt(part) >= 0))
     .catch('1')
     .default('1'),
+  edit: boolean().default(false),
 });
 
 export const Route = createFileRoute('/')({
@@ -34,6 +35,7 @@ function Index() {
       navigate({
         search: {
           path: parentPath,
+          edit: false,
         },
       })
     }
@@ -42,7 +44,7 @@ function Index() {
   return (
     <div className="flex flex-col gap-2">
       <Breadcrumbs path={path} />
-      <FunctionInfoView functionId={id} />
+      <FunctionView functionId={id} />
       <FunctionColumnView path={path} />
     </div>
   )

@@ -43,6 +43,7 @@ export function FunctionFolder({ functionId, selectedFunctionIds }: FunctionFold
           if (!nameElement) return;
           addChild.mutateAsync({
             name: nameElement.value,
+            description: null,
             parentId: functionId,
           }).then((f) => navigate({ search: { path: f.path } }))
           // clear form
