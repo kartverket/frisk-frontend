@@ -12,7 +12,7 @@ const functionSearchSchema = object({
     .refine((arg) => arg.split('.').every((part) => parseInt(part) >= 0))
     .catch('1')
     .default('1'),
-  edit: boolean().default(false),
+  edit: boolean().catch(false).default(false),
 });
 
 export const Route = createFileRoute('/')({
