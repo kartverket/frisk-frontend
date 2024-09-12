@@ -3,6 +3,7 @@ import { BackendFunction } from "@/services/backend"
 import { Link } from "@tanstack/react-router"
 import { Route } from "@/routes"
 import { useCallback } from "react"
+import { cn } from "@/lib/utils"
 
 type FunctionFolderProps = {
   functionId: number
@@ -62,7 +63,7 @@ export function FunctionFolder({ functionId, selectedFunctionIds }: FunctionFold
           </>
         )}
         {children.data?.map((child) => (
-          <li key={child.id + child.name + child.parentId + child.path} className={`flex p-2 justify-between gap-2 ${selectedFunctionIds.includes(child.id) ? 'bg-green-200' : ''}`}>
+          <li key={child.id + child.name + child.parentId + child.path} className={cn(`flex p-2 justify-between gap-2`, selectedFunctionIds.includes(child.id) ? 'bg-green-200' : '')}>
             <Link className="w-full text-start" to={Route.to} search={{ path: child.path, edit: false }}>
               {child.name}
             </Link>
