@@ -16,10 +16,15 @@ async function fetchFromBackend(path: string, options: RequestInit) {
 	return response;
 }
 
-export async function getFunctions(): Promise<BackendFunction[]> {
-	const response = await fetchFromBackend("/functions", {
-		method: "GET",
-	});
+export async function getFunctions(
+	search?: string,
+): Promise<BackendFunction[]> {
+	const response = await fetchFromBackend(
+		`/functions${search ? `?search=${search}` : ""}`,
+		{
+			method: "GET",
+		},
+	);
 	return await response.json();
 }
 
@@ -65,7 +70,7 @@ export async function createDependency({
 }: {
 	functionId: number;
 	dependencyFunctionId: number;
-}): Promise<{ functionId: number; dependencyFunctionId: number }> {
+}): Promise<FunctionDependency> {
 	const response = await fetchFromBackend(
 		`/functions/${functionId}/dependencies`,
 		{
@@ -78,6 +83,18 @@ export async function createDependency({
 	);
 
 	return await response.json();
+}
+
+export async function deleteDependency({
+	functionId,
+	dependencyFunctionId,
+}: FunctionDependency) {
+	await fetchFromBackend(
+		`/functions/${functionId}/dependencies/${dependencyFunctionId}`,
+		{
+			method: "DELETE",
+		},
+	);
 }
 
 export async function getDependencies(functionId: number): Promise<number[]> {
@@ -109,3 +126,8 @@ export type BackendFunction = {
 };
 
 type BackendFunctionCreate = Omit<BackendFunction, "id" | "path">;
+
+export type FunctionDependency = {
+	functionId: number;
+	dependencyFunctionId: number;
+};
