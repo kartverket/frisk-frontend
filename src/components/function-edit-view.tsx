@@ -1,5 +1,7 @@
 import { useFunction } from "@/hooks/use-function";
-import { getFunctions } from "@/services/backend";
+import { getIdsFromPath } from "@/lib/utils";
+import { Route } from "@/routes";
+import { type BackendFunction, getFunctions } from "@/services/backend";
 import {
 	Button,
 	FormControl,
@@ -9,7 +11,7 @@ import {
 	SearchAsync,
 	Textarea,
 } from "@kvib/react";
-import { useState } from "react";
+import { useCallback, useState } from "react";
 
 type FunctionEditViewProps = {
 	functionId: number;
@@ -20,12 +22,11 @@ export function FunctionEditView({
 	functionId,
 	onEditComplete,
 }: FunctionEditViewProps) {
-	const { func, dependencies, addDependency, removeDependency } = useFunction(
-		functionId,
-		{
+	const { path } = Route.useSearch();
+	const { func, removeChild, dependencies, addDependency, removeDependency } =
+		useFunction(functionId, {
 			includeDependencies: true,
-		},
-	);
+		});
 	const [newDependencies, setDependencies] = useState<
 		{ label: string; value: number }[]
 	>(
@@ -35,9 +36,30 @@ export function FunctionEditView({
 		})) ?? [],
 	);
 
+	const navigate = Route.useNavigate();
+
+	const selectedFunctionIds = getIdsFromPath(path);
+
+	const handleDeletedFunction = useCallback(
+		(deletedFunction: BackendFunction) => {
+			if (selectedFunctionIds.includes(deletedFunction.id)) {
+				const deletedFunctionParentPath = deletedFunction.path
+					.split(".")
+					.slice(0, -1)
+					.join(".");
+				navigate({
+					search: {
+						path: deletedFunctionParentPath ?? "1",
+					},
+				});
+				return;
+			}
+		},
+		[selectedFunctionIds, navigate],
+	);
+
 	return (
 		<form
-			className="flex flex-col gap-2"
 			onSubmit={(e) => {
 				e.preventDefault();
 				if (!func.data) return;
@@ -67,7 +89,7 @@ export function FunctionEditView({
 				onEditComplete?.();
 			}}
 		>
-			<FormControl>
+			<FormControl className="flex flex-col gap-2">
 				<FormLabel htmlFor="name">Navn</FormLabel>
 				<Input
 					disabled
@@ -111,6 +133,17 @@ export function FunctionEditView({
 				/>
 
 				<Button type="submit">Lagre</Button>
+				<Button
+					colorScheme="red"
+					disabled={!func.data}
+					onClick={() => {
+						if (!func.data) return;
+						removeChild.mutate(func.data.id);
+						handleDeletedFunction(func.data);
+					}}
+				>
+					Slett
+				</Button>
 			</FormControl>
 		</form>
 	);
