@@ -1,18 +1,18 @@
-import { useMemo } from "react";
 import { FunctionFolder } from "./function-folder";
+import { getIdsFromPath } from "@/lib/utils";
 
 type FunctionColumnViewProps = {
-  path: string
-}
+	path: string;
+};
 
 export function FunctionColumnView({ path }: FunctionColumnViewProps) {
-  const selectedFunctionIds = useMemo(() => path.split('.').map((part) => parseInt(part)), [path]);
+	const selectedFunctionIds = getIdsFromPath(path);
 
-  return (
-    <div className="flex gap-2 w-full overflow-scroll">
-      {selectedFunctionIds?.map((id) => (
-        <FunctionFolder key={id} functionId={id} selectedFunctionIds={selectedFunctionIds} />
-      ))}
-    </div>
-  );
+	return (
+		<div className="flex gap-2 w-full">
+			{selectedFunctionIds?.map((id) => (
+				<FunctionFolder key={id} functionId={id} />
+			))}
+		</div>
+	);
 }

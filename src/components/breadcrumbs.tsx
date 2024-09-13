@@ -1,36 +1,45 @@
 import { useFunction } from "@/hooks/use-function";
-import { Link } from "@tanstack/react-router"
 import { Route } from "@/routes";
-
+import {
+	Breadcrumb,
+	BreadcrumbItem,
+	BreadcrumbLink,
+	Skeleton,
+} from "@kvib/react";
+import { Link as TSRLink } from "@tanstack/react-router";
 
 type BreadcrumbsProps = {
-  path: string
-}
+	path: string;
+};
 
 export function Breadcrumbs({ path }: BreadcrumbsProps) {
-  const ids = path.split('.').map((id) => parseInt(id));
+	const ids = path.split(".").map((id) => Number.parseInt(id));
 
-  return (
-    <div className="flex gap-2 font-bold p-2">
-      {ids?.map((id) => (
-        <div key={id} className="flex gap-2">
-          <BreadcrumbItem functionId={id} />
-          <span className="text-gray-400 text-sm">/</span>
-        </div>
-      ))}
-    </div>
-  );
+	return (
+		<Breadcrumb className="p-2">
+			{ids?.map((id) => (
+				<CustomBreadcrumbItem key={id} functionId={id} />
+			))}
+		</Breadcrumb>
+	);
 }
 
 type BreadcrumbItemProps = {
-  functionId: number;
-}
-function BreadcrumbItem({ functionId }: BreadcrumbItemProps) {
-  const { func } = useFunction(functionId);
+	functionId: number;
+};
+function CustomBreadcrumbItem({ functionId }: BreadcrumbItemProps) {
+	const { func } = useFunction(functionId);
+	const { path } = Route.useSearch();
 
-  if (!func.data) return <div className="w-24 h-6 bg-gray-400 animate-pulse rounded-sm"></div>;
-
-  return (
-    <Link to={Route.to} search={{ path: func.data.path }}>{func.data?.name}</Link>
-  );
+	return (
+		<Skeleton isLoaded={!!func.data} fitContent w={24}>
+			<BreadcrumbItem>
+				<BreadcrumbLink isCurrentPage={path === func.data?.path}>
+					<TSRLink to={Route.to} search={{ path: func.data?.path }}>
+						{func.data?.name}
+					</TSRLink>
+				</BreadcrumbLink>
+			</BreadcrumbItem>
+		</Skeleton>
+	);
 }
