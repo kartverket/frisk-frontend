@@ -24,4 +24,4 @@ dist-ssr
 *.sw?
 
 # bun
-tsconfig.tsbuildinfo
+*.tsbuildinfo
