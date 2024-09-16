@@ -1,4 +1,4 @@
-const BACKEND_URL = import.meta.env.BACKEND_URL ?? "http://localhost:8080";
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL ?? "http://localhost:8080";
 const BEARER_TOKEN = import.meta.env.BEARER_TOKEN ?? "test123";
 
 // backend fetcher that appends the Bearer token to the request
