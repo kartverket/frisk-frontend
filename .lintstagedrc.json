@@ -1,5 +1,5 @@
 {
-  "*.ts": ["prettier --write", "eslint"],
-  "*.html": ["eslint", "prettier --write"],
-  "*.css": "prettier --write"
+  "*.ts": ["biome format --write", "biome lint --write"],
+  "*.html": ["biome lint --write", "biome format --write"],
+  "*.css": "biome format --write"
 }
