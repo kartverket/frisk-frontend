@@ -1,5 +1,5 @@
 {
-  "*.ts": ["biome format --write", "biome lint --write"],
-  "*.html": ["biome lint --write", "biome format --write"],
-  "*.css": "biome format --write"
+	"*.ts": ["biome format --write", "biome lint --write"],
+	"*.html": ["biome lint --write", "biome format --write"],
+	"*.css": "biome format --write"
 }
