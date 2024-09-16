@@ -23,11 +23,9 @@ export function FunctionInfoView({ functionId }: FunctionInfoViewProps) {
 				<List>
 					{dependencies.data?.map((dependency) => (
 						<ListItem key={dependency.id}>
-							<KvibLink>
-								<TSRLink to={Route.to} search={{ path: dependency.path }}>
-									{dependency.name}
-								</TSRLink>
-							</KvibLink>
+							<TSRLink to={Route.to} search={{ path: dependency.path }}>
+								<KvibLink as="span">{dependency.name}</KvibLink>
+							</TSRLink>
 						</ListItem>
 					))}
 				</List>
@@ -36,11 +34,9 @@ export function FunctionInfoView({ functionId }: FunctionInfoViewProps) {
 				<List>
 					{dependents.data?.map((dependent) => (
 						<ListItem key={dependent.id}>
-							<KvibLink>
-								<TSRLink to={Route.to} search={{ path: dependent.path }}>
-									{dependent.name}
-								</TSRLink>
-							</KvibLink>
+							<TSRLink to={Route.to} search={{ path: dependent.path }}>
+								<KvibLink as="span">{dependent.name}</KvibLink>
+							</TSRLink>
 						</ListItem>
 					))}
 				</List>
