@@ -1,11 +1,6 @@
 import { useFunction } from "@/hooks/use-function";
 import { Route } from "@/routes";
-import {
-	Breadcrumb,
-	BreadcrumbItem,
-	BreadcrumbLink,
-	Skeleton,
-} from "@kvib/react";
+import { Breadcrumb, BreadcrumbItem, BreadcrumbLink } from "@kvib/react";
 import { Link as TSRLink } from "@tanstack/react-router";
 
 type BreadcrumbsProps = {
@@ -32,14 +27,12 @@ function CustomBreadcrumbItem({ functionId }: BreadcrumbItemProps) {
 	const { path } = Route.useSearch();
 
 	return (
-		<Skeleton isLoaded={!!func.data} fitContent w={24}>
-			<BreadcrumbItem>
-				<BreadcrumbLink isCurrentPage={path === func.data?.path}>
-					<TSRLink to={Route.to} search={{ path: func.data?.path }}>
-						{func.data?.name}
-					</TSRLink>
+		<BreadcrumbItem>
+			<TSRLink to={Route.to} search={{ path: func.data?.path }}>
+				<BreadcrumbLink as="span" isCurrentPage={path === func.data?.path}>
+					{func.data?.name}
 				</BreadcrumbLink>
-			</BreadcrumbItem>
-		</Skeleton>
+			</TSRLink>
+		</BreadcrumbItem>
 	);
 }

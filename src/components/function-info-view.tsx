@@ -1,7 +1,7 @@
 import { useFunction } from "@/hooks/use-function";
 import { Route } from "@/routes";
 import { Link as TSRLink } from "@tanstack/react-router";
-import { Skeleton, Link as KvibLink } from "@kvib/react";
+import { Skeleton, Link as KvibLink, List, ListItem } from "@kvib/react";
 
 type FunctionInfoViewProps = {
 	functionId: number;
@@ -18,26 +18,28 @@ export function FunctionInfoView({ functionId }: FunctionInfoViewProps) {
 			<div className="p-2">
 				<p>Funksjonsnavn: {func.data?.name}</p>
 				<p>Beskrivelse: {func.data?.description}</p>
-				<p className="font-bold">Bruker</p>
-				{dependencies.data?.map((dependency) => (
-					<div key={dependency.id}>
-						<KvibLink>
+
+				<p className="font-bold">Avhengig av</p>
+				<List>
+					{dependencies.data?.map((dependency) => (
+						<ListItem key={dependency.id}>
 							<TSRLink to={Route.to} search={{ path: dependency.path }}>
-								{dependency.name}
+								<KvibLink as="span">{dependency.name}</KvibLink>
 							</TSRLink>
-						</KvibLink>
-					</div>
-				))}
+						</ListItem>
+					))}
+				</List>
+
 				<p className="font-bold">Brukes av</p>
-				{dependents.data?.map((dependent) => (
-					<div key={dependent.id}>
-						<KvibLink>
+				<List>
+					{dependents.data?.map((dependent) => (
+						<ListItem key={dependent.id}>
 							<TSRLink to={Route.to} search={{ path: dependent.path }}>
-								{dependent.name}
+								<KvibLink as="span">{dependent.name}</KvibLink>
 							</TSRLink>
-						</KvibLink>
-					</div>
-				))}
+						</ListItem>
+					))}
+				</List>
 			</div>
 		</Skeleton>
 	);

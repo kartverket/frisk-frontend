@@ -1,7 +1,17 @@
-import { useQueryClient } from "@tanstack/react-query";
 import { useFunction } from "@/hooks/use-function";
-import type { BackendFunction } from "@/services/backend";
-import { Button } from "@kvib/react";
+import { getIdsFromPath } from "@/lib/utils";
+import { Route } from "@/routes";
+import { type BackendFunction, getFunctions } from "@/services/backend";
+import {
+	Button,
+	FormControl,
+	FormLabel,
+	Icon,
+	Input,
+	SearchAsync,
+	Textarea,
+} from "@kvib/react";
+import { useCallback, useState } from "react";
 
 type FunctionEditViewProps = {
 	functionId: number;
@@ -12,58 +22,129 @@ export function FunctionEditView({
 	functionId,
 	onEditComplete,
 }: FunctionEditViewProps) {
-	const queryClient = useQueryClient();
-	const { func } = useFunction(functionId);
+	const { path } = Route.useSearch();
+	const { func, removeChild, dependencies, addDependency, removeDependency } =
+		useFunction(functionId, {
+			includeDependencies: true,
+		});
+	const [newDependencies, setDependencies] = useState<
+		{ label: string; value: number }[]
+	>(
+		dependencies.data?.map((dependency) => ({
+			label: dependency.name,
+			value: dependency.id,
+		})) ?? [],
+	);
+
+	const navigate = Route.useNavigate();
+
+	const selectedFunctionIds = getIdsFromPath(path);
+
+	const handleDeletedFunction = useCallback(
+		(deletedFunction: BackendFunction) => {
+			if (selectedFunctionIds.includes(deletedFunction.id)) {
+				const deletedFunctionParentPath = deletedFunction.path
+					.split(".")
+					.slice(0, -1)
+					.join(".");
+				navigate({
+					search: {
+						path: deletedFunctionParentPath ?? "1",
+					},
+				});
+				return;
+			}
+		},
+		[selectedFunctionIds, navigate],
+	);
 
 	return (
 		<form
-			className="flex flex-col gap-2"
-			onSubmit={async (e) => {
+			onSubmit={(e) => {
 				e.preventDefault();
 				if (!func.data) return;
-				const form = e.target as HTMLFormElement;
-				const nameElement = form.elements.namedItem(
-					"name",
-				) as HTMLInputElement | null;
-				const descriptionElement = form.elements.namedItem(
-					"description",
-				) as HTMLTextAreaElement | null;
 
-				const nameValue =
-					nameElement?.value === "" ? undefined : nameElement?.value;
-				const descriptionValue =
-					descriptionElement?.value === ""
-						? undefined
-						: descriptionElement?.value;
+				const dependenciesToCreate = newDependencies.filter(
+					(dependency) =>
+						!dependencies.data?.map((dep) => dep.id).includes(dependency.value),
+				);
+				const dependenciesToDelete =
+					dependencies.data?.filter(
+						(dependency) =>
+							!newDependencies.map((dep) => dep.value).includes(dependency.id),
+					) ?? [];
 
-				// eslint-disable-next-line @typescript-eslint/no-unused-vars
-				const putObject: BackendFunction = {
-					...func.data,
-					...(nameValue && { name: nameValue }),
-					...(descriptionValue && { description: descriptionValue }),
-				};
-
-				/*       await putFunction(putObject).then(() => {
-              queryClient.invalidateQueries({
-                queryKey: ['functions', functionId],
-              });
-              onEditComplete?.();
-            }) */
+				for (const dependency of dependenciesToDelete) {
+					removeDependency.mutate({
+						functionId,
+						dependencyFunctionId: dependency.id,
+					});
+				}
+				for (const dependency of dependenciesToCreate) {
+					addDependency.mutate({
+						functionId: functionId,
+						dependencyFunctionId: dependency.value,
+					});
+				}
+				onEditComplete?.();
 			}}
 		>
-			<input
-				type="text"
-				name="name"
-				placeholder="Navn"
-				required
-				defaultValue={func.data?.name}
-			/>
-			<textarea
-				name="description"
-				placeholder="Beskrivelse"
-				defaultValue={func.data?.description ?? ""}
-			/>
-			<Button type="submit">Lagre</Button>
+			<FormControl className="flex flex-col gap-2">
+				<FormLabel htmlFor="name">Navn</FormLabel>
+				<Input
+					disabled
+					type="text"
+					name="name"
+					placeholder="Navn"
+					required
+					defaultValue={func.data?.name}
+				/>
+
+				<FormLabel htmlFor="description">Beskrivelse</FormLabel>
+				<Textarea
+					disabled
+					name="description"
+					placeholder="Beskrivelse"
+					defaultValue={func.data?.description ?? ""}
+				/>
+
+				<FormLabel htmlFor="async-search">Legg til avhengigheter</FormLabel>
+				<SearchAsync
+					value={newDependencies}
+					isMulti
+					debounceTime={100}
+					defaultOptions
+					dropdownIndicator={<Icon icon="expand_more" weight={400} />}
+					loadOptions={(inputValue, callback) => {
+						getFunctions(inputValue).then((functions) => {
+							const depOpts = functions.map((functionData) => ({
+								label: functionData.name,
+								value: functionData.id,
+							}));
+							// @ts-expect-error
+							callback(depOpts);
+						});
+					}}
+					onChange={(newValue) => {
+						// @ts-expect-error
+						setDependencies(newValue ?? []);
+					}}
+					placeholder="Søk"
+				/>
+
+				<Button type="submit">Lagre</Button>
+				<Button
+					colorScheme="red"
+					disabled={!func.data}
+					onClick={() => {
+						if (!func.data) return;
+						removeChild.mutate(func.data.id);
+						handleDeletedFunction(func.data);
+					}}
+				>
+					Slett
+				</Button>
+			</FormControl>
 		</form>
 	);
 }
