@@ -1,3 +1,5 @@
+import { array, number, object, string, type z } from "zod";
+
 const BACKEND_URL = import.meta.env.BACKEND_URL ?? "http://localhost:8080";
 const BEARER_TOKEN = import.meta.env.BEARER_TOKEN ?? "test123";
 
@@ -16,37 +18,38 @@ async function fetchFromBackend(path: string, options: RequestInit) {
 	return response;
 }
 
-export async function getFunctions(
-	search?: string,
-): Promise<BackendFunction[]> {
+export async function getFunctions(search?: string) {
 	const response = await fetchFromBackend(
 		`/functions${search ? `?search=${search}` : ""}`,
 		{
 			method: "GET",
 		},
 	);
-	return await response.json();
+	const json = await response.json();
+	return array(BackendFunction).parse(json);
 }
 
-export async function getFunction(id: number): Promise<BackendFunction> {
+export async function getFunction(id: number) {
 	const response = await fetchFromBackend(`/functions/${id}`, {
 		method: "GET",
 	});
-	return await response.json();
+	const json = await response.json();
+	return BackendFunction.parse(json);
 }
 
-export async function getChildren(id: number): Promise<BackendFunction[]> {
+export async function getChildren(id: number) {
 	const response = await fetchFromBackend(`/functions/${id}/children`, {
 		method: "GET",
 	});
-	return await response.json();
+	const json = await response.json();
+	return array(BackendFunction).parse(json);
 }
 
 export async function createFunction({
 	name,
 	description,
 	parentId,
-}: BackendFunctionCreate): Promise<BackendFunction> {
+}: BackendFunctionCreate) {
 	const response = await fetchFromBackend("/functions", {
 		method: "POST",
 		headers: {
@@ -55,7 +58,8 @@ export async function createFunction({
 		body: JSON.stringify({ name, description, parentId }),
 	});
 
-	return await response.json();
+	const json = await response.json();
+	return BackendFunction.parse(json);
 }
 
 export async function deleteFunction(id: number) {
@@ -70,7 +74,7 @@ export async function createDependency({
 }: {
 	functionId: number;
 	dependencyFunctionId: number;
-}): Promise<FunctionDependency> {
+}) {
 	const response = await fetchFromBackend(
 		`/functions/${functionId}/dependencies`,
 		{
@@ -82,7 +86,8 @@ export async function createDependency({
 		},
 	);
 
-	return await response.json();
+	const json = await response.json();
+	return FunctionDependency.parse(json);
 }
 
 export async function deleteDependency({
@@ -97,37 +102,41 @@ export async function deleteDependency({
 	);
 }
 
-export async function getDependencies(functionId: number): Promise<number[]> {
+export async function getDependencies(functionId: number) {
 	const response = await fetchFromBackend(
 		`/functions/${functionId}/dependencies`,
 		{
 			method: "GET",
 		},
 	);
-	return await response.json();
+	const json = await response.json();
+	return array(number().int()).parse(json);
 }
 
-export async function getDependents(functionId: number): Promise<number[]> {
+export async function getDependents(functionId: number) {
 	const response = await fetchFromBackend(
 		`/functions/${functionId}/dependents`,
 		{
 			method: "GET",
 		},
 	);
-	return await response.json();
+	const json = await response.json();
+	return array(number().int()).parse(json);
 }
 
-export type BackendFunction = {
-	id: number;
-	name: string;
-	description: string | null;
-	path: string;
-	parentId: number | null;
-};
+const BackendFunction = object({
+	id: number().int(),
+	name: string(),
+	description: string().nullable(),
+	path: string(),
+	parentId: number().int().nullable(),
+});
+export type BackendFunction = z.infer<typeof BackendFunction>;
 
 type BackendFunctionCreate = Omit<BackendFunction, "id" | "path">;
 
-export type FunctionDependency = {
-	functionId: number;
-	dependencyFunctionId: number;
-};
+const FunctionDependency = object({
+	functionId: number().int(),
+	dependencyFunctionId: number().int(),
+});
+export type FunctionDependency = z.infer<typeof FunctionDependency>;
