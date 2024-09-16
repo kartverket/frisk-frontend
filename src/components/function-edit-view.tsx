@@ -23,10 +23,15 @@ export function FunctionEditView({
 	onEditComplete,
 }: FunctionEditViewProps) {
 	const { path } = Route.useSearch();
-	const { func, removeChild, dependencies, addDependency, removeDependency } =
-		useFunction(functionId, {
-			includeDependencies: true,
-		});
+	const {
+		func,
+		removeFunction,
+		dependencies,
+		addDependency,
+		removeDependency,
+	} = useFunction(functionId, {
+		includeDependencies: true,
+	});
 	const [newDependencies, setDependencies] = useState<
 		{ label: string; value: number }[]
 	>(
@@ -138,7 +143,7 @@ export function FunctionEditView({
 					disabled={!func.data}
 					onClick={() => {
 						if (!func.data) return;
-						removeChild.mutate(func.data.id);
+						removeFunction.mutate(func.data.id);
 						handleDeletedFunction(func.data);
 					}}
 				>
