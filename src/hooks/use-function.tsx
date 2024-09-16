@@ -1,7 +1,9 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
 	type BackendFunction,
+	createDependency,
 	createFunction,
+	deleteDependency,
 	deleteFunction,
 	getChildren,
 	getDependencies,
@@ -172,12 +174,181 @@ export function useFunction(functionId: number, opts?: UseFunctionOpts) {
 		},
 	});
 
+	const addDependency = useMutation({
+		mutationFn: createDependency,
+		onMutate: async (_newDependency) => {
+			await queryClient.cancelQueries({
+				queryKey: ["functions", functionId, "dependencies"],
+			});
+			await queryClient.cancelQueries({
+				queryKey: [
+					"functions",
+					_newDependency.dependencyFunctionId,
+					"dependents",
+				],
+			});
+
+			const previousDependencies = queryClient.getQueryData<BackendFunction[]>([
+				"functions",
+				functionId,
+				"dependencies",
+			]);
+
+			const previousDependents = queryClient.getQueryData<BackendFunction[]>([
+				"functions",
+				_newDependency.dependencyFunctionId,
+				"dependents",
+			]);
+
+			let newDependency = queryClient.getQueryData<BackendFunction>([
+				"functions",
+				_newDependency.dependencyFunctionId,
+			]);
+			if (!newDependency) {
+				newDependency = await queryClient.fetchQuery<BackendFunction>({
+					queryKey: ["functions", _newDependency.dependencyFunctionId],
+					queryFn: async () => {
+						const functionData = await getFunction(
+							_newDependency.dependencyFunctionId,
+						);
+						return functionData;
+					},
+				});
+			}
+
+			if (previousDependencies) {
+				queryClient.setQueryData<BackendFunction[]>(
+					["functions", functionId, "dependencies"],
+					[...previousDependencies, newDependency],
+				);
+			} else {
+				queryClient.setQueryData<BackendFunction[]>(
+					["functions", functionId, "dependencies"],
+					[newDependency],
+				);
+			}
+
+			if (func.data) {
+				if (previousDependents) {
+					queryClient.setQueryData<BackendFunction[]>(
+						["functions", _newDependency.dependencyFunctionId, "dependents"],
+						[...previousDependents, func.data],
+					);
+				} else {
+					queryClient.setQueryData<BackendFunction[]>(
+						["functions", _newDependency.dependencyFunctionId, "dependents"],
+						[func.data],
+					);
+				}
+			}
+
+			return { previousDependencies, previousDependents };
+		},
+		onError: (_, vars, context) => {
+			queryClient.setQueryData<BackendFunction[]>(
+				["functions", functionId, "dependencies"],
+				context?.previousDependencies,
+			);
+			queryClient.setQueryData<BackendFunction[]>(
+				["functions", vars.dependencyFunctionId, "dependents"],
+				context?.previousDependents,
+			);
+		},
+		onSettled: (_, __, functionDep) => {
+			queryClient.invalidateQueries({
+				queryKey: ["functions", functionId, "dependencies"],
+			});
+			queryClient.invalidateQueries({
+				queryKey: ["functions", functionDep.dependencyFunctionId, "dependents"],
+			});
+		},
+	});
+
+	const removeDependency = useMutation({
+		mutationFn: deleteDependency,
+		onMutate: async (dependencyToDelete) => {
+			await queryClient.cancelQueries({
+				queryKey: ["functions", functionId, "dependencies"],
+			});
+			await queryClient.cancelQueries({
+				queryKey: [
+					"functions",
+					dependencyToDelete.dependencyFunctionId,
+					"dependents",
+				],
+			});
+
+			const previousDependencies = queryClient.getQueryData<BackendFunction[]>([
+				"functions",
+				functionId,
+				"dependencies",
+			]);
+
+			const previousDependents = queryClient.getQueryData<BackendFunction[]>([
+				"functions",
+				dependencyToDelete.dependencyFunctionId,
+				"dependents",
+			]);
+
+			if (previousDependencies) {
+				queryClient.setQueryData<BackendFunction[]>(
+					["functions", functionId, "dependencies"],
+					previousDependencies.filter(
+						(dependency) =>
+							dependency.id !== dependencyToDelete.dependencyFunctionId,
+					),
+				);
+			} else {
+				queryClient.setQueryData<BackendFunction[]>(
+					["functions", functionId, "dependencies"],
+					[],
+				);
+			}
+
+			if (previousDependents) {
+				queryClient.setQueryData<BackendFunction[]>(
+					["functions", dependencyToDelete.dependencyFunctionId, "dependents"],
+					previousDependents.filter(
+						(dependent) => dependent.id !== dependencyToDelete.functionId,
+					),
+				);
+			} else {
+				queryClient.setQueryData<BackendFunction[]>(
+					["functions", dependencyToDelete.dependencyFunctionId, "dependents"],
+					[],
+				);
+			}
+
+			return { previousDependencies, previousDependents };
+		},
+		onError: (_, vars, context) => {
+			queryClient.setQueryData<BackendFunction[]>(
+				["functions", functionId, "dependencies"],
+				context?.previousDependencies,
+			);
+			queryClient.setQueryData<BackendFunction[]>(
+				["functions", vars.dependencyFunctionId, "dependents"],
+				context?.previousDependents,
+			);
+		},
+		onSettled: (_, __, functionDep) => {
+			queryClient.invalidateQueries({
+				queryKey: ["functions", functionId, "dependencies"],
+			});
+			queryClient.invalidateQueries({
+				queryKey: ["functions", functionDep.dependencyFunctionId, "dependents"],
+			});
+		},
+	});
+
 	return {
 		func,
 		children,
 		addChild,
 		removeChild,
 		dependencies,
+		addDependency,
+		removeDependency,
 		dependents,
 	};
 }

@@ -1,4 +1,5 @@
 import { useFunction } from "@/hooks/use-function";
+import { cn, getIdsFromPath } from "@/lib/utils";
 import { Route } from "@/routes";
 import { Button, Input, Skeleton } from "@kvib/react";
 import { Link as TSRLink } from "@tanstack/react-router";
@@ -8,11 +9,14 @@ type FunctionFolderProps = {
 };
 
 export function FunctionFolder({ functionId }: FunctionFolderProps) {
+	const { path } = Route.useSearch();
 	const { func, children, addChild } = useFunction(functionId, {
 		includeChildren: true,
 	});
 
 	const navigate = Route.useNavigate();
+
+	const selectedFunctionIds = getIdsFromPath(path);
 
 	return (
 		<div className="p-2 flex flex-col gap-2">
@@ -52,7 +56,10 @@ export function FunctionFolder({ functionId }: FunctionFolderProps) {
 							className="bg-transparent w-full"
 						>
 							<TSRLink
-								className="flex w-full p-2 text-start data-[status=active]:bg-green-200"
+								className={cn(
+									"flex w-full p-2 text-start data-[status=active]:bg-green-200",
+									selectedFunctionIds.includes(child.id) ? "bg-green-200" : "",
+								)}
 								to={Route.to}
 								search={{ path: child.path }}
 							>
