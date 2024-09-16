@@ -10,7 +10,7 @@ type FunctionFolderProps = {
 
 export function FunctionFolder({ functionId }: FunctionFolderProps) {
 	const { path } = Route.useSearch();
-	const { func, children, addChild } = useFunction(functionId, {
+	const { func, children, addFunction } = useFunction(functionId, {
 		includeChildren: true,
 	});
 
@@ -34,7 +34,7 @@ export function FunctionFolder({ functionId }: FunctionFolderProps) {
 						"name",
 					) as HTMLInputElement | null;
 					if (!nameElement) return;
-					addChild
+					addFunction
 						.mutateAsync({
 							name: nameElement.value,
 							description: null,

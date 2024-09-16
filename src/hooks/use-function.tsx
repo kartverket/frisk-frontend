@@ -85,75 +85,86 @@ export function useFunction(functionId: number, opts?: UseFunctionOpts) {
 		enabled: opts?.includeDependents,
 	});
 
-	const addChild = useMutation({
+	const addFunction = useMutation({
 		mutationFn: createFunction,
 		onMutate: async (_newFunction) => {
-			await queryClient.cancelQueries({
-				queryKey: ["functions", functionId, "children"],
-			});
-
-			const previousChildren = queryClient.getQueryData<BackendFunction[]>([
-				"functions",
-				functionId,
-				"children",
-			]);
-
 			const randomNegativeNumber = -Math.floor(Math.random() * 1000);
 			const newFunction: BackendFunction = {
 				..._newFunction,
 				id: randomNegativeNumber,
 				path: `${func.data?.path}.${randomNegativeNumber}`,
 			};
+			await queryClient.cancelQueries({
+				queryKey: ["functions", newFunction.parentId, "children"],
+			});
+
+			const previousChildren = queryClient.getQueryData<BackendFunction[]>([
+				"functions",
+				newFunction.parentId,
+				"children",
+			]);
+
 			if (previousChildren) {
 				queryClient.setQueryData<BackendFunction[]>(
-					["functions", functionId, "children"],
+					["functions", newFunction.parentId, "children"],
 					[...previousChildren, newFunction],
 				);
 			} else {
 				queryClient.setQueryData<BackendFunction[]>(
-					["functions", functionId, "children"],
+					["functions", newFunction.parentId, "children"],
 					[newFunction],
 				);
 			}
 
 			return { previousChildren };
 		},
-		onError: (_, __, context) => {
+		onError: (_, newFunction, context) => {
 			queryClient.setQueryData<BackendFunction[]>(
-				["functions", functionId, "children"],
-				context?.previousChildren,
+				["functions", newFunction.parentId, "children"],
+				context?.previousChildren ?? [],
 			);
 		},
-		onSettled: () => {
+		onSettled: (newFunction) => {
 			queryClient.invalidateQueries({
-				queryKey: ["functions", functionId, "children"],
+				queryKey: ["functions", newFunction?.parentId, "children"],
 			});
 		},
 	});
 
-	const removeChild = useMutation({
+	const removeFunction = useMutation({
 		mutationFn: deleteFunction,
-		onMutate: async (childId) => {
-			await queryClient.cancelQueries({
-				queryKey: ["functions", functionId, "children"],
-			});
-
-			const previousChildren = queryClient.getQueryData<BackendFunction[]>([
+		onMutate: async (deletedFunctionId) => {
+			const deletedFunction = queryClient.getQueryData<BackendFunction>([
 				"functions",
-				functionId,
-				"children",
+				deletedFunctionId,
 			]);
 
-			if (previousChildren) {
-				queryClient.setQueryData<BackendFunction[]>(
-					["functions", functionId, "children"],
-					previousChildren.filter((child) => child.id !== childId),
-				);
-			} else {
-				queryClient.setQueryData<BackendFunction[]>(
-					["functions", functionId, "children"],
-					[],
-				);
+			let previousChildren: BackendFunction[] | undefined;
+			if (deletedFunction) {
+				await queryClient.cancelQueries({
+					queryKey: ["functions", deletedFunction.parentId, "children"],
+				});
+				await queryClient.cancelQueries({
+					queryKey: ["functions", deletedFunctionId],
+				});
+
+				previousChildren = queryClient.getQueryData<BackendFunction[]>([
+					"functions",
+					deletedFunction.parentId,
+					"children",
+				]);
+
+				if (previousChildren) {
+					queryClient.setQueryData<BackendFunction[]>(
+						["functions", deletedFunction.parentId, "children"],
+						previousChildren.filter((child) => child.id !== deletedFunctionId),
+					);
+				} else {
+					queryClient.setQueryData<BackendFunction[]>(
+						["functions", deletedFunction.parentId, "children"],
+						[],
+					);
+				}
 			}
 
 			return { previousChildren };
@@ -161,15 +172,22 @@ export function useFunction(functionId: number, opts?: UseFunctionOpts) {
 		onError: (_, __, context) => {
 			queryClient.setQueryData<BackendFunction[]>(
 				["functions", functionId, "children"],
-				context?.previousChildren,
+				context?.previousChildren ?? [],
 			);
 		},
-		onSettled: (_, __, childId) => {
+		onSettled: (_, __, deletedFunctionId) => {
+			const deletedFunction = queryClient.getQueryData<BackendFunction>([
+				"functions",
+				deletedFunctionId,
+			]);
+
+			if (deletedFunction) {
+				queryClient.invalidateQueries({
+					queryKey: ["functions", deletedFunction.parentId, "children"],
+				});
+			}
 			queryClient.invalidateQueries({
-				queryKey: ["functions", functionId, "children"],
-			});
-			queryClient.invalidateQueries({
-				queryKey: ["functions", childId],
+				queryKey: ["functions", deletedFunctionId],
 			});
 		},
 	});
@@ -344,8 +362,8 @@ export function useFunction(functionId: number, opts?: UseFunctionOpts) {
 	return {
 		func,
 		children,
-		addChild,
-		removeChild,
+		addFunction,
+		removeFunction,
 		dependencies,
 		addDependency,
 		removeDependency,
