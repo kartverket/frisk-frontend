@@ -42,7 +42,7 @@ export function useFunction(functionId: number, opts?: UseFunctionOpts) {
 			}
 			return children;
 		},
-		enabled: opts?.includeChildren,
+		enabled: opts?.includeChildren === true,
 	});
 
 	const dependencies = useQuery({
@@ -63,7 +63,7 @@ export function useFunction(functionId: number, opts?: UseFunctionOpts) {
 			}
 			return dependencies;
 		},
-		enabled: opts?.includeDependencies,
+		enabled: opts?.includeDependencies === true,
 	});
 
 	const dependents = useQuery({
@@ -82,7 +82,7 @@ export function useFunction(functionId: number, opts?: UseFunctionOpts) {
 			}
 			return dependents;
 		},
-		enabled: opts?.includeDependents,
+		enabled: opts?.includeDependents === true,
 	});
 
 	const addFunction = useMutation({
