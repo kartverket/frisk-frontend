@@ -1,6 +1,9 @@
 import {
 	type Configuration,
+	type PopupRequest,
 	PublicClientApplication,
+	type RedirectRequest,
+	type SsoSilentRequest,
 } from "@azure/msal-browser";
 
 const clientId = import.meta.env.VITE_CLIENT_ID;
@@ -33,3 +36,12 @@ const configuration: Configuration = {
 };
 
 export const msalInstance = new PublicClientApplication(configuration);
+
+const scopes = import.meta.env.VITE_AUTH_SCOPES?.split(",") ?? [];
+
+export const authenticationRequest:
+	| PopupRequest
+	| RedirectRequest
+	| SsoSilentRequest = {
+	scopes,
+};
