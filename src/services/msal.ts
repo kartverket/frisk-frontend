@@ -4,17 +4,25 @@ import {
 } from "@azure/msal-browser";
 
 const clientId = import.meta.env.VITE_CLIENT_ID;
+const authority = import.meta.env.VITE_AUTHORITY;
+const redirectUri = import.meta.env.VITE_LOGIN_REDIRECT_URI;
 
 if (!clientId) {
 	throw new Error("Client ID is not set");
+}
+if (!authority) {
+	throw new Error("Authority is not set");
+}
+if (!redirectUri) {
+	throw new Error("Redirect URI is not set");
 }
 
 // MSAL configuration
 const configuration: Configuration = {
 	auth: {
 		clientId,
-		authority: "https://regelrettoutlook.ciamlogin.com/",
-		redirectUri: "http://localhost:5173", // Points to window.location.origin. You must register this URI on Microsoft Entra admin center/App Registration.
+		authority,
+		redirectUri, // Points to window.location.origin. You must register this URI on Microsoft Entra admin center/App Registration.
 		postLogoutRedirectUri: "/", // Indicates the page to navigate after logout.
 		navigateToLoginRequestUrl: false, // If "true", will navigate back to the original request location before processing the auth code response.
 	},
