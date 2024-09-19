@@ -1,5 +1,5 @@
 import { Header } from "@/components/header";
-import { FooterInline, KvibProvider } from "@kvib/react";
+import { Flex, FooterInline, KvibProvider } from "@kvib/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { createRootRoute, Outlet } from "@tanstack/react-router";
 
@@ -9,13 +9,13 @@ export const Route = createRootRoute({
 	component: () => (
 		<QueryClientProvider client={queryClient}>
 			<KvibProvider>
-				<div className="flex flex-col min-h-svh">
+				<Flex flexDirection="column" minHeight="100svh">
 					<Header />
 					<Outlet />
 					<footer>
 						<FooterInline />
 					</footer>
-				</div>
+				</Flex>
 			</KvibProvider>
 		</QueryClientProvider>
 	),

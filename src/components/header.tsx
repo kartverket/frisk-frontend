@@ -1,4 +1,4 @@
-import { Header as KvibHeader } from "@kvib/react";
+import { Flex, Header as KvibHeader, Text } from "@kvib/react";
 
 export function Header() {
 	return (
@@ -11,13 +11,19 @@ export function Header() {
 
 function WarningBanner() {
 	return (
-		<div className="bg-red-50 text-red-900 text-sm font-medium px-4 py-2 rounded-md flex items-center flex-col">
-			<p>
+		<Flex
+			bgColor="red.50"
+			textColor="red.500"
+			p={2}
+			alignItems="center"
+			flexDirection="column"
+		>
+			<Text>
 				Denne siden er under utvikling. Vi er ikke helt sikre på at alt funker
 				som det skal.
-			</p>
-			<p>Alt innhold blir liggende offentlig tilgjengelig.</p>
-			<p>Vær forsiktig med å legge inn sensitiv/hemmelig informasjon.</p>
-		</div>
+			</Text>
+			<Text>Alt innhold blir liggende offentlig tilgjengelig.</Text>
+			<Text>Vær forsiktig med å legge inn sensitiv/hemmelig informasjon.</Text>
+		</Flex>
 	);
 }

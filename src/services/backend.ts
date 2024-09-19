@@ -137,7 +137,6 @@ const BackendFunction = object({
 export type BackendFunction = z.infer<typeof BackendFunction>;
 
 type BackendFunctionCreate = Omit<BackendFunction, "id" | "path">;
-type BackendFunctionUpdate = BackendFunctionCreate;
 
 const FunctionDependency = object({
 	functionId: number().int(),

@@ -14,31 +14,25 @@
 	"dependencies": {
 		"@kvib/react": "4.5.0",
 		"@tanstack/react-query": "5.56.2",
-		"@tanstack/router-zod-adapter": "1.57.13",
-		"class-variance-authority": "0.7.0",
-		"clsx": "2.1.1",
+		"@tanstack/react-router": "1.58.3",
+		"@tanstack/router-zod-adapter": "1.58.3",
 		"react": "18.3.1",
 		"react-dom": "18.3.1",
-		"tailwind-merge": "2.5.2",
-		"tailwindcss-animate": "1.0.7",
 		"zod": "3.23.8"
 	},
 	"devDependencies": {
-		"@biomejs/biome": "1.9.0",
-		"@tanstack/router-devtools": "1.57.13",
-		"@tanstack/router-plugin": "1.57.13",
+		"@biomejs/biome": "1.9.1",
+		"@tanstack/router-devtools": "1.58.3",
+		"@tanstack/router-plugin": "1.58.4",
 		"@total-typescript/ts-reset": "^0.6.1",
 		"@types/bun": "1.1.9",
-		"@types/react": "18.3.5",
+		"@types/react": "18.3.7",
 		"@types/react-dom": "18.3.0",
 		"@vitejs/plugin-react": "4.3.1",
-		"autoprefixer": "10.4.20",
 		"globals": "15.9.0",
 		"husky": "^9.1.6",
 		"lint-staged": "^15.2.10",
-		"postcss": "8.4.45",
-		"tailwindcss": "3.4.11",
 		"typescript": "5.6.2",
-		"vite": "5.4.4"
+		"vite": "5.4.6"
 	}
 }
