@@ -11,9 +11,11 @@ export function Breadcrumbs({ path }: BreadcrumbsProps) {
 	const ids = path.split(".").map((id) => Number.parseInt(id));
 
 	return (
-		<Breadcrumb p={2}>
+		<Breadcrumb p={4}>
 			{ids?.map((id) => (
-				<CustomBreadcrumbItem key={id} functionId={id} />
+				<BreadcrumbItem key={id}>
+					<CustomBreadcrumbLink functionId={id} />
+				</BreadcrumbItem>
 			))}
 		</Breadcrumb>
 	);
@@ -22,17 +24,15 @@ export function Breadcrumbs({ path }: BreadcrumbsProps) {
 type BreadcrumbItemProps = {
 	functionId: number;
 };
-function CustomBreadcrumbItem({ functionId }: BreadcrumbItemProps) {
+function CustomBreadcrumbLink({ functionId }: BreadcrumbItemProps) {
 	const { func } = useFunction(functionId);
 	const { path } = Route.useSearch();
 
 	return (
-		<BreadcrumbItem>
-			<TSRLink to={Route.to} search={{ path: func.data?.path }}>
-				<BreadcrumbLink as="span" isCurrentPage={path === func.data?.path}>
-					{func.data?.name}
-				</BreadcrumbLink>
-			</TSRLink>
-		</BreadcrumbItem>
+		<TSRLink to={Route.to} search={{ path: func.data?.path }}>
+			<BreadcrumbLink as="span" isCurrentPage={path === func.data?.path}>
+				{func.data?.name}
+			</BreadcrumbLink>
+		</TSRLink>
 	);
 }
