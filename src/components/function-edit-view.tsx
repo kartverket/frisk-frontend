@@ -112,7 +112,7 @@ export function FunctionEditView({
 				onEditComplete?.();
 			}}
 		>
-			<FormControl className="flex flex-col gap-2">
+			<FormControl>
 				<FormLabel htmlFor="name">Navn</FormLabel>
 				<Input
 					type="text"

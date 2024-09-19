@@ -11,7 +11,7 @@ export function Breadcrumbs({ path }: BreadcrumbsProps) {
 	const ids = path.split(".").map((id) => Number.parseInt(id));
 
 	return (
-		<Breadcrumb className="p-2">
+		<Breadcrumb p={2}>
 			{ids?.map((id) => (
 				<CustomBreadcrumbItem key={id} functionId={id} />
 			))}

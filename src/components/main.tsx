@@ -1,12 +1,9 @@
-import { cn } from "@/lib/utils";
+import { Flex } from "@kvib/react";
 
-export function Main({
-	children,
-	className,
-}: { children: React.ReactNode; className?: string }) {
+export function Main({ children }: { children: React.ReactNode }) {
 	return (
-		<main className={cn("bg-gray-50 h-full w-full flex flex-col", className)}>
+		<Flex as="main" h="100%" w="100%" flexDirection="column">
 			{children}
-		</main>
+		</Flex>
 	);
 }

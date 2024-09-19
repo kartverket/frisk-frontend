@@ -43,7 +43,7 @@ function Index() {
 	}, [func.error, navigate, idArray]);
 
 	return (
-		<Main className="flex flex-col gap-2">
+		<Main>
 			<Breadcrumbs path={path} />
 			<FunctionView functionId={id} />
 			<FunctionColumnView path={path} />

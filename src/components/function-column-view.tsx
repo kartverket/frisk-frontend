@@ -1,3 +1,4 @@
+import { Flex } from "@kvib/react";
 import { FunctionFolder } from "./function-folder";
 import { getIdsFromPath } from "@/lib/utils";
 
@@ -9,10 +10,10 @@ export function FunctionColumnView({ path }: FunctionColumnViewProps) {
 	const selectedFunctionIds = getIdsFromPath(path);
 
 	return (
-		<div className="flex gap-2 w-full">
+		<Flex w="100%" gap={2}>
 			{selectedFunctionIds?.map((id) => (
 				<FunctionFolder key={id} functionId={id} />
 			))}
-		</div>
+		</Flex>
 	);
 }
