@@ -14,7 +14,7 @@ export function Breadcrumbs({ path }: BreadcrumbsProps) {
 		<Breadcrumb p={4}>
 			{ids?.map((id) => (
 				<BreadcrumbItem key={id}>
-					<CustomBreadcrumbLink key={id} functionId={id} />
+					<CustomBreadcrumbLink functionId={id} />
 				</BreadcrumbItem>
 			))}
 		</Breadcrumb>
