@@ -45,17 +45,26 @@ export async function getChildren(id: number) {
 	return array(BackendFunction).parse(json);
 }
 
-export async function createFunction({
-	name,
-	description,
-	parentId,
-}: BackendFunctionCreate) {
+export async function createFunction(newFunction: BackendFunctionCreate) {
 	const response = await fetchFromBackend("/functions", {
 		method: "POST",
 		headers: {
 			"Content-Type": "application/json",
 		},
-		body: JSON.stringify({ name, description, parentId }),
+		body: JSON.stringify(newFunction),
+	});
+
+	const json = await response.json();
+	return BackendFunction.parse(json);
+}
+
+export async function putFunction({ id, ...updatedFunction }: BackendFunction) {
+	const response = await fetchFromBackend(`/functions/${id}`, {
+		method: "PUT",
+		headers: {
+			"Content-Type": "application/json",
+		},
+		body: JSON.stringify(updatedFunction),
 	});
 
 	const json = await response.json();
@@ -68,21 +77,15 @@ export async function deleteFunction(id: number) {
 	});
 }
 
-export async function createDependency({
-	functionId,
-	dependencyFunctionId,
-}: {
-	functionId: number;
-	dependencyFunctionId: number;
-}) {
+export async function createDependency(functionDependency: FunctionDependency) {
 	const response = await fetchFromBackend(
-		`/functions/${functionId}/dependencies`,
+		`/functions/${functionDependency.functionId}/dependencies`,
 		{
 			method: "POST",
 			headers: {
 				"Content-Type": "application/json",
 			},
-			body: JSON.stringify({ functionId, dependencyFunctionId }),
+			body: JSON.stringify(functionDependency),
 		},
 	);
 
@@ -134,6 +137,7 @@ const BackendFunction = object({
 export type BackendFunction = z.infer<typeof BackendFunction>;
 
 type BackendFunctionCreate = Omit<BackendFunction, "id" | "path">;
+type BackendFunctionUpdate = BackendFunctionCreate;
 
 const FunctionDependency = object({
 	functionId: number().int(),
