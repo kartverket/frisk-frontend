@@ -12,6 +12,8 @@
 		"prepare": "husky"
 	},
 	"dependencies": {
+		"@azure/msal-browser": "^3.23.0",
+		"@azure/msal-react": "^2.0.22",
 		"@kvib/react": "4.5.0",
 		"@tanstack/react-query": "5.56.2",
 		"@tanstack/react-router": "1.58.3",

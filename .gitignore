@@ -23,3 +23,6 @@ dist-ssr
 
 # bun
 *.tsbuildinfo
+
+# environment files
+.env

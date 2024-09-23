@@ -1,15 +1,30 @@
 import { array, number, object, string, type z } from "zod";
+import { msalInstance } from "./msal";
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL ?? "http://localhost:8080";
-const BEARER_TOKEN = import.meta.env.BEARER_TOKEN ?? "test123";
+
+function getIdToken() {
+	const accounts = msalInstance.getAllAccounts();
+	const account = accounts[0];
+	if (!account) {
+		throw new Error("No active account");
+	}
+
+	const a = account.idToken;
+	if (!a) {
+		throw new Error("No id token");
+	}
+	return a;
+}
 
 // backend fetcher that appends the Bearer token to the request
 async function fetchFromBackend(path: string, options: RequestInit) {
+	const idToken = getIdToken();
 	const response = await fetch(`${BACKEND_URL}${path}`, {
 		...options,
 		headers: {
 			...options.headers,
-			Authorization: `Bearer ${BEARER_TOKEN}`,
+			Authorization: `Bearer ${idToken}`,
 		},
 	});
 	if (!response.ok) {
