@@ -1,7 +1,7 @@
 import { Route } from "@/routes";
 import { FunctionEditView } from "./function-edit-view";
 import { FunctionInfoView } from "./function-info-view";
-import { Button } from "@kvib/react";
+import { Button, Flex } from "@kvib/react";
 
 type FunctionViewProps = {
 	functionId: number;
@@ -21,7 +21,7 @@ export function FunctionView({ functionId }: FunctionViewProps) {
 	}
 
 	return (
-		<div className="p-2 flex flex-col gap-2">
+		<Flex p={2} gap={2} flexDirection="column">
 			{edit ? (
 				<FunctionEditView
 					functionId={functionId}
@@ -38,6 +38,6 @@ export function FunctionView({ functionId }: FunctionViewProps) {
 					Rediger
 				</Button>
 			)}
-		</div>
+		</Flex>
 	);
 }

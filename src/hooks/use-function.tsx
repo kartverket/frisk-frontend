@@ -9,6 +9,7 @@ import {
 	getDependencies,
 	getDependents,
 	getFunction,
+	putFunction,
 } from "@/services/backend";
 
 type UseFunctionOpts = {
@@ -127,6 +128,116 @@ export function useFunction(functionId: number, opts?: UseFunctionOpts) {
 		onSettled: (newFunction) => {
 			queryClient.invalidateQueries({
 				queryKey: ["functions", newFunction?.parentId, "children"],
+			});
+		},
+	});
+
+	const updateFunction = useMutation({
+		mutationFn: putFunction,
+		onMutate: async (_updatedFunction) => {
+			const oldFunction = queryClient.getQueryData<BackendFunction>([
+				"functions",
+				_updatedFunction.id,
+			]);
+			if (!oldFunction) return;
+
+			queryClient.cancelQueries({
+				queryKey: ["functions", _updatedFunction.id],
+			});
+
+			const updatedFunction = structuredClone(_updatedFunction);
+
+			let previousOldParentChildren: BackendFunction[] | undefined;
+			let previousUpdatedParentChildren: BackendFunction[] | undefined;
+			if (
+				oldFunction.parentId &&
+				oldFunction.parentId !== _updatedFunction.parentId
+			) {
+				const newParent = queryClient.getQueryData<BackendFunction>([
+					"functions",
+					_updatedFunction.parentId,
+				]);
+				if (newParent) {
+					updatedFunction.path = `${newParent.path}.${updatedFunction.id}`;
+				}
+				previousOldParentChildren = queryClient.getQueryData<BackendFunction[]>(
+					["functions", oldFunction.parentId, "children"],
+				);
+				if (previousOldParentChildren) {
+					queryClient.setQueryData<BackendFunction[]>(
+						["functions", oldFunction.parentId, "children"],
+						previousOldParentChildren.filter(
+							(child) => child.id !== oldFunction.id,
+						),
+					);
+				} else {
+					queryClient.setQueryData<BackendFunction[]>(
+						["functions", oldFunction.parentId, "children"],
+						[],
+					);
+				}
+			}
+			if (updatedFunction.parentId) {
+				previousUpdatedParentChildren = queryClient.getQueryData<
+					BackendFunction[]
+				>(["functions", updatedFunction.parentId, "children"]);
+				if (previousUpdatedParentChildren) {
+					queryClient.setQueryData<BackendFunction[]>(
+						["functions", updatedFunction.parentId, "children"],
+						[...previousUpdatedParentChildren, updatedFunction],
+					);
+				} else {
+					queryClient.setQueryData<BackendFunction[]>(
+						["functions", updatedFunction.parentId, "children"],
+						[updatedFunction],
+					);
+				}
+			}
+
+			queryClient.setQueryData<BackendFunction>(
+				["functions", _updatedFunction.id],
+				updatedFunction,
+			);
+
+			return {
+				oldFunction,
+				previousOldParentChildren,
+				previousUpdatedParentChildren,
+			};
+		},
+		onError: (_, vars, context) => {
+			if (
+				context?.oldFunction &&
+				context.oldFunction.parentId !== vars.parentId
+			) {
+				queryClient.setQueryData<BackendFunction[]>(
+					["functions", context.oldFunction.parentId, "children"],
+					context?.previousOldParentChildren,
+				);
+			}
+			queryClient.setQueryData<BackendFunction[]>(
+				["functions", vars.parentId, "children"],
+				context?.previousUpdatedParentChildren,
+			);
+			queryClient.setQueryData<BackendFunction>(
+				["functions", vars.id],
+				context?.oldFunction,
+			);
+		},
+		onSettled: (_, __, req, context) => {
+			if (
+				context?.oldFunction &&
+				context.oldFunction.parentId !== req.parentId
+			) {
+				queryClient.invalidateQueries({
+					queryKey: ["functions", context.oldFunction.parentId, "children"],
+				});
+			}
+			queryClient.invalidateQueries({
+				queryKey: ["functions", req.parentId, "children"],
+			});
+			queryClient.invalidateQueries({
+				queryKey: ["functions", req.id],
 			});
 		},
 	});
@@ -363,6 +474,7 @@ export function useFunction(functionId: number, opts?: UseFunctionOpts) {
 		func,
 		children,
 		addFunction,
+		updateFunction,
 		removeFunction,
 		dependencies,
 		addDependency,

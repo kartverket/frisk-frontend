@@ -1,7 +1,14 @@
 import { useFunction } from "@/hooks/use-function";
 import { Route } from "@/routes";
 import { Link as TSRLink } from "@tanstack/react-router";
-import { Skeleton, Link as KvibLink, List, ListItem } from "@kvib/react";
+import {
+	Skeleton,
+	Link as KvibLink,
+	List,
+	ListItem,
+	Box,
+	Text,
+} from "@kvib/react";
 
 type FunctionInfoViewProps = {
 	functionId: number;
@@ -15,11 +22,11 @@ export function FunctionInfoView({ functionId }: FunctionInfoViewProps) {
 
 	return (
 		<Skeleton isLoaded={!!func.data} fitContent>
-			<div className="p-2">
-				<p>Funksjonsnavn: {func.data?.name}</p>
-				<p>Beskrivelse: {func.data?.description}</p>
+			<Box p={2}>
+				<Text>Funksjonsnavn: {func.data?.name}</Text>
+				<Text>Beskrivelse: {func.data?.description}</Text>
 
-				<p className="font-bold">Avhengig av</p>
+				<Text>Avhengigheter</Text>
 				<List>
 					{dependencies.data?.map((dependency) => (
 						<ListItem key={dependency.id}>
@@ -30,7 +37,7 @@ export function FunctionInfoView({ functionId }: FunctionInfoViewProps) {
 					))}
 				</List>
 
-				<p className="font-bold">Brukes av</p>
+				<Text>Brukes av</Text>
 				<List>
 					{dependents.data?.map((dependent) => (
 						<ListItem key={dependent.id}>
@@ -40,7 +47,7 @@ export function FunctionInfoView({ functionId }: FunctionInfoViewProps) {
 						</ListItem>
 					))}
 				</List>
-			</div>
+			</Box>
 		</Skeleton>
 	);
 }

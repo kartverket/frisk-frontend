@@ -25,6 +25,7 @@ export function FunctionEditView({
 	const { path } = Route.useSearch();
 	const {
 		func,
+		updateFunction,
 		removeFunction,
 		dependencies,
 		addDependency,
@@ -65,9 +66,26 @@ export function FunctionEditView({
 
 	return (
 		<form
-			onSubmit={(e) => {
+			onSubmit={async (e) => {
 				e.preventDefault();
 				if (!func.data) return;
+				const newNameElement = e.currentTarget.elements.namedItem(
+					"name",
+				) as HTMLInputElement | null;
+				const newDescriptionElement = e.currentTarget.elements.namedItem(
+					"description",
+				) as HTMLInputElement | null;
+
+				await updateFunction.mutateAsync({
+					...func.data,
+					...(newNameElement?.value && newNameElement.value !== func.data.name
+						? { name: newNameElement.value }
+						: {}),
+					...(newDescriptionElement?.value &&
+					newDescriptionElement.value !== func.data.description
+						? { description: newDescriptionElement.value }
+						: {}),
+				});
 
 				const dependenciesToCreate = newDependencies.filter(
 					(dependency) =>
@@ -94,10 +112,9 @@ export function FunctionEditView({
 				onEditComplete?.();
 			}}
 		>
-			<FormControl className="flex flex-col gap-2">
+			<FormControl>
 				<FormLabel htmlFor="name">Navn</FormLabel>
 				<Input
-					disabled
 					type="text"
 					name="name"
 					placeholder="Navn"
@@ -107,7 +124,6 @@ export function FunctionEditView({
 
 				<FormLabel htmlFor="description">Beskrivelse</FormLabel>
 				<Textarea
-					disabled
 					name="description"
 					placeholder="Beskrivelse"
 					defaultValue={func.data?.description ?? ""}
