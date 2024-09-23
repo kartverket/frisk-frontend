@@ -20,7 +20,6 @@ function getIdToken() {
 // backend fetcher that appends the Bearer token to the request
 async function fetchFromBackend(path: string, options: RequestInit) {
 	const idToken = getIdToken();
-	console.log({ idToken });
 	const response = await fetch(`${BACKEND_URL}${path}`, {
 		...options,
 		headers: {
