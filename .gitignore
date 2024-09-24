@@ -25,4 +25,4 @@ dist-ssr
 *.tsbuildinfo
 
 # environment files
-.env
+.env*.local

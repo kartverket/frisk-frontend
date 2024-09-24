@@ -18,7 +18,7 @@ function getIdToken() {
 }
 
 // backend fetcher that appends the Bearer token to the request
-async function fetchFromBackend(path: string, options: RequestInit) {
+async function fetchFromBackend(path: Path, options: RequestInit) {
 	const idToken = getIdToken();
 	const response = await fetch(`${BACKEND_URL}${path}`, {
 		...options,
@@ -158,3 +158,5 @@ const FunctionDependency = object({
 	dependencyFunctionId: number().int(),
 });
 export type FunctionDependency = z.infer<typeof FunctionDependency>;
+
+type Path = `/${string}`;
