@@ -1,9 +1,9 @@
 FROM oven/bun:1 AS build
 WORKDIR /react-app
 COPY package*.json ./
-RUN bun install
+COPY bun.lockb ./
+RUN bun install --frozen-lockfile
 COPY . .
-ENV VITE_BACKEND_URL="https://frisk-backend.fly.dev"
 RUN bun run build
 
 FROM nginx:1.19
