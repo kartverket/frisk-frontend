@@ -176,6 +176,12 @@ export async function createFunctionMetadata(
 	});
 }
 
+export async function deleteFunctionMetadata(id: number) {
+	await fetchFromBackend(`/metadata/${id}`, {
+		method: "DELETE",
+	});
+}
+
 const BackendFunction = object({
 	id: number().int(),
 	name: string(),

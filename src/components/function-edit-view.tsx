@@ -3,12 +3,15 @@ import { getIdsFromPath } from "@/lib/utils";
 import { Route } from "@/routes";
 import { type BackendFunction, getFunctions } from "@/services/backend";
 import {
+	Box,
 	Button,
+	Flex,
 	FormControl,
 	FormLabel,
 	Icon,
 	Input,
 	SearchAsync,
+	Text,
 	Textarea,
 } from "@kvib/react";
 import { useCallback, useState } from "react";
@@ -30,8 +33,12 @@ export function FunctionEditView({
 		dependencies,
 		addDependency,
 		removeDependency,
+		metadata,
+		addMetadata,
+		removeMetadata,
 	} = useFunction(functionId, {
 		includeDependencies: true,
+		includeMetadata: true,
 	});
 	const [newDependencies, setDependencies] = useState<
 		{ label: string; value: number }[]
@@ -157,6 +164,65 @@ export function FunctionEditView({
 					}}
 					placeholder="Søk"
 				/>
+
+				{metadata.data?.map((metadata) => (
+					<Flex gap={2} key={metadata.id}>
+						<Text>{metadata.key}</Text>
+						<Text>{metadata.value}</Text>
+						<Button
+							type="button"
+							colorScheme="red"
+							onClick={() => {
+								removeMetadata.mutate(metadata.id);
+							}}
+						>
+							<Icon icon="delete" />
+						</Button>
+					</Flex>
+				))}
+
+				<Flex gap={2}>
+					<Box>
+						<FormLabel htmlFor="metadata-key">Metadata nøkkel</FormLabel>
+						<Input
+							id="metadata-key"
+							type="text"
+							name="metadata-key"
+							placeholder="Metadata nøkkel"
+						/>
+					</Box>
+					<Box>
+						<FormLabel htmlFor="metadata-value">Metadata verdi</FormLabel>
+						<Input
+							id="metadata-value"
+							type="text"
+							name="metadata-value"
+							placeholder="Metadata verdi"
+						/>
+					</Box>
+					<Button
+						type="button"
+						colorScheme="blue"
+						onClick={() => {
+							if (!func.data) return;
+							const metadataKeyElement = document.getElementById(
+								"metadata-key",
+							) as HTMLInputElement;
+							const metadataValueElement = document.getElementById(
+								"metadata-value",
+							) as HTMLInputElement;
+							addMetadata.mutate({
+								functionId: func.data.id,
+								key: metadataKeyElement.value,
+								value: metadataValueElement.value,
+							});
+							metadataKeyElement.value = "";
+							metadataValueElement.value = "";
+						}}
+					>
+						Legg til
+					</Button>
+				</Flex>
 
 				<Button type="submit">Lagre</Button>
 				<Button
