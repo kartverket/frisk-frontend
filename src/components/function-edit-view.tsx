@@ -165,8 +165,9 @@ export function FunctionEditView({
 					placeholder="Søk"
 				/>
 
+				<FormLabel>Metadata</FormLabel>
 				{metadata.data?.map((metadata) => (
-					<Flex gap={2} key={metadata.id}>
+					<Flex gap={2} alignItems="center" key={metadata.id}>
 						<Text>{metadata.key}</Text>
 						<Text>{metadata.value}</Text>
 						<Button
@@ -184,7 +185,7 @@ export function FunctionEditView({
 					</Flex>
 				))}
 
-				<Flex gap={2}>
+				<Flex gap={2} alignItems="flex-end">
 					<Box>
 						<FormLabel htmlFor="metadata-key">Metadata nøkkel</FormLabel>
 						<Input
@@ -229,6 +230,7 @@ export function FunctionEditView({
 
 				<Button type="submit">Lagre</Button>
 				<Button
+					type="button"
 					colorScheme="red"
 					disabled={!func.data}
 					onClick={() => {
