@@ -15,9 +15,10 @@ type FunctionInfoViewProps = {
 };
 
 export function FunctionInfoView({ functionId }: FunctionInfoViewProps) {
-	const { func, dependencies, dependents } = useFunction(functionId, {
+	const { func, dependencies, dependents, metadata } = useFunction(functionId, {
 		includeDependencies: true,
 		includeDependents: true,
+		includeMetadata: true,
 	});
 
 	return (
@@ -44,6 +45,17 @@ export function FunctionInfoView({ functionId }: FunctionInfoViewProps) {
 							<TSRLink to={Route.to} search={{ path: dependent.path }}>
 								<KvibLink as="span">{dependent.name}</KvibLink>
 							</TSRLink>
+						</ListItem>
+					))}
+				</List>
+
+				<Text>Metadata</Text>
+				<List>
+					{metadata.data?.map((metadata) => (
+						<ListItem key={metadata.id}>
+							<Text>
+								{metadata.key}: {metadata.value}
+							</Text>
 						</ListItem>
 					))}
 				</List>

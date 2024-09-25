@@ -76,16 +76,21 @@ export function FunctionEditView({
 					"description",
 				) as HTMLInputElement | null;
 
-				await updateFunction.mutateAsync({
-					...func.data,
-					...(newNameElement?.value && newNameElement.value !== func.data.name
-						? { name: newNameElement.value }
-						: {}),
-					...(newDescriptionElement?.value &&
-					newDescriptionElement.value !== func.data.description
-						? { description: newDescriptionElement.value }
-						: {}),
-				});
+				if (
+					func.data.name !== newNameElement?.value ||
+					(func.data.description ?? "") !== newDescriptionElement?.value
+				) {
+					await updateFunction.mutateAsync({
+						...func.data,
+						...(newNameElement?.value && newNameElement.value !== func.data.name
+							? { name: newNameElement.value }
+							: {}),
+						...(newDescriptionElement?.value &&
+						newDescriptionElement.value !== func.data.description
+							? { description: newDescriptionElement.value }
+							: {}),
+					});
+				}
 
 				const dependenciesToCreate = newDependencies.filter(
 					(dependency) =>

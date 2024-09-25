@@ -142,6 +142,40 @@ export async function getDependents(functionId: number) {
 	return array(number().int()).parse(json);
 }
 
+export async function getMetadataKeys(search?: string) {
+	const response = await fetchFromBackend(
+		`/metadata/keys${search ? `?search=${search}` : ""}`,
+		{
+			method: "GET",
+		},
+	);
+	const json = await response.json();
+	return array(string()).parse(json);
+}
+
+export async function getFunctionMetadata(functionId: number) {
+	const response = await fetchFromBackend(`/functions/${functionId}/metadata`, {
+		method: "GET",
+	});
+	const json = await response.json();
+	return array(FunctionMetadata).parse(json);
+}
+
+export async function createFunctionMetadata(
+	functionMetadata: FunctionMetadataCreate,
+) {
+	await fetchFromBackend(`/functions/${functionMetadata.functionId}/metadata`, {
+		method: "POST",
+		headers: {
+			"Content-Type": "application/json",
+		},
+		body: JSON.stringify({
+			key: functionMetadata.key,
+			value: functionMetadata.value,
+		}),
+	});
+}
+
 const BackendFunction = object({
 	id: number().int(),
 	name: string(),
@@ -150,7 +184,6 @@ const BackendFunction = object({
 	parentId: number().int().nullable(),
 });
 export type BackendFunction = z.infer<typeof BackendFunction>;
-
 type BackendFunctionCreate = Omit<BackendFunction, "id" | "path">;
 
 const FunctionDependency = object({
@@ -158,5 +191,14 @@ const FunctionDependency = object({
 	dependencyFunctionId: number().int(),
 });
 export type FunctionDependency = z.infer<typeof FunctionDependency>;
+
+const FunctionMetadata = object({
+	id: number().int(),
+	functionId: number().int(),
+	key: string(),
+	value: string(),
+});
+export type FunctionMetadata = z.infer<typeof FunctionMetadata>;
+type FunctionMetadataCreate = Omit<FunctionMetadata, "id">;
 
 type Path = `/${string}`;
