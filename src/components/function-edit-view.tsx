@@ -1,7 +1,11 @@
 import { useFunction } from "@/hooks/use-function";
 import { getIdsFromPath } from "@/lib/utils";
 import { Route } from "@/routes";
-import { type BackendFunction, getFunctions } from "@/services/backend";
+import {
+	type BackendFunction,
+	getFunctions,
+	getMetadataKeys,
+} from "@/services/backend";
 import {
 	Box,
 	Button,
@@ -48,6 +52,10 @@ export function FunctionEditView({
 			value: dependency.id,
 		})) ?? [],
 	);
+
+	const [customMetadataKey, setCustomMetadataKey] = useState<string>("");
+	const [useCustomMetadataKey, setUseCustomMetadataKey] =
+		useState<boolean>(false);
 
 	const navigate = Route.useNavigate();
 
@@ -188,12 +196,50 @@ export function FunctionEditView({
 				<Flex gap={2} alignItems="flex-end">
 					<Box>
 						<FormLabel htmlFor="metadata-key">Metadata nøkkel</FormLabel>
-						<Input
-							id="metadata-key"
-							type="text"
-							name="metadata-key"
-							placeholder="Metadata nøkkel"
-						/>
+						{useCustomMetadataKey && customMetadataKey ? (
+							<Input
+								id="metadata-key"
+								value={customMetadataKey}
+								onChange={(e) => setCustomMetadataKey(e.target.value)}
+								type="text"
+								name="metadata-key"
+								placeholder="Metadata nøkkel"
+							/>
+						) : (
+							<SearchAsync
+								value={{
+									label: customMetadataKey,
+									value: customMetadataKey,
+								}}
+								isClearable={false}
+								debounceTime={100}
+								defaultOptions
+								dropdownIndicator={<Icon icon="expand_more" weight={400} />}
+								loadOptions={(inputValue, callback) => {
+									getMetadataKeys(inputValue).then((metadataKeys) => {
+										const metaOpts = metadataKeys.map((metadataKey) => ({
+											label: metadataKey,
+											value: metadataKey,
+										}));
+										callback(metaOpts);
+									});
+								}}
+								noOptionsMessage={({ inputValue }) => (
+									<Button
+										onClick={() => {
+											setCustomMetadataKey(inputValue);
+											setUseCustomMetadataKey(true);
+										}}
+									>
+										<Icon icon="add" /> Bruk {inputValue}
+									</Button>
+								)}
+								onChange={(newValue) =>
+									setCustomMetadataKey(newValue?.value ?? "")
+								}
+								placeholder="Søk"
+							/>
+						)}
 					</Box>
 					<Box>
 						<FormLabel htmlFor="metadata-value">Metadata verdi</FormLabel>
@@ -220,7 +266,7 @@ export function FunctionEditView({
 								key: metadataKeyElement.value,
 								value: metadataValueElement.value,
 							});
-							metadataKeyElement.value = "";
+							setCustomMetadataKey("");
 							metadataValueElement.value = "";
 						}}
 					>
