@@ -173,7 +173,10 @@ export function FunctionEditView({
 							type="button"
 							colorScheme="red"
 							onClick={() => {
-								removeMetadata.mutate(metadata.id);
+								removeMetadata.mutate({
+									id: metadata.id,
+									functionId: metadata.functionId,
+								});
 							}}
 						>
 							<Icon icon="delete" />
