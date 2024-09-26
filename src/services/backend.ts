@@ -1,30 +1,43 @@
 import { array, number, object, string, type z } from "zod";
-import { msalInstance } from "./msal";
+import { msalInstance, scopes } from "./msal";
+import { InteractionRequiredAuthError } from "@azure/msal-browser";
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL ?? "http://localhost:8080";
 
-function getIdToken() {
+async function getTokens() {
 	const accounts = msalInstance.getAllAccounts();
 	const account = accounts[0];
 	if (!account) {
 		throw new Error("No active account");
 	}
+	const tokenResponse = await msalInstance
+		.acquireTokenSilent({
+			scopes: scopes,
+			account: account,
+		})
+		.catch((error) => {
+			if (error instanceof InteractionRequiredAuthError) {
+				return msalInstance.acquireTokenRedirect({
+					scopes: scopes,
+					account: account,
+				});
+			}
+		});
 
-	const a = account.idToken;
-	if (!a) {
-		throw new Error("No id token");
+	if (!tokenResponse) {
+		throw new Error("No tokenResponse");
 	}
-	return a;
+	return tokenResponse;
 }
 
 // backend fetcher that appends the Bearer token to the request
 async function fetchFromBackend(path: Path, options: RequestInit) {
-	const idToken = getIdToken();
+	const tokens = await getTokens();
 	const response = await fetch(`${BACKEND_URL}${path}`, {
 		...options,
 		headers: {
 			...options.headers,
-			Authorization: `Bearer ${idToken}`,
+			Authorization: `Bearer ${tokens.idToken}`,
 		},
 	});
 	if (!response.ok) {
