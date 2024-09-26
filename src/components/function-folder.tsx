@@ -59,7 +59,7 @@ export function FunctionFolder({ functionId }: FunctionFolderProps) {
 					{children.data?.map((child) => (
 						<ListItem key={child.id + child.name + child.parentId + child.path}>
 							<FunctionFolderItem
-								backendFunction={child}
+								functionId={child.id}
 								selected={selectedFunctionIds.includes(child.id)}
 							/>
 						</ListItem>
