@@ -1,9 +1,8 @@
 import { useFunction } from "@/hooks/use-function";
 import { Route } from "@/routes";
-import { BackendFunction } from "@/services/backend";
 import { Card, Flex, Icon, IconButton, Input, Text } from "@kvib/react";
 import { Link as TSRLink } from "@tanstack/react-router";
-import { useCallback, useRef, useState } from "react";
+import { useRef, useState } from "react";
 
 export function FunctionFolderItem({
 	functionId,
