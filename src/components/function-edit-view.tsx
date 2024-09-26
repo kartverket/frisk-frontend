@@ -1,14 +1,21 @@
 import { useFunction } from "@/hooks/use-function";
 import { getIdsFromPath } from "@/lib/utils";
 import { Route } from "@/routes";
-import { type BackendFunction, getFunctions } from "@/services/backend";
 import {
+	type BackendFunction,
+	getFunctions,
+	getMetadataKeys,
+} from "@/services/backend";
+import {
+	Box,
 	Button,
+	Flex,
 	FormControl,
 	FormLabel,
 	Icon,
 	Input,
 	SearchAsync,
+	Text,
 	Textarea,
 } from "@kvib/react";
 import { useCallback, useState } from "react";
@@ -30,8 +37,12 @@ export function FunctionEditView({
 		dependencies,
 		addDependency,
 		removeDependency,
+		metadata,
+		addMetadata,
+		removeMetadata,
 	} = useFunction(functionId, {
 		includeDependencies: true,
+		includeMetadata: true,
 	});
 	const [newDependencies, setDependencies] = useState<
 		{ label: string; value: number }[]
@@ -41,6 +52,10 @@ export function FunctionEditView({
 			value: dependency.id,
 		})) ?? [],
 	);
+
+	const [customMetadataKey, setCustomMetadataKey] = useState<string>("");
+	const [useCustomMetadataKey, setUseCustomMetadataKey] =
+		useState<boolean>(false);
 
 	const navigate = Route.useNavigate();
 
@@ -76,16 +91,21 @@ export function FunctionEditView({
 					"description",
 				) as HTMLInputElement | null;
 
-				await updateFunction.mutateAsync({
-					...func.data,
-					...(newNameElement?.value && newNameElement.value !== func.data.name
-						? { name: newNameElement.value }
-						: {}),
-					...(newDescriptionElement?.value &&
-					newDescriptionElement.value !== func.data.description
-						? { description: newDescriptionElement.value }
-						: {}),
-				});
+				if (
+					func.data.name !== newNameElement?.value ||
+					(func.data.description ?? "") !== newDescriptionElement?.value
+				) {
+					await updateFunction.mutateAsync({
+						...func.data,
+						...(newNameElement?.value && newNameElement.value !== func.data.name
+							? { name: newNameElement.value }
+							: {}),
+						...(newDescriptionElement?.value &&
+						newDescriptionElement.value !== func.data.description
+							? { description: newDescriptionElement.value }
+							: {}),
+					});
+				}
 
 				const dependenciesToCreate = newDependencies.filter(
 					(dependency) =>
@@ -153,8 +173,110 @@ export function FunctionEditView({
 					placeholder="Søk"
 				/>
 
+				<FormLabel>Metadata</FormLabel>
+				{metadata.data?.map((metadata) => (
+					<Flex gap={2} alignItems="center" key={metadata.id}>
+						<Text>{metadata.key}</Text>
+						<Text>{metadata.value}</Text>
+						<Button
+							type="button"
+							colorScheme="red"
+							onClick={() => {
+								removeMetadata.mutate({
+									id: metadata.id,
+									functionId: metadata.functionId,
+								});
+							}}
+						>
+							<Icon icon="delete" />
+						</Button>
+					</Flex>
+				))}
+
+				<Flex gap={2} alignItems="flex-end">
+					<Box>
+						<FormLabel htmlFor="metadata-key">Metadata nøkkel</FormLabel>
+						{useCustomMetadataKey && customMetadataKey ? (
+							<Input
+								id="metadata-key"
+								value={customMetadataKey}
+								onChange={(e) => setCustomMetadataKey(e.target.value)}
+								type="text"
+								name="metadata-key"
+								placeholder="Metadata nøkkel"
+							/>
+						) : (
+							<SearchAsync
+								value={{
+									label: customMetadataKey,
+									value: customMetadataKey,
+								}}
+								isClearable={false}
+								debounceTime={100}
+								defaultOptions
+								dropdownIndicator={<Icon icon="expand_more" weight={400} />}
+								loadOptions={(inputValue, callback) => {
+									getMetadataKeys(inputValue).then((metadataKeys) => {
+										const metaOpts = metadataKeys.map((metadataKey) => ({
+											label: metadataKey,
+											value: metadataKey,
+										}));
+										callback(metaOpts);
+									});
+								}}
+								noOptionsMessage={({ inputValue }) => (
+									<Button
+										onClick={() => {
+											setCustomMetadataKey(inputValue);
+											setUseCustomMetadataKey(true);
+										}}
+									>
+										<Icon icon="add" /> Bruk {inputValue}
+									</Button>
+								)}
+								onChange={(newValue) =>
+									setCustomMetadataKey(newValue?.value ?? "")
+								}
+								placeholder="Søk"
+							/>
+						)}
+					</Box>
+					<Box>
+						<FormLabel htmlFor="metadata-value">Metadata verdi</FormLabel>
+						<Input
+							id="metadata-value"
+							type="text"
+							name="metadata-value"
+							placeholder="Metadata verdi"
+						/>
+					</Box>
+					<Button
+						type="button"
+						colorScheme="blue"
+						onClick={() => {
+							if (!func.data) return;
+							const metadataKeyElement = document.getElementById(
+								"metadata-key",
+							) as HTMLInputElement;
+							const metadataValueElement = document.getElementById(
+								"metadata-value",
+							) as HTMLInputElement;
+							addMetadata.mutate({
+								functionId: func.data.id,
+								key: metadataKeyElement.value,
+								value: metadataValueElement.value,
+							});
+							setCustomMetadataKey("");
+							metadataValueElement.value = "";
+						}}
+					>
+						Legg til
+					</Button>
+				</Flex>
+
 				<Button type="submit">Lagre</Button>
 				<Button
+					type="button"
 					colorScheme="red"
 					disabled={!func.data}
 					onClick={() => {
