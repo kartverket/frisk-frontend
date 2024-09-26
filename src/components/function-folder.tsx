@@ -9,9 +9,8 @@ import {
 	List,
 	ListItem,
 	Skeleton,
-	Text,
 } from "@kvib/react";
-import { Link as TSRLink } from "@tanstack/react-router";
+import { FunctionFolderItem } from "./function-folder-item";
 
 type FunctionFolderProps = {
 	functionId: number;
@@ -19,19 +18,18 @@ type FunctionFolderProps = {
 
 export function FunctionFolder({ functionId }: FunctionFolderProps) {
 	const { path } = Route.useSearch();
-	const { func, children, addFunction } = useFunction(functionId, {
+	const { children, addFunction } = useFunction(functionId, {
 		includeChildren: true,
 	});
 
 	const navigate = Route.useNavigate();
 
 	const selectedFunctionIds = getIdsFromPath(path);
+	const currentLevel = selectedFunctionIds.indexOf(functionId);
 
 	return (
 		<Flex p={2} gap={2} flexDirection="column">
-			<Skeleton isLoaded={!!func.data} fitContent>
-				<Heading>{func.data?.name}</Heading>
-			</Skeleton>
+			<Heading>Funksjon nivå {currentLevel + 1}</Heading>
 			<form
 				onSubmit={(e) => {
 					e.preventDefault();
@@ -57,25 +55,13 @@ export function FunctionFolder({ functionId }: FunctionFolderProps) {
 				</Flex>
 			</form>
 			<Skeleton isLoaded={!!children.data} h={60}>
-				<List>
+				<List display="flex" flexDirection="column" gap={2}>
 					{children.data?.map((child) => (
 						<ListItem key={child.id + child.name + child.parentId + child.path}>
-							<TSRLink to={Route.to} search={{ path: child.path }}>
-								<Text
-									as="span"
-									display="flex"
-									w="100%"
-									textAlign="start"
-									p={2}
-									bgColor={
-										selectedFunctionIds.includes(child.id)
-											? "green.100"
-											: undefined
-									}
-								>
-									{child.name}
-								</Text>
-							</TSRLink>
+							<FunctionFolderItem
+								backendFunction={child}
+								selected={selectedFunctionIds.includes(child.id)}
+							/>
 						</ListItem>
 					))}
 				</List>
