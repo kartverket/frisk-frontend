@@ -255,15 +255,12 @@ export function FunctionEditView({
 						colorScheme="blue"
 						onClick={() => {
 							if (!func.data) return;
-							const metadataKeyElement = document.getElementById(
-								"metadata-key",
-							) as HTMLInputElement;
 							const metadataValueElement = document.getElementById(
 								"metadata-value",
 							) as HTMLInputElement;
 							addMetadata.mutate({
 								functionId: func.data.id,
-								key: metadataKeyElement.value,
+								key: customMetadataKey,
 								value: metadataValueElement.value,
 							});
 							setCustomMetadataKey("");
