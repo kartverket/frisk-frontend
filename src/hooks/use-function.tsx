@@ -548,7 +548,7 @@ export function useFunction(functionId: number, opts?: UseFunctionOpts) {
 
 			if (previousMetadata) {
 				queryClient.setQueryData<FunctionMetadata[]>(
-					["functions", deletedMetadata, "metadata"],
+					["functions", deletedMetadata.functionId, "metadata"],
 					previousMetadata.filter(
 						(metadata) => metadata.id !== deletedMetadata.id,
 					),
