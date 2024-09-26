@@ -1,6 +1,6 @@
 import { useFunction } from "@/hooks/use-function";
 import { Route } from "@/routes";
-import { Card, Flex, IconButton, Input, Text } from "@kvib/react";
+import { Card, Flex, Icon, IconButton, Input, Text } from "@kvib/react";
 import { Link as TSRLink } from "@tanstack/react-router";
 import { useRef, useState } from "react";
 
@@ -45,8 +45,16 @@ export function FunctionFolderItem({
 					alignItems="center"
 					p={2}
 				>
+					<IconButton
+						type="button"
+						colorScheme="gray"
+						variant="ghost"
+						aria-label="drag"
+						icon="drag_indicator"
+					/>
 					{edit ? (
 						<Input
+							autoFocus
 							type="text"
 							required
 							ref={nameInputRef}
@@ -69,7 +77,7 @@ export function FunctionFolderItem({
 							{func.data?.name}
 						</Text>
 					)}
-					<Flex>
+					<Flex alignItems="center">
 						{edit ? (
 							<IconButton
 								colorScheme="gray"
@@ -86,23 +94,12 @@ export function FunctionFolderItem({
 								variant="ghost"
 								aria-label="edit"
 								icon="edit"
-								onClick={() => setEdit(true)}
+								onClick={() => {
+									setEdit(true);
+								}}
 							/>
 						)}
-						<IconButton
-							type="button"
-							colorScheme="gray"
-							variant="ghost"
-							aria-label="drag"
-							icon="drag_indicator"
-						/>
-						<IconButton
-							type="button"
-							colorScheme="gray"
-							variant="ghost"
-							aria-label={selected ? "close" : "open"}
-							icon={selected ? "arrow_back_ios" : "arrow_forward_ios"}
-						/>
+						<Icon icon={selected ? "arrow_back_ios" : "arrow_forward_ios"} />
 					</Flex>
 				</Flex>
 			</TSRLink>
