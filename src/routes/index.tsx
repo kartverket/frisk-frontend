@@ -2,18 +2,22 @@ import { createFileRoute } from "@tanstack/react-router";
 import { FunctionColumnView } from "../components/function-column-view";
 import { Breadcrumbs } from "@/components/breadcrumbs";
 import { boolean, object, string } from "zod";
-import { zodSearchValidator } from "@tanstack/router-zod-adapter";
+import { fallback, zodSearchValidator } from "@tanstack/router-zod-adapter";
 import { useFunction } from "@/hooks/use-function";
 import { useEffect } from "react";
 import { FunctionView } from "@/components/function-view";
 import { Main } from "@/components/main";
 
 const functionSearchSchema = object({
-	path: string()
-		.refine((arg) => arg.split(".").every((part) => Number.parseInt(part) >= 0))
-		.catch("1")
-		.default("1"),
-	edit: boolean().catch(false).default(false),
+	path: fallback(
+		string()
+			.refine((arg) =>
+				arg.split(".").every((part) => Number.parseInt(part) >= 0),
+			)
+			.default("1"),
+		"1",
+	),
+	edit: fallback(boolean().default(false), false),
 });
 
 export const Route = createFileRoute("/")({
