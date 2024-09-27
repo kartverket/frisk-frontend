@@ -4,7 +4,7 @@ import { Card, Flex, Icon, IconButton, Input, Text } from "@kvib/react";
 import { Link as TSRLink } from "@tanstack/react-router";
 import { useRef, useState } from "react";
 
-export function FunctionFolderItem({
+export function FunctionCard({
 	functionId,
 	selected,
 }: { functionId: number; selected: boolean }) {

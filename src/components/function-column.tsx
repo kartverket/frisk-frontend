@@ -10,13 +10,13 @@ import {
 	ListItem,
 	Skeleton,
 } from "@kvib/react";
-import { FunctionFolderItem } from "./function-folder-item";
+import { FunctionCard } from "./function-card";
 
 type FunctionFolderProps = {
 	functionId: number;
 };
 
-export function FunctionFolder({ functionId }: FunctionFolderProps) {
+export function FunctionColumn({ functionId }: FunctionFolderProps) {
 	const { path } = Route.useSearch();
 	const { children, addFunction } = useFunction(functionId, {
 		includeChildren: true,
@@ -58,7 +58,7 @@ export function FunctionFolder({ functionId }: FunctionFolderProps) {
 				<List display="flex" flexDirection="column" gap={2}>
 					{children.data?.map((child) => (
 						<ListItem key={child.id + child.name + child.parentId + child.path}>
-							<FunctionFolderItem
+							<FunctionCard
 								functionId={child.id}
 								selected={selectedFunctionIds.includes(child.id)}
 							/>

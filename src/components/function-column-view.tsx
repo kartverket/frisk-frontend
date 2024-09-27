@@ -1,5 +1,5 @@
 import { Flex } from "@kvib/react";
-import { FunctionFolder } from "./function-folder";
+import { FunctionColumn } from "./function-column";
 import { getIdsFromPath } from "@/lib/utils";
 
 type FunctionColumnViewProps = {
@@ -12,7 +12,7 @@ export function FunctionColumnView({ path }: FunctionColumnViewProps) {
 	return (
 		<Flex w="100%" gap={2}>
 			{selectedFunctionIds?.map((id) => (
-				<FunctionFolder key={id} functionId={id} />
+				<FunctionColumn key={id} functionId={id} />
 			))}
 		</Flex>
 	);
