@@ -198,7 +198,16 @@ export function useFunction(functionId: number, opts?: UseFunctionOpts) {
 				if (previousUpdatedParentChildren) {
 					queryClient.setQueryData<BackendFunction[]>(
 						["functions", updatedFunction.parentId, "children"],
-						[...previousUpdatedParentChildren, updatedFunction],
+						previousUpdatedParentChildren.find(
+							(child) => child.id === updatedFunction.id,
+						)
+							? previousUpdatedParentChildren.map((child) => {
+									if (child.id === updatedFunction.id) {
+										return updatedFunction;
+									}
+									return child;
+								})
+							: [...previousUpdatedParentChildren, updatedFunction],
 					);
 				} else {
 					queryClient.setQueryData<BackendFunction[]>(
