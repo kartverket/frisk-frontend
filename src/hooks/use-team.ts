@@ -2,7 +2,7 @@ import { getTeam } from "@/services/backend";
 import { useQuery } from "@tanstack/react-query";
 
 export function useTeam(id: string) {
-	const { data: team } = useQuery({
+	const team = useQuery({
 		queryKey: ["microsoft", "teams", id],
 		queryFn: async () => {
 			const team = await getTeam(id);

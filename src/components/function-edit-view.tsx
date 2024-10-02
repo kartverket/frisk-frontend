@@ -256,13 +256,13 @@ export function FunctionEditView({
 					<Box>
 						<FormLabel htmlFor="metadata-value">Metadata verdi</FormLabel>
 						{customMetadataKey === "team" ? (
-							<Skeleton isLoaded={!!teams} fitContent>
+							<Skeleton isLoaded={!!teams.data} fitContent>
 								<Select
 									id="metadata-value"
 									name="metadata-value"
 									placeholder="Velg team"
 								>
-									{teams?.map((team) => (
+									{teams.data?.map((team) => (
 										<option key={team.id} value={team.id}>
 											{team.displayName}
 										</option>

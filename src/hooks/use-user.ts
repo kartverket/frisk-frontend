@@ -3,7 +3,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 
 export function useUser() {
 	const queryClient = useQueryClient();
-	const { data: teams } = useQuery({
+	const teams = useQuery({
 		queryKey: ["microsoft", "me", "teams"],
 		queryFn: async () => {
 			const teams = await getMyMicrosoftTeams();

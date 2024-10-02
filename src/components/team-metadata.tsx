@@ -7,8 +7,8 @@ export function TeamMetadata({ teamId }: { teamId: string }) {
 	return (
 		<>
 			<Text>team</Text>
-			<Skeleton isLoaded={!!team} minW={70} fitContent>
-				<Text>{team?.displayName}</Text>
+			<Skeleton isLoaded={!!team.data} minW={70} fitContent>
+				<Text>{team.data?.displayName}</Text>
 			</Skeleton>
 		</>
 	);
