@@ -1,4 +1,5 @@
 import { useFunction } from "@/hooks/use-function";
+import { useUser } from "@/hooks/use-user";
 import { getIdsFromPath } from "@/lib/utils";
 import { Route } from "@/routes";
 import {
@@ -15,10 +16,13 @@ import {
 	Icon,
 	Input,
 	SearchAsync,
+	Select,
+	Skeleton,
 	Text,
 	Textarea,
 } from "@kvib/react";
 import { useCallback, useState } from "react";
+import { TeamMetadata } from "./team-metadata";
 
 type FunctionEditViewProps = {
 	functionId: number;
@@ -58,6 +62,8 @@ export function FunctionEditView({
 		useState<boolean>(false);
 
 	const navigate = Route.useNavigate();
+
+	const { teams } = useUser();
 
 	const selectedFunctionIds = getIdsFromPath(path);
 
@@ -176,8 +182,14 @@ export function FunctionEditView({
 				<FormLabel>Metadata</FormLabel>
 				{metadata.data?.map((metadata) => (
 					<Flex gap={2} alignItems="center" key={metadata.id}>
-						<Text>{metadata.key}</Text>
-						<Text>{metadata.value}</Text>
+						{metadata.key === "team" ? (
+							<TeamMetadata teamId={metadata.value} />
+						) : (
+							<>
+								<Text>{metadata.key}</Text>
+								<Text>{metadata.value}</Text>
+							</>
+						)}
 						<Button
 							type="button"
 							colorScheme="red"
@@ -243,12 +255,24 @@ export function FunctionEditView({
 					</Box>
 					<Box>
 						<FormLabel htmlFor="metadata-value">Metadata verdi</FormLabel>
-						<Input
-							id="metadata-value"
-							type="text"
-							name="metadata-value"
-							placeholder="Metadata verdi"
-						/>
+						{customMetadataKey === "team" ? (
+							<Skeleton isLoaded={!!teams} fitContent>
+								<Select id="metadata-value" name="metadata-value">
+									{teams?.map((team) => (
+										<option key={team.id} value={team.id}>
+											{team.displayName}
+										</option>
+									))}
+								</Select>
+							</Skeleton>
+						) : (
+							<Input
+								id="metadata-value"
+								type="text"
+								name="metadata-value"
+								placeholder="Metadata verdi"
+							/>
+						)}
 					</Box>
 					<Button
 						type="button"
