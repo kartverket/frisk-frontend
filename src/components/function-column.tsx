@@ -54,7 +54,7 @@ export function FunctionColumn({ functionId }: FunctionFolderProps) {
 					<Button type="submit">Legg til</Button>
 				</Flex>
 			</form>
-			<Skeleton isLoaded={!!children.data} h={60}>
+			<Skeleton isLoaded={!!children.data} minH={60}>
 				<List display="flex" flexDirection="column" gap={2}>
 					{children.data?.map((child) => (
 						<ListItem key={child.id + child.name + child.parentId + child.path}>
