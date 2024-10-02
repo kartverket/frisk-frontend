@@ -257,7 +257,11 @@ export function FunctionEditView({
 						<FormLabel htmlFor="metadata-value">Metadata verdi</FormLabel>
 						{customMetadataKey === "team" ? (
 							<Skeleton isLoaded={!!teams} fitContent>
-								<Select id="metadata-value" name="metadata-value">
+								<Select
+									id="metadata-value"
+									name="metadata-value"
+									placeholder="Velg team"
+								>
 									{teams?.map((team) => (
 										<option key={team.id} value={team.id}>
 											{team.displayName}
