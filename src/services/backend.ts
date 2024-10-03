@@ -37,7 +37,7 @@ async function fetchFromBackend(path: Path, options: RequestInit) {
 		...options,
 		headers: {
 			...options.headers,
-			Authorization: `Bearer ${tokens.idToken}`,
+			Authorization: `Bearer ${tokens.accessToken}`,
 		},
 	});
 	if (!response.ok) {
