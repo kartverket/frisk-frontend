@@ -1,6 +1,6 @@
 ---
-name: KNURR
-about: Ikke gjøre noe dumt
+name: Mal for Team KNURR
+about: Bruk denne malen
 title: ''
 labels: ''
 assignees: ''
