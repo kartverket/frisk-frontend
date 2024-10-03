@@ -9,6 +9,7 @@ import {
 	Box,
 	Text,
 } from "@kvib/react";
+import { TeamMetadata } from "./team-metadata";
 
 type FunctionInfoViewProps = {
 	functionId: number;
@@ -52,10 +53,15 @@ export function FunctionInfoView({ functionId }: FunctionInfoViewProps) {
 				<Text>Metadata</Text>
 				<List>
 					{metadata.data?.map((metadata) => (
-						<ListItem key={metadata.id}>
-							<Text>
-								{metadata.key}: {metadata.value}
-							</Text>
+						<ListItem key={metadata.id} display="flex" gap={2}>
+							{metadata.key === "team" ? (
+								<TeamMetadata teamId={metadata.value} />
+							) : (
+								<>
+									<Text>{metadata.key}</Text>
+									<Text>{metadata.value}</Text>
+								</>
+							)}
 						</ListItem>
 					))}
 				</List>

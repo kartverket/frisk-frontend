@@ -195,6 +195,22 @@ export async function deleteFunctionMetadata(id: number) {
 	});
 }
 
+export async function getMyMicrosoftTeams() {
+	const response = await fetchFromBackend("/microsoft/me/teams", {
+		method: "GET",
+	});
+	const json = await response.json();
+	return array(MicrosoftTeam).parse(json);
+}
+
+export async function getTeam(id: string) {
+	const response = await fetchFromBackend(`/microsoft/teams/${id}`, {
+		method: "GET",
+	});
+	const json = await response.json();
+	return MicrosoftTeam.parse(json);
+}
+
 const BackendFunction = object({
 	id: number().int(),
 	name: string(),
@@ -219,5 +235,11 @@ const FunctionMetadata = object({
 });
 export type FunctionMetadata = z.infer<typeof FunctionMetadata>;
 type FunctionMetadataCreate = Omit<FunctionMetadata, "id">;
+
+const MicrosoftTeam = object({
+	id: string(),
+	displayName: string(),
+});
+export type MicrosoftTeam = z.infer<typeof MicrosoftTeam>;
 
 type Path = `/${string}`;
