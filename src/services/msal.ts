@@ -37,11 +37,14 @@ const configuration: Configuration = {
 
 export const msalInstance = new PublicClientApplication(configuration);
 
-export const scopes = import.meta.env.VITE_AUTH_SCOPES?.split(",") ?? [];
+export const scopes = import.meta.env.VITE_AUTH_SCOPES?.split(",") ?? [
+	`${clientId}/.default`,
+];
 
 export const authenticationRequest:
 	| PopupRequest
 	| RedirectRequest
 	| SsoSilentRequest = {
+	authority,
 	scopes,
 };
