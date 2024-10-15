@@ -1,6 +1,6 @@
 import { useFunction } from "@/hooks/use-function";
 import { useUser } from "@/hooks/use-user";
-import { getIdsFromPath } from "@/lib/utils";
+import { getIdsFromPath, isURL } from "@/lib/utils";
 import { Route } from "@/routes";
 import {
 	type BackendFunction,
@@ -23,6 +23,7 @@ import {
 } from "@kvib/react";
 import { useCallback, useState } from "react";
 import { TeamMetadata } from "./team-metadata";
+import { LinkMetadata } from "./link-metadata";
 
 type FunctionEditViewProps = {
 	functionId: number;
@@ -180,14 +181,16 @@ export function FunctionEditView({
 				/>
 
 				<FormLabel>Metadata</FormLabel>
-				{metadata.data?.map((metadata) => (
-					<Flex gap={2} alignItems="center" key={metadata.id}>
-						{metadata.key === "team" ? (
-							<TeamMetadata teamId={metadata.value} />
+				{metadata.data?.map(({ id, key, value }) => (
+					<Flex gap={2} alignItems="center" key={id}>
+						{key === "team" ? (
+							<TeamMetadata teamId={value} />
+						) : isURL(value) ? (
+							<LinkMetadata keyKey={key} url={value} />
 						) : (
 							<>
-								<Text>{metadata.key}</Text>
-								<Text>{metadata.value}</Text>
+								<Text>{key}</Text>
+								<Text>{value}</Text>
 							</>
 						)}
 						<Button
@@ -195,8 +198,8 @@ export function FunctionEditView({
 							colorScheme="red"
 							onClick={() => {
 								removeMetadata.mutate({
-									id: metadata.id,
-									functionId: metadata.functionId,
+									id,
+									functionId,
 								});
 							}}
 						>

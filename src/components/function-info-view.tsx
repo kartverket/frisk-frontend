@@ -10,6 +10,8 @@ import {
 	Text,
 } from "@kvib/react";
 import { TeamMetadata } from "./team-metadata";
+import { isURL } from "@/lib/utils";
+import { LinkMetadata } from "./link-metadata";
 
 type FunctionInfoViewProps = {
 	functionId: number;
@@ -52,14 +54,16 @@ export function FunctionInfoView({ functionId }: FunctionInfoViewProps) {
 
 				<Text>Metadata</Text>
 				<List>
-					{metadata.data?.map((metadata) => (
-						<ListItem key={metadata.id} display="flex" gap={2}>
-							{metadata.key === "team" ? (
-								<TeamMetadata teamId={metadata.value} />
+					{metadata.data?.map(({ id, key, value }) => (
+						<ListItem key={id} display="flex" gap={2}>
+							{key === "team" ? (
+								<TeamMetadata teamId={value} />
+							) : isURL(value) ? (
+								<LinkMetadata keyKey={key} url={value} />
 							) : (
 								<>
-									<Text>{metadata.key}</Text>
-									<Text>{metadata.value}</Text>
+									<Text>{key}</Text>
+									<Text>{value}</Text>
 								</>
 							)}
 						</ListItem>
