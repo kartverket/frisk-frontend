@@ -19,7 +19,7 @@ const functionSearchSchema = object({
 	),
 	edit: fallback(boolean().default(false), false),
 	newMetadataKey: string().optional(),
-	newMetadataValue: string().optional()
+	newMetadataValue: string().optional(),
 });
 
 export const Route = createFileRoute("/")({

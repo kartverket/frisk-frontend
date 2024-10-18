@@ -80,18 +80,19 @@ export function FunctionInfoView({ functionId }: FunctionInfoViewProps) {
 							(obj) => obj.key === "team",
 						)?.value;
 
-						const searchParamsRedirectURL = new URLSearchParams();
-						searchParamsRedirectURL.set("path", `"${func.data.path}"`);
-						searchParamsRedirectURL.set("edit", "true");
-						searchParamsRedirectURL.set("newMetadataKey", "skjema");
-						searchParamsRedirectURL.set("newMetadataValue", "rr-fill");
+						const searchParamsRedirectURL = new URLSearchParams({
+							path: `"${func.data.path}"`,
+							edit: "true",
+							newMetadataKey: "skjema",
+							newMetadataValue: "rr-fill",
+						});
 						const redirectURL = `${location.origin}?${searchParamsRedirectURL.toString()}`;
 
-						const searchParams = new URLSearchParams();
-						searchParams.set("name", func.data?.name);
-						teamId && searchParams.set("teamId", teamId);
-						searchParams.set("redirect", redirectURL);
-
+						const searchParams = new URLSearchParams({
+							name: func.data?.name,
+							...(teamId && { teamId }),
+							redirect: redirectURL,
+						});
 						const path = `${import.meta.env.VITE_REGELRETT_FRONTEND_URL}/ny?${searchParams.toString()}`;
 						window.location.href = path;
 					}}
