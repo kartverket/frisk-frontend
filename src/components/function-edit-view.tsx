@@ -21,7 +21,7 @@ import {
 	Text,
 	Textarea,
 } from "@kvib/react";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { TeamMetadata } from "./team-metadata";
 import { LinkMetadata } from "./link-metadata";
 
@@ -34,7 +34,7 @@ export function FunctionEditView({
 	functionId,
 	onEditComplete,
 }: FunctionEditViewProps) {
-	const { path } = Route.useSearch();
+	const { path, newMetadataKey, newMetadataValue } = Route.useSearch();
 	const {
 		func,
 		updateFunction,
@@ -85,6 +85,25 @@ export function FunctionEditView({
 		},
 		[selectedFunctionIds, navigate],
 	);
+
+	useEffect(() => {
+		if (newMetadataKey && newMetadataValue && func.data) {
+			addMetadata
+				.mutateAsync({
+					functionId: func.data.id,
+					key: newMetadataKey,
+					value: newMetadataValue,
+				})
+				.finally(() => navigate({ search: { path: func.data.path } }));
+		}
+	}, [
+		newMetadataKey,
+		newMetadataValue,
+		func.data,
+		func.data?.id,
+		addMetadata.mutateAsync,
+		navigate,
+	]);
 
 	return (
 		<form

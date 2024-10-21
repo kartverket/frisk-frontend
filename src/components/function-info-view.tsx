@@ -8,6 +8,7 @@ import {
 	ListItem,
 	Box,
 	Text,
+	Button,
 } from "@kvib/react";
 import { TeamMetadata } from "./team-metadata";
 import { isURL } from "@/lib/utils";
@@ -69,6 +70,35 @@ export function FunctionInfoView({ functionId }: FunctionInfoViewProps) {
 						</ListItem>
 					))}
 				</List>
+				<Button
+					variant="tertiary"
+					rightIcon="open_in_new"
+					p={0}
+					onClick={() => {
+						if (!func.data) return;
+						const teamId = metadata.data?.find(
+							(obj) => obj.key === "team",
+						)?.value;
+
+						const searchParamsRedirectURL = new URLSearchParams({
+							path: `"${func.data.path}"`,
+							edit: "true",
+							newMetadataKey: "skjema",
+							newMetadataValue: "rr-fill",
+						});
+						const redirectURL = `${location.origin}?${searchParamsRedirectURL.toString()}`;
+
+						const searchParams = new URLSearchParams({
+							name: func.data?.name,
+							...(teamId && { teamId }),
+							redirect: redirectURL,
+						});
+						const path = `${import.meta.env.VITE_REGELRETT_FRONTEND_URL}/ny?${searchParams.toString()}`;
+						window.location.href = path;
+					}}
+				>
+					Fyll ut skjema
+				</Button>
 			</Box>
 		</Skeleton>
 	);
