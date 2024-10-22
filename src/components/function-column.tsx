@@ -48,8 +48,8 @@ export function FunctionColumn({ functionId }: FunctionFolderProps) {
 				</Text>
 			</Box>
 			<Box border="1px" p="20px" borderColor="gray.400" minH="100%">
-				<Skeleton isLoaded={!!children.data} marginBottom={2}>
-					<List display="flex" flexDirection="column" gap={2}>
+				<Skeleton isLoaded={!!children.data} minH={60}>
+					<List display="flex" flexDirection="column" gap={2} marginBottom="2">
 						{children.data?.map((child) => (
 							<ListItem
 								key={child.id + child.name + child.parentId + child.path}
@@ -61,60 +61,60 @@ export function FunctionColumn({ functionId }: FunctionFolderProps) {
 							</ListItem>
 						))}
 					</List>
-				</Skeleton>
-				{isFormVisible && (
-					<form
-						onSubmit={(e) => {
-							e.preventDefault();
-							const form = e.target as HTMLFormElement;
-							const nameElement = form.elements.namedItem(
-								"name",
-							) as HTMLInputElement | null;
-							if (!nameElement) return;
-							addFunction
-								.mutateAsync({
-									name: nameElement.value,
-									description: null,
-									parentId: functionId,
-								})
-								.then((f) => navigate({ search: { path: f.path } }));
-							// clear form
-							nameElement.value = "";
-							setFormVisible(false);
-						}}
-					>
-						<Flex
-							border="1px"
-							borderRadius="8px"
-							borderColor="gray.400"
-							p="5px"
+					{isFormVisible && (
+						<form
+							onSubmit={(e) => {
+								e.preventDefault();
+								const form = e.target as HTMLFormElement;
+								const nameElement = form.elements.namedItem(
+									"name",
+								) as HTMLInputElement | null;
+								if (!nameElement) return;
+								addFunction
+									.mutateAsync({
+										name: nameElement.value,
+										description: null,
+										parentId: functionId,
+									})
+									.then((f) => navigate({ search: { path: f.path } }));
+								// clear form
+								nameElement.value = "";
+								setFormVisible(false);
+							}}
 						>
-							<Input type="text" name="name" placeholder="Navn" required />
-							<IconButton
-								type="submit"
-								icon="check"
-								aria-label="check"
-								variant="tertiary"
-								colorScheme="gray"
-							/>
-							<IconButton
-								icon="delete"
-								aria-label="delete"
-								variant="tertiary"
-								colorScheme="gray"
-								onClick={() => setFormVisible(false)}
-							/>
-						</Flex>
-					</form>
-				)}
-				<Button
-					leftIcon="add"
-					variant="tertiary"
-					colorScheme="blue"
-					onClick={() => setFormVisible(true)}
-				>
-					Legg til funksjon
-				</Button>
+							<Flex
+								border="1px"
+								borderRadius="8px"
+								borderColor="gray.400"
+								p="5px"
+							>
+								<Input type="text" name="name" placeholder="Navn" required />
+								<IconButton
+									type="submit"
+									icon="check"
+									aria-label="check"
+									variant="tertiary"
+									colorScheme="gray"
+								/>
+								<IconButton
+									icon="delete"
+									aria-label="delete"
+									variant="tertiary"
+									colorScheme="gray"
+									onClick={() => setFormVisible(false)}
+								/>
+							</Flex>
+						</form>
+					)}
+					<Button
+						leftIcon="add"
+						variant="tertiary"
+						colorScheme="blue"
+						onClick={() => setFormVisible(true)}
+					>
+						Legg til funksjon
+					</Button>
+				</Skeleton>
 			</Box>
 		</Flex>
 	);
