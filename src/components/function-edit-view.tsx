@@ -1,6 +1,6 @@
 import { useFunction } from "@/hooks/use-function";
 import { useUser } from "@/hooks/use-user";
-import { getIdsFromPath, isURL } from "@/lib/utils";
+import { getIdsFromPath } from "@/lib/utils";
 import { Route } from "@/routes";
 import {
 	type BackendFunction,
@@ -18,12 +18,10 @@ import {
 	SearchAsync,
 	Select,
 	Skeleton,
-	Text,
 	Textarea,
 } from "@kvib/react";
-import { useCallback, useEffect, useState } from "react";
-import { TeamMetadata } from "./team-metadata";
-import { LinkMetadata } from "./link-metadata";
+import { useCallback, useState } from "react";
+import { Metadata } from "./metadata/metadata";
 
 type FunctionEditViewProps = {
 	functionId: number;
@@ -34,7 +32,7 @@ export function FunctionEditView({
 	functionId,
 	onEditComplete,
 }: FunctionEditViewProps) {
-	const { path, newMetadataKey, newMetadataValue } = Route.useSearch();
+	const { path } = Route.useSearch();
 	const {
 		func,
 		updateFunction,
@@ -85,25 +83,6 @@ export function FunctionEditView({
 		},
 		[selectedFunctionIds, navigate],
 	);
-
-	useEffect(() => {
-		if (newMetadataKey && newMetadataValue && func.data) {
-			addMetadata
-				.mutateAsync({
-					functionId: func.data.id,
-					key: newMetadataKey,
-					value: newMetadataValue,
-				})
-				.finally(() => navigate({ search: { path: func.data.path } }));
-		}
-	}, [
-		newMetadataKey,
-		newMetadataValue,
-		func.data,
-		func.data?.id,
-		addMetadata.mutateAsync,
-		navigate,
-	]);
 
 	return (
 		<form
@@ -200,18 +179,9 @@ export function FunctionEditView({
 				/>
 
 				<FormLabel>Metadata</FormLabel>
-				{metadata.data?.map(({ id, key, value }) => (
+				{metadata.data?.map(({ id, ...metadata }) => (
 					<Flex gap={2} alignItems="center" key={id}>
-						{key === "team" ? (
-							<TeamMetadata teamId={value} />
-						) : isURL(value) ? (
-							<LinkMetadata keyKey={key} url={value} />
-						) : (
-							<>
-								<Text>{key}</Text>
-								<Text>{value}</Text>
-							</>
-						)}
+						<Metadata metadata={metadata} />
 						<Button
 							type="button"
 							colorScheme="red"

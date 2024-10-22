@@ -7,6 +7,7 @@ import { useFunction } from "@/hooks/use-function";
 import { useEffect } from "react";
 import { FunctionView } from "@/components/function-view";
 import { Main } from "@/components/main";
+import { CreateAndRedirectEffect } from "@/effects/create-and-redirect-effect";
 
 const functionSearchSchema = object({
 	path: fallback(
@@ -20,6 +21,7 @@ const functionSearchSchema = object({
 	edit: fallback(boolean().default(false), false),
 	newMetadataKey: string().optional(),
 	newMetadataValue: string().optional(),
+	redirect: string().optional(),
 });
 
 export const Route = createFileRoute("/")({
@@ -53,6 +55,7 @@ function Index() {
 			<Breadcrumbs path={path} />
 			<FunctionView functionId={id} />
 			<FunctionColumnView path={path} />
+			<CreateAndRedirectEffect />
 		</Main>
 	);
 }
