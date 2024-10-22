@@ -27,7 +27,7 @@ const configuration: Configuration = {
 		authority,
 		redirectUri, // Points to window.location.origin. You must register this URI on Microsoft Entra admin center/App Registration.
 		postLogoutRedirectUri: "/", // Indicates the page to navigate after logout.
-		navigateToLoginRequestUrl: false, // If "true", will navigate back to the original request location before processing the auth code response.
+		navigateToLoginRequestUrl: true, // If "true", will navigate back to the original request location before processing the auth code response.
 	},
 	cache: {
 		cacheLocation: "localStorage", // Configures cache location. "sessionStorage" is more secure, but "localStorage" gives you SSO between tabs.

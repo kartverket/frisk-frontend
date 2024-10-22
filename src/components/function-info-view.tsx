@@ -10,9 +10,7 @@ import {
 	Text,
 	Button,
 } from "@kvib/react";
-import { TeamMetadata } from "./team-metadata";
-import { isURL } from "@/lib/utils";
-import { LinkMetadata } from "./link-metadata";
+import { Metadata } from "./metadata/metadata";
 
 type FunctionInfoViewProps = {
 	functionId: number;
@@ -55,18 +53,9 @@ export function FunctionInfoView({ functionId }: FunctionInfoViewProps) {
 
 				<Text>Metadata</Text>
 				<List>
-					{metadata.data?.map(({ id, key, value }) => (
+					{metadata.data?.map(({ id, ...metadata }) => (
 						<ListItem key={id} display="flex" gap={2}>
-							{key === "team" ? (
-								<TeamMetadata teamId={value} />
-							) : isURL(value) ? (
-								<LinkMetadata keyKey={key} url={value} />
-							) : (
-								<>
-									<Text>{key}</Text>
-									<Text>{value}</Text>
-								</>
-							)}
+							<Metadata metadata={metadata} />
 						</ListItem>
 					))}
 				</List>
@@ -82,9 +71,9 @@ export function FunctionInfoView({ functionId }: FunctionInfoViewProps) {
 
 						const searchParamsRedirectURL = new URLSearchParams({
 							path: `"${func.data.path}"`,
-							edit: "true",
-							newMetadataKey: "skjema",
-							newMetadataValue: "rr-fill",
+							newMetadataKey: "rr-{tableName}-{contextName}",
+							newMetadataValue: "{contextId}",
+							redirect: `"${location.origin}"`,
 						});
 						const redirectURL = `${location.origin}?${searchParamsRedirectURL.toString()}`;
 
