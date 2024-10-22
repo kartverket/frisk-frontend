@@ -1,12 +1,6 @@
 import { useFunction } from "@/hooks/use-function";
 import { useUser } from "@/hooks/use-user";
-import { getIdsFromPath } from "@/lib/utils";
-import { Route } from "@/routes";
-import {
-	type BackendFunction,
-	getFunctions,
-	getMetadataKeys,
-} from "@/services/backend";
+import { getFunctions, getMetadataKeys } from "@/services/backend";
 import {
 	Box,
 	Button,
@@ -20,7 +14,7 @@ import {
 	Skeleton,
 	Textarea,
 } from "@kvib/react";
-import { useCallback, useState } from "react";
+import { useState } from "react";
 import { Metadata } from "./metadata/metadata";
 
 type FunctionEditViewProps = {
@@ -32,11 +26,9 @@ export function FunctionEditView({
 	functionId,
 	onEditComplete,
 }: FunctionEditViewProps) {
-	const { path } = Route.useSearch();
 	const {
 		func,
 		updateFunction,
-		removeFunction,
 		dependencies,
 		addDependency,
 		removeDependency,
@@ -60,29 +52,7 @@ export function FunctionEditView({
 	const [useCustomMetadataKey, setUseCustomMetadataKey] =
 		useState<boolean>(false);
 
-	const navigate = Route.useNavigate();
-
 	const { teams } = useUser();
-
-	const selectedFunctionIds = getIdsFromPath(path);
-
-	const handleDeletedFunction = useCallback(
-		(deletedFunction: BackendFunction) => {
-			if (selectedFunctionIds.includes(deletedFunction.id)) {
-				const deletedFunctionParentPath = deletedFunction.path
-					.split(".")
-					.slice(0, -1)
-					.join(".");
-				navigate({
-					search: {
-						path: deletedFunctionParentPath ?? "1",
-					},
-				});
-				return;
-			}
-		},
-		[selectedFunctionIds, navigate],
-	);
 
 	return (
 		<form
@@ -292,18 +262,6 @@ export function FunctionEditView({
 				</Flex>
 
 				<Button type="submit">Lagre</Button>
-				<Button
-					type="button"
-					colorScheme="red"
-					disabled={!func.data}
-					onClick={() => {
-						if (!func.data) return;
-						removeFunction.mutate(func.data.id);
-						handleDeletedFunction(func.data);
-					}}
-				>
-					Slett
-				</Button>
 			</FormControl>
 		</form>
 	);
