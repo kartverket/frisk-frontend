@@ -28,7 +28,7 @@ export function FunctionColumn({ functionId }: FunctionFolderProps) {
 	const currentLevel = selectedFunctionIds.indexOf(functionId);
 
 	return (
-		<Flex p={2} gap={2} flexDirection="column">
+		<Flex gap={2} flexDirection="column">
 			<Heading>Funksjon nivå {currentLevel + 1}</Heading>
 			<form
 				onSubmit={(e) => {
