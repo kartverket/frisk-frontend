@@ -1,12 +1,8 @@
 import { useFunction } from "@/hooks/use-function";
 import { useUser } from "@/hooks/use-user";
-import { getIdsFromPath, isURL } from "@/lib/utils";
+import { isURL } from "@/lib/utils";
 import { Route } from "@/routes";
-import {
-	type BackendFunction,
-	getFunctions,
-	getMetadataKeys,
-} from "@/services/backend";
+import { getFunctions, getMetadataKeys } from "@/services/backend";
 import {
 	Box,
 	Button,
@@ -21,7 +17,7 @@ import {
 	Text,
 	Textarea,
 } from "@kvib/react";
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { TeamMetadata } from "./team-metadata";
 import { LinkMetadata } from "./link-metadata";
 
@@ -34,11 +30,10 @@ export function FunctionEditView({
 	functionId,
 	onEditComplete,
 }: FunctionEditViewProps) {
-	const { path, newMetadataKey, newMetadataValue } = Route.useSearch();
+	const { newMetadataKey, newMetadataValue } = Route.useSearch();
 	const {
 		func,
 		updateFunction,
-		removeFunction,
 		dependencies,
 		addDependency,
 		removeDependency,
@@ -65,26 +60,6 @@ export function FunctionEditView({
 	const navigate = Route.useNavigate();
 
 	const { teams } = useUser();
-
-	const selectedFunctionIds = getIdsFromPath(path);
-
-	const handleDeletedFunction = useCallback(
-		(deletedFunction: BackendFunction) => {
-			if (selectedFunctionIds.includes(deletedFunction.id)) {
-				const deletedFunctionParentPath = deletedFunction.path
-					.split(".")
-					.slice(0, -1)
-					.join(".");
-				navigate({
-					search: {
-						path: deletedFunctionParentPath ?? "1",
-					},
-				});
-				return;
-			}
-		},
-		[selectedFunctionIds, navigate],
-	);
 
 	useEffect(() => {
 		if (newMetadataKey && newMetadataValue && func.data) {
@@ -322,18 +297,6 @@ export function FunctionEditView({
 				</Flex>
 
 				<Button type="submit">Lagre</Button>
-				<Button
-					type="button"
-					colorScheme="red"
-					disabled={!func.data}
-					onClick={() => {
-						if (!func.data) return;
-						removeFunction.mutate(func.data.id);
-						handleDeletedFunction(func.data);
-					}}
-				>
-					Slett
-				</Button>
 			</FormControl>
 		</form>
 	);
