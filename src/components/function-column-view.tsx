@@ -14,7 +14,7 @@ export function FunctionColumnView({ path }: FunctionColumnViewProps) {
 			<Text fontSize="2xl" fontWeight="700">
 				Funksjonsregisteret
 			</Text>
-			<Flex gap="4">
+			<Flex>
 				{selectedFunctionIds?.map((id) => (
 					<FunctionColumn key={id} functionId={id} />
 				))}
