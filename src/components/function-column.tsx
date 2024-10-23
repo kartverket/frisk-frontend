@@ -70,13 +70,11 @@ export function FunctionColumn({ functionId }: FunctionFolderProps) {
 									"name",
 								) as HTMLInputElement | null;
 								if (!nameElement) return;
-								addFunction
-									.mutateAsync({
-										name: nameElement.value,
-										description: null,
-										parentId: functionId,
-									})
-									.then((f) => navigate({ search: { path: f.path } }));
+								addFunction.mutateAsync({
+									name: nameElement.value,
+									description: null,
+									parentId: functionId,
+								});
 								// clear form
 								nameElement.value = "";
 								setFormVisible(false);
