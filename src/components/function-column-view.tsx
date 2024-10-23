@@ -10,9 +10,12 @@ export function FunctionColumnView({ path }: FunctionColumnViewProps) {
 	const selectedFunctionIds = getIdsFromPath(path);
 
 	return (
-		<Flex gap="38" flexDirection="column" paddingY="38" paddingX="100">
-			<Text fontSize="2xl" fontWeight="700">
+		<Flex flexDirection="column" paddingY="38" paddingX="100" marginBottom="76">
+			<Text fontSize="2xl" fontWeight="700" marginBottom="3">
 				Funksjonsregisteret
+			</Text>
+			<Text fontSize="xs" marginBottom="38">
+				Smell opp noen bra funksjoner og få den oversikten du fortjener
 			</Text>
 			<Flex>
 				{selectedFunctionIds?.map((id) => (

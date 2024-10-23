@@ -39,13 +39,6 @@ export function FunctionCard({
 					alignItems="center"
 					p={2}
 				>
-					<IconButton
-						type="button"
-						colorScheme="gray"
-						variant="ghost"
-						aria-label="drag"
-						icon="drag_indicator"
-					/>
 					{edit ? (
 						<Input
 							autoFocus
@@ -69,7 +62,7 @@ export function FunctionCard({
 							as="span"
 							display="flex"
 							w="100%"
-							textAlign="start"
+							paddingLeft="10px"
 						>
 							{func.data?.name}
 						</Text>
