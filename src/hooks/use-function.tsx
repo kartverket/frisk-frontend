@@ -27,6 +27,7 @@ export function useFunction(functionId: number, opts?: UseFunctionOpts) {
 	const queryClient = useQueryClient();
 
 	const func = useQuery({
+		refetchOnMount: false,
 		queryKey: ["functions", functionId],
 		queryFn: async () => {
 			const functionData = await getFunction(functionId);
