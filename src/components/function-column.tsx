@@ -33,7 +33,7 @@ export function FunctionColumn({ functionId }: FunctionFolderProps) {
 	const [isFormVisible, setFormVisible] = useState(false);
 
 	return (
-		<Flex flexDirection="column">
+		<Flex flexDirection="column" width="380px">
 			<Box
 				bgColor="gray.200"
 				border="1px"
