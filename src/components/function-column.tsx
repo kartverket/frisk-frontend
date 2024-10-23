@@ -25,8 +25,6 @@ export function FunctionColumn({ functionId }: FunctionFolderProps) {
 		includeChildren: true,
 	});
 
-	const navigate = Route.useNavigate();
-
 	const selectedFunctionIds = getIdsFromPath(path);
 	const currentLevel = selectedFunctionIds.indexOf(functionId);
 
