@@ -1,35 +1,11 @@
 name: Build and deploy frontend to SKIP
 on:
-    workflow_dispatch:
-        inputs:
-            commit_sha:
-                description: "Commit hash to deploy"
-                default: ""
-                type: string
-            dev:
-                description: "Deploy to dev"
-                required: true
-                type: boolean
-            prod:
-                description: "Deploy to prod"
-                required: true
-                type: boolean
     pull_request:
         branches:
             - main
-        paths:
-            - .github/workflows/skip-deploy.yml
-            - nginx/**
-            - public/**
-            - src/**
     push:
         branches:
             - main
-        paths:
-            - .github/workflows/skip-deploy.yml
-            - nginx/**
-            - public/**
-            - src/**
 
 env:
     REGISTRY: ghcr.io
