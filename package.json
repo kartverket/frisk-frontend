@@ -6,6 +6,7 @@
 	"scripts": {
 		"dev": "NODE_ENV=development vite",
 		"build": "tsc -b && NODE_ENV=production vite build",
+		"build:skip": "tsc -b && vite build --mode skip",
 		"lint": "biome lint --write src",
 		"preview": "vite preview",
 		"format": "biome format --write src",
