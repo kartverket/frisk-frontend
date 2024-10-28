@@ -84,7 +84,13 @@ export function FunctionColumn({ functionId }: FunctionFolderProps) {
 								borderColor="gray.400"
 								p="5px"
 							>
-								<Input type="text" name="name" placeholder="Navn" required />
+								<Input
+									type="text"
+									name="name"
+									placeholder="Navn"
+									required
+									autoFocus
+								/>
 								<IconButton
 									type="submit"
 									icon="check"
