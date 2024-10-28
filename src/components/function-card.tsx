@@ -1,17 +1,30 @@
 import { useFunction } from "@/hooks/use-function";
 import { Route } from "@/routes";
-import { Card, Flex, Icon, IconButton, Input, Text } from "@kvib/react";
+import {
+	Card,
+	Flex,
+	Icon,
+	IconButton,
+	Input,
+	Text,
+	useDisclosure,
+} from "@kvib/react";
 import { Link as TSRLink } from "@tanstack/react-router";
 import { useRef, useState } from "react";
+import { DeleteFunctionModal } from "./delete-function-modal";
 
 export function FunctionCard({
 	functionId,
 	selected,
 }: { functionId: number; selected: boolean }) {
-	const { func, updateFunction, removeFunction } = useFunction(functionId);
+	const { func, updateFunction } = useFunction(functionId);
 	const nameInputRef = useRef<HTMLInputElement>(null);
 	const [edit, setEdit] = useState(false);
-	const navigate = Route.useNavigate();
+	const {
+		isOpen: isDeleteOpen,
+		onOpen: onDeleteOpen,
+		onClose: onDeleteClose,
+	} = useDisclosure();
 
 	function saveName() {
 		const newName = nameInputRef.current?.value;
@@ -87,21 +100,7 @@ export function FunctionCard({
 									aria-label="delete"
 									icon="delete"
 									type="button"
-									onClick={(e) => {
-										e.preventDefault();
-										if (!func.data) return;
-										const deletedFunctionParentPath = func.data.path
-											.split(".")
-											.slice(0, -1)
-											.join(".");
-
-										removeFunction.mutate(func.data.id);
-										navigate({
-											search: {
-												path: deletedFunctionParentPath ?? "1",
-											},
-										});
-									}}
+									onClick={onDeleteOpen}
 								/>
 							</>
 						) : (
@@ -125,6 +124,15 @@ export function FunctionCard({
 					</Flex>
 				</Flex>
 			</TSRLink>
+			<DeleteFunctionModal
+				onOpen={onDeleteOpen}
+				onClose={() => {
+					setEdit(false);
+					onDeleteClose();
+				}}
+				isOpen={isDeleteOpen}
+				functionId={functionId}
+			/>
 		</Card>
 	);
 }
