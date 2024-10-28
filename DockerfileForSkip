@@ -2,8 +2,11 @@ FROM oven/bun:1 AS build
 WORKDIR /react-app
 COPY package*.json ./
 COPY bun.lockb ./
-RUN bun install --frozen-lockfile
+COPY .env.skip ./
 COPY . .
+RUN rm .env.development
+RUN rm .env.production
+RUN bun install --frozen-lockfile
 RUN bun run build:skip
 
 FROM nginx:1.19
