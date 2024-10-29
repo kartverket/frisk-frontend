@@ -1,24 +1,28 @@
-import { Flex, Input, Text, Button, Skeleton, Select } from "@kvib/react";
+import {
+	Flex,
+	Input,
+	Text,
+	Button,
+	Skeleton,
+	Select,
+	useDisclosure,
+} from "@kvib/react";
 import { SchemaButton } from "./schema-button";
 import { useUser } from "@/hooks/use-user";
 import { useRef } from "react";
 import { useFunction } from "@/hooks/use-function";
 import { Route } from "@/routes";
 import { useTeam } from "@/hooks/use-team";
+import { DeleteFunctionModal } from "@/components/delete-function-modal.tsx";
 
 export function FunctionCardEdit({ functionId }: { functionId: number }) {
-	const {
-		func,
-		updateFunction,
-		removeFunction,
-		metadata,
-		addMetadata,
-		removeMetadata,
-	} = useFunction(functionId);
+	const { func, updateFunction, metadata, addMetadata, removeMetadata } =
+		useFunction(functionId);
 	const { teams } = useUser();
 	const nameInputRef = useRef<HTMLInputElement>(null);
 	const navigate = Route.useNavigate();
 	const search = Route.useSearch();
+	const { isOpen, onOpen, onClose } = useDisclosure();
 
 	const currentTeamId = metadata.data?.find((m) => m.key === "team");
 	const { team: currentTeam } = useTeam(currentTeamId?.value);
@@ -125,25 +129,20 @@ export function FunctionCardEdit({ functionId }: { functionId: number }) {
 					leftIcon="delete"
 					size="sm"
 					colorScheme="blue"
-					onClick={(e) => {
-						e.preventDefault();
-						if (!func.data) return;
-						const deletedFunctionParentPath = func.data.path
-							.split(".")
-							.slice(0, -1)
-							.join(".");
-
-						removeFunction.mutate(func.data.id);
-						navigate({
-							search: {
-								path: deletedFunctionParentPath ?? "1",
-							},
-						});
-					}}
+					onClick={onOpen}
 				>
 					Slett funksjon
 				</Button>
 			</Flex>
+			<DeleteFunctionModal
+				onOpen={onOpen}
+				onClose={() => {
+					navigate({ search: { ...search, edit: undefined } });
+					onClose();
+				}}
+				isOpen={isOpen}
+				functionId={functionId}
+			/>
 		</Flex>
 	);
 }
