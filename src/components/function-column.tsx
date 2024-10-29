@@ -5,15 +5,16 @@ import {
 	Box,
 	Button,
 	Flex,
-	IconButton,
 	Input,
 	List,
 	ListItem,
+	Select,
 	Skeleton,
 	Text,
 } from "@kvib/react";
 import { FunctionCard } from "./function-card";
 import { useState } from "react";
+import { useUser } from "@/hooks/use-user";
 
 type FunctionFolderProps = {
 	functionId: number;
@@ -21,9 +22,10 @@ type FunctionFolderProps = {
 
 export function FunctionColumn({ functionId }: FunctionFolderProps) {
 	const { path } = Route.useSearch();
-	const { children, addFunction } = useFunction(functionId, {
+	const { children, addFunction, addMetadata } = useFunction(functionId, {
 		includeChildren: true,
 	});
+	const { teams } = useUser();
 
 	const selectedFunctionIds = getIdsFromPath(path);
 	const currentLevel = selectedFunctionIds.indexOf(functionId);
@@ -61,50 +63,98 @@ export function FunctionColumn({ functionId }: FunctionFolderProps) {
 					</List>
 					{isFormVisible && (
 						<form
-							onSubmit={(e) => {
+							onSubmit={async (e) => {
 								e.preventDefault();
 								const form = e.target as HTMLFormElement;
 								const nameElement = form.elements.namedItem(
 									"name",
 								) as HTMLInputElement | null;
+								const teamElement = document.getElementById(
+									"team-value",
+								) as HTMLInputElement;
 								if (!nameElement) return;
-								addFunction.mutateAsync({
-									name: nameElement.value,
-									description: null,
-									parentId: functionId,
-								});
-								// clear form
-								nameElement.value = "";
-								setFormVisible(false);
+
+								try {
+									const { id: newFunctionId } = await addFunction.mutateAsync({
+										name: nameElement.value,
+										description: null,
+										parentId: functionId,
+									});
+									if (teamElement) {
+										await addMetadata.mutate({
+											functionId: newFunctionId,
+											key: "team",
+											value: teamElement.value,
+										});
+									}
+									// clear form
+									form.reset();
+									setFormVisible(false);
+								} catch (error) {
+									console.error(error);
+								}
 							}}
 						>
 							<Flex
 								border="1px"
 								borderRadius="8px"
-								borderColor="gray.400"
-								p="5px"
+								borderColor="blue.500"
+								pt="14px"
+								px="25px"
+								pb="30px"
+								flexDirection="column"
 							>
+								<Text fontSize="xs" fontWeight="700" mb="4px">
+									Funksjonsnavn*
+								</Text>
 								<Input
 									type="text"
 									name="name"
 									placeholder="Navn"
 									required
-									autoFocus
+									size="sm"
+									borderRadius="5px"
+									mb="20px"
+                                    autoFocus
 								/>
-								<IconButton
-									type="submit"
-									icon="check"
-									aria-label="check"
-									variant="tertiary"
-									colorScheme="gray"
-								/>
-								<IconButton
-									icon="delete"
-									aria-label="delete"
-									variant="tertiary"
-									colorScheme="gray"
-									onClick={() => setFormVisible(false)}
-								/>
+								<Text fontSize="xs" fontWeight="700" mb="4px">
+									Ansvarlig team for denne funksjonen?
+								</Text>
+								<Skeleton isLoaded={!!teams.data} fitContent>
+									<Select
+										id="team-value"
+										name="team-value"
+										placeholder="Velg team"
+										mb="30px"
+										size="sm"
+										borderRadius="5px"
+									>
+										{teams.data?.map((team) => (
+											<option key={team.id} value={team.id}>
+												{team.displayName}
+											</option>
+										))}
+									</Select>
+								</Skeleton>
+								<Flex gap="10px">
+									<Button
+										aria-label="delete"
+										variant="secondary"
+										colorScheme="blue"
+										size="sm"
+										onClick={() => setFormVisible(false)}
+									>
+										Avbryt
+									</Button>
+									<Button
+										type="submit"
+										aria-label="check"
+										colorScheme="blue"
+										size="sm"
+									>
+										Lagre
+									</Button>
+								</Flex>
 							</Flex>
 						</form>
 					)}

@@ -15,7 +15,7 @@ export function FunctionView({ functionId }: FunctionViewProps) {
 		navigate({
 			search: {
 				path,
-				edit: false,
+				edit: undefined,
 			},
 		});
 	}
@@ -33,7 +33,7 @@ export function FunctionView({ functionId }: FunctionViewProps) {
 			{!edit && (
 				<Button
 					colorScheme="blue"
-					onClick={() => navigate({ search: { path, edit: !edit } })}
+					onClick={() => navigate({ search: { path, edit: functionId } })}
 				>
 					Rediger
 				</Button>
