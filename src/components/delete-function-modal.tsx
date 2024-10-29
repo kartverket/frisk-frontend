@@ -44,7 +44,7 @@ export function DeleteFunctionModal({ onClose, isOpen, functionId }: Props) {
 							variant="primary"
 							colorScheme="red"
 							leftIcon="delete"
-							onClick={(e) => {
+							onClick={async (e) => {
 								e.preventDefault();
 								if (!func.data) return;
 								const deletedFunctionParentPath = func.data.path
@@ -52,7 +52,7 @@ export function DeleteFunctionModal({ onClose, isOpen, functionId }: Props) {
 									.slice(0, -1)
 									.join(".");
 
-								removeFunction.mutate(func.data.id);
+								await removeFunction.mutateAsync(func.data.id);
 								navigate({
 									search: {
 										path: deletedFunctionParentPath ?? "1",
