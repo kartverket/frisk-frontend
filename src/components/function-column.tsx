@@ -69,7 +69,7 @@ export function FunctionColumn({ functionId }: FunctionFolderProps) {
 								const nameElement = form.elements.namedItem(
 									"name",
 								) as HTMLInputElement | null;
-								const teamElement = document.getElementById(
+								const teamElement = form.elements.namedItem(
 									"team-value",
 								) as HTMLInputElement;
 								if (!nameElement) return;
