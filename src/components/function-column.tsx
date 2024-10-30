@@ -47,7 +47,13 @@ export function FunctionColumn({ functionId }: FunctionFolderProps) {
 					Funksjon nivå {currentLevel + 1}
 				</Text>
 			</Box>
-			<Box border="1px" p="20px" borderColor="gray.400" minH="100%">
+			<Box
+				border="1px"
+				p="20px"
+				borderColor="gray.400"
+				minH="100%"
+				backgroundColor="white"
+			>
 				<Skeleton isLoaded={!!children.data} minH={60}>
 					<List display="flex" flexDirection="column" gap={2} marginBottom="2">
 						{children.data?.map((child) => (
@@ -115,10 +121,10 @@ export function FunctionColumn({ functionId }: FunctionFolderProps) {
 									size="sm"
 									borderRadius="5px"
 									mb="20px"
-                                    autoFocus
+									autoFocus
 								/>
 								<Text fontSize="xs" fontWeight="700" mb="4px">
-									Ansvarlig team for denne funksjonen?
+									Ansvarlig team for denne funksjonen?*
 								</Text>
 								<Skeleton isLoaded={!!teams.data} fitContent>
 									<Select
@@ -128,6 +134,7 @@ export function FunctionColumn({ functionId }: FunctionFolderProps) {
 										mb="30px"
 										size="sm"
 										borderRadius="5px"
+										required
 									>
 										{teams.data?.map((team) => (
 											<option key={team.id} value={team.id}>

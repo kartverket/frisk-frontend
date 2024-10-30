@@ -57,7 +57,7 @@ export function FunctionCardEdit({ functionId }: { functionId: number }) {
 	}
 
 	return (
-		<Flex flexDirection="column" paddingLeft="10px" p="2">
+		<Flex flexDirection="column" paddingLeft="10px" p="2" bgColor="white">
 			<Text fontSize="xs" fontWeight="700" mb="4px">
 				Funksjonsnavn*
 			</Text>
@@ -76,7 +76,7 @@ export function FunctionCardEdit({ functionId }: { functionId: number }) {
 				}}
 			/>
 			<Text fontSize="xs" fontWeight="700" mb="4px">
-				Ansvarlig team for denne funksjonen?
+				Ansvarlig team for denne funksjonen?*
 			</Text>
 			<Skeleton isLoaded={!!teams.data} fitContent>
 				<Select
@@ -87,7 +87,6 @@ export function FunctionCardEdit({ functionId }: { functionId: number }) {
 					borderRadius="5px"
 					defaultValue={currentTeam.data?.id}
 				>
-					<option value="no-team">Ingen team</option>
 					{teams.data?.map((team) => (
 						<option key={team.id} value={team.id}>
 							{team.displayName}
@@ -99,7 +98,7 @@ export function FunctionCardEdit({ functionId }: { functionId: number }) {
 				Svar på sikkerhetsspørsmål som er relevant for denne funksjonen
 			</Text>
 			<SchemaButton functionId={functionId} />
-			<Flex gap="12px" mt="32px">
+			<Flex gap="10px" mt="32px">
 				<Button
 					aria-label="decline"
 					variant="secondary"
@@ -129,6 +128,7 @@ export function FunctionCardEdit({ functionId }: { functionId: number }) {
 					leftIcon="delete"
 					size="sm"
 					colorScheme="blue"
+					ml="auto"
 					onClick={onOpen}
 				>
 					Slett funksjon
