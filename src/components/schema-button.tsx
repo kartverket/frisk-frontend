@@ -31,6 +31,7 @@ export function SchemaButton({
 					name: func.data?.name,
 					...(teamId && { teamId }),
 					redirect: redirectURL,
+					locked: "true",
 				});
 				const path = `${import.meta.env.VITE_REGELRETT_FRONTEND_URL}/ny?${searchParams.toString()}`;
 				window.location.href = path;
