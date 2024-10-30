@@ -1,14 +1,15 @@
 import { getTeam } from "@/services/backend";
 import { useQuery } from "@tanstack/react-query";
 
-export function useTeam(id: string) {
+export function useTeam(id: string | undefined) {
 	const team = useQuery({
 		queryKey: ["microsoft", "teams", id],
 		queryFn: async () => {
-			const team = await getTeam(id);
+			// biome-ignore lint/style/noNonNullAssertion: <explanation>
+			const team = await getTeam(id!);
 			return team;
 		},
-		enabled: true,
+		enabled: !!id,
 	});
 
 	return {

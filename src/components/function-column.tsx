@@ -5,7 +5,6 @@ import {
 	Box,
 	Button,
 	Flex,
-	IconButton,
 	Input,
 	List,
 	ListItem,
@@ -14,6 +13,7 @@ import {
 } from "@kvib/react";
 import { FunctionCard } from "./function-card";
 import { useState } from "react";
+import { TeamSelect } from "./team-select";
 
 type FunctionFolderProps = {
 	functionId: number;
@@ -21,7 +21,7 @@ type FunctionFolderProps = {
 
 export function FunctionColumn({ functionId }: FunctionFolderProps) {
 	const { path } = Route.useSearch();
-	const { children, addFunction } = useFunction(functionId, {
+	const { children, addFunction, addMetadata } = useFunction(functionId, {
 		includeChildren: true,
 	});
 
@@ -45,7 +45,13 @@ export function FunctionColumn({ functionId }: FunctionFolderProps) {
 					Funksjon nivå {currentLevel + 1}
 				</Text>
 			</Box>
-			<Box border="1px" p="20px" borderColor="gray.400" minH="100%">
+			<Box
+				border="1px"
+				p="20px"
+				borderColor="gray.400"
+				minH="100%"
+				backgroundColor="white"
+			>
 				<Skeleton isLoaded={!!children.data} minH={60}>
 					<List display="flex" flexDirection="column" gap={2} marginBottom="2">
 						{children.data?.map((child) => (
@@ -61,50 +67,76 @@ export function FunctionColumn({ functionId }: FunctionFolderProps) {
 					</List>
 					{isFormVisible && (
 						<form
-							onSubmit={(e) => {
+							onSubmit={async (e) => {
 								e.preventDefault();
 								const form = e.target as HTMLFormElement;
 								const nameElement = form.elements.namedItem(
 									"name",
 								) as HTMLInputElement | null;
+								const teamElement = form.elements.namedItem(
+									"team-value",
+								) as HTMLInputElement;
 								if (!nameElement) return;
-								addFunction.mutateAsync({
+
+								const { id: newFunctionId } = await addFunction.mutateAsync({
 									name: nameElement.value,
 									description: null,
 									parentId: functionId,
 								});
+								if (teamElement) {
+									await addMetadata.mutate({
+										functionId: newFunctionId,
+										key: "team",
+										value: teamElement.value,
+									});
+								}
 								// clear form
-								nameElement.value = "";
+								form.reset();
 								setFormVisible(false);
 							}}
 						>
 							<Flex
 								border="1px"
 								borderRadius="8px"
-								borderColor="gray.400"
-								p="5px"
+								borderColor="blue.500"
+								pt="14px"
+								px="25px"
+								pb="30px"
+								flexDirection="column"
 							>
+								<Text fontSize="xs" fontWeight="700" mb="4px">
+									Funksjonsnavn*
+								</Text>
 								<Input
 									type="text"
 									name="name"
 									placeholder="Navn"
 									required
+									size="sm"
+									borderRadius="5px"
+									mb="20px"
 									autoFocus
 								/>
-								<IconButton
-									type="submit"
-									icon="check"
-									aria-label="check"
-									variant="tertiary"
-									colorScheme="gray"
-								/>
-								<IconButton
-									icon="delete"
-									aria-label="delete"
-									variant="tertiary"
-									colorScheme="gray"
-									onClick={() => setFormVisible(false)}
-								/>
+								<TeamSelect functionId={functionId} edit />
+								<Flex gap="10px">
+									<Button
+										aria-label="delete"
+										variant="secondary"
+										colorScheme="blue"
+										size="sm"
+										onClick={() => setFormVisible(false)}
+									>
+										Avbryt
+									</Button>
+									<Button
+										type="submit"
+										aria-label="check"
+										colorScheme="blue"
+										size="sm"
+									>
+										Lagre
+									</Button>
+								</Flex>
 							</Flex>
 						</form>
 					)}

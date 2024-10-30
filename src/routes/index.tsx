@@ -1,11 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { FunctionColumnView } from "../components/function-column-view";
 import { Breadcrumbs } from "@/components/breadcrumbs";
-import { boolean, object, string } from "zod";
+import { number, object, string } from "zod";
 import { fallback, zodSearchValidator } from "@tanstack/router-zod-adapter";
 import { useFunction } from "@/hooks/use-function";
 import { useEffect } from "react";
-import { FunctionView } from "@/components/function-view";
 import { Main } from "@/components/main";
 import { CreateAndRedirectEffect } from "@/effects/create-and-redirect-effect";
 
@@ -18,7 +17,7 @@ const functionSearchSchema = object({
 			.default("1"),
 		"1",
 	),
-	edit: fallback(boolean().default(false), false),
+	edit: number().optional(),
 	newMetadataKey: string().optional(),
 	newMetadataValue: string().optional(),
 	redirect: string().optional(),
@@ -44,7 +43,7 @@ function Index() {
 			navigate({
 				search: {
 					path: parentPath,
-					edit: false,
+					edit: undefined,
 				},
 			});
 		}
@@ -53,7 +52,7 @@ function Index() {
 	return (
 		<Main>
 			<Breadcrumbs path={path} />
-			<FunctionView functionId={id} />
+			{/* <FunctionView functionId={id} /> */}
 			<FunctionColumnView path={path} />
 			<CreateAndRedirectEffect />
 		</Main>
