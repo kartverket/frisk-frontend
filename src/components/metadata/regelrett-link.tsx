@@ -5,7 +5,7 @@ export function RegelrettLink({
 }: { metadata: { key: string; contextId: string } }) {
 	const url = `${import.meta.env.VITE_REGELRETT_FRONTEND_URL}/context/${contextId}`;
 	return (
-		<Link href={url} colorScheme="blue">
+		<Link href={url} colorScheme="blue" onClick={(e) => e.stopPropagation()}>
 			{key
 				.split("-")[1]
 				.replace(/\+/g, " ")
