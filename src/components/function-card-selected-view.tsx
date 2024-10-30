@@ -13,7 +13,9 @@ export function FunctionCardSelectedView({
 	const navigate = Route.useNavigate();
 	const teamId = metadata.data?.find((m) => m.key === "team")?.value;
 	const { team } = useTeam(teamId);
-	const schemaMetadata = metadata.data?.filter((m) => m.key.startsWith("rr-"));
+	const schemaMetadata =
+		metadata.data?.filter((m) => m.key.startsWith("rr-")) ?? [];
+	const teamDisplayName = team.data?.displayName.replace(/.* - /, "");
 
 	return (
 		<Flex flexDirection="column" paddingLeft="10px" w="100%">
@@ -34,19 +36,17 @@ export function FunctionCardSelectedView({
 				/>
 				<Icon icon={"arrow_back_ios"} />
 			</Flex>
-			{team && <Text>{team.data?.displayName.replace(/.* - /, "")}</Text>}
+			{team && <Text>{teamDisplayName}</Text>}
 			<SchemaButton my="16px" functionId={functionId} />
-			{schemaMetadata &&
-				schemaMetadata.length > 0 &&
-				schemaMetadata.map((item) => (
-					<RegelrettLink
-						key={item.key}
-						metadata={{
-							key: item.key,
-							contextId: item.value,
-						}}
-					/>
-				))}
+			{schemaMetadata.map((item) => (
+				<RegelrettLink
+					key={item.key}
+					metadata={{
+						key: item.key,
+						contextId: item.value,
+					}}
+				/>
+			))}
 		</Flex>
 	);
 }

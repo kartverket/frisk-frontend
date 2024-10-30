@@ -8,13 +8,12 @@ import {
 	Input,
 	List,
 	ListItem,
-	Select,
 	Skeleton,
 	Text,
 } from "@kvib/react";
 import { FunctionCard } from "./function-card";
 import { useState } from "react";
-import { useUser } from "@/hooks/use-user";
+import { TeamSelect } from "./team-select";
 
 type FunctionFolderProps = {
 	functionId: number;
@@ -25,7 +24,6 @@ export function FunctionColumn({ functionId }: FunctionFolderProps) {
 	const { children, addFunction, addMetadata } = useFunction(functionId, {
 		includeChildren: true,
 	});
-	const { teams } = useUser();
 
 	const selectedFunctionIds = getIdsFromPath(path);
 	const currentLevel = selectedFunctionIds.indexOf(functionId);
@@ -80,25 +78,21 @@ export function FunctionColumn({ functionId }: FunctionFolderProps) {
 								) as HTMLInputElement;
 								if (!nameElement) return;
 
-								try {
-									const { id: newFunctionId } = await addFunction.mutateAsync({
-										name: nameElement.value,
-										description: null,
-										parentId: functionId,
+								const { id: newFunctionId } = await addFunction.mutateAsync({
+									name: nameElement.value,
+									description: null,
+									parentId: functionId,
+								});
+								if (teamElement) {
+									await addMetadata.mutate({
+										functionId: newFunctionId,
+										key: "team",
+										value: teamElement.value,
 									});
-									if (teamElement) {
-										await addMetadata.mutate({
-											functionId: newFunctionId,
-											key: "team",
-											value: teamElement.value,
-										});
-									}
-									// clear form
-									form.reset();
-									setFormVisible(false);
-								} catch (error) {
-									console.error(error);
 								}
+								// clear form
+								form.reset();
+								setFormVisible(false);
 							}}
 						>
 							<Flex
@@ -123,26 +117,7 @@ export function FunctionColumn({ functionId }: FunctionFolderProps) {
 									mb="20px"
 									autoFocus
 								/>
-								<Text fontSize="xs" fontWeight="700" mb="4px">
-									Ansvarlig team for denne funksjonen?*
-								</Text>
-								<Skeleton isLoaded={!!teams.data} fitContent>
-									<Select
-										id="team-value"
-										name="team-value"
-										placeholder="Velg team"
-										mb="30px"
-										size="sm"
-										borderRadius="5px"
-										required
-									>
-										{teams.data?.map((team) => (
-											<option key={team.id} value={team.id}>
-												{team.displayName}
-											</option>
-										))}
-									</Select>
-								</Skeleton>
+								<TeamSelect functionId={functionId} edit />
 								<Flex gap="10px">
 									<Button
 										aria-label="delete"

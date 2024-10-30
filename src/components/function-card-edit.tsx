@@ -1,31 +1,20 @@
-import {
-	Flex,
-	Input,
-	Text,
-	Button,
-	Skeleton,
-	Select,
-	useDisclosure,
-} from "@kvib/react";
+import { Flex, Input, Text, Button, useDisclosure } from "@kvib/react";
 import { SchemaButton } from "./schema-button";
-import { useUser } from "@/hooks/use-user";
 import { useRef } from "react";
 import { useFunction } from "@/hooks/use-function";
 import { Route } from "@/routes";
-import { useTeam } from "@/hooks/use-team";
 import { DeleteFunctionModal } from "@/components/delete-function-modal.tsx";
+import { TeamSelect } from "./team-select";
 
 export function FunctionCardEdit({ functionId }: { functionId: number }) {
 	const { func, updateFunction, metadata, addMetadata, removeMetadata } =
 		useFunction(functionId);
-	const { teams } = useUser();
 	const nameInputRef = useRef<HTMLInputElement>(null);
 	const navigate = Route.useNavigate();
 	const search = Route.useSearch();
 	const { isOpen, onOpen, onClose } = useDisclosure();
 
 	const currentTeamId = metadata.data?.find((m) => m.key === "team");
-	const { team: currentTeam } = useTeam(currentTeamId?.value);
 
 	async function save() {
 		const newName = nameInputRef.current?.value;
@@ -75,25 +64,7 @@ export function FunctionCardEdit({ functionId }: { functionId: number }) {
 					e.preventDefault();
 				}}
 			/>
-			<Text fontSize="xs" fontWeight="700" mb="4px">
-				Ansvarlig team for denne funksjonen?*
-			</Text>
-			<Skeleton isLoaded={!!teams.data} fitContent>
-				<Select
-					id="team-value"
-					name="team-value"
-					mb="30px"
-					size="sm"
-					borderRadius="5px"
-					defaultValue={currentTeam.data?.id}
-				>
-					{teams.data?.map((team) => (
-						<option key={team.id} value={team.id}>
-							{team.displayName}
-						</option>
-					))}
-				</Select>
-			</Skeleton>
+			<TeamSelect functionId={functionId} />
 			<Text fontSize="xs" fontWeight="700" mb="10px">
 				Svar på sikkerhetsspørsmål som er relevant for denne funksjonen
 			</Text>
