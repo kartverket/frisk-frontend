@@ -37,7 +37,7 @@ export function SchemaButton({
 				window.location.href = path;
 			}}
 		>
-			Sikkerhetsskjema
+			Opprett sikkerhetsskjema
 		</Button>
 	);
 }
