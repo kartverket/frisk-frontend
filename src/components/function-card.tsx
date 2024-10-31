@@ -31,6 +31,7 @@ export function FunctionCard({
 		id: functionId,
 	});
 
+	// TODO: fikse fakka reff style
 	const setRefs = (node: HTMLElement | null) => {
 		setDraggableRef(node);
 		setDroppableRef(node);
@@ -50,7 +51,6 @@ export function FunctionCard({
 			{...listeners}
 			{...attributes}
 			style={dragableStyle}
-			onClick={(e) => e.preventDefault()}
 		>
 			<TSRLink
 				to={Route.to}

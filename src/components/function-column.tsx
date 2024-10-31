@@ -31,6 +31,13 @@ export function FunctionColumn({ functionId }: FunctionFolderProps) {
 
 	const [isFormVisible, setFormVisible] = useState(false);
 
+	const r = selectedFunctionIds[currentLevel];
+
+	console.log(`Dette er R ${r}`);
+	const { isOver, setNodeRef } = useDroppable({
+		id: r,
+	});
+
 	return (
 		<Flex flexDirection="column" width="380px">
 			<Box
@@ -51,7 +58,8 @@ export function FunctionColumn({ functionId }: FunctionFolderProps) {
 				p="20px"
 				borderColor="gray.400"
 				minH="100%"
-				backgroundColor={"white"}
+				backgroundColor={isOver ? "blue.50" : "white"}
+				ref={setNodeRef}
 			>
 				<Skeleton isLoaded={!!children.data} minH={60}>
 					<List display="flex" flexDirection="column" gap={2} marginBottom="2">
