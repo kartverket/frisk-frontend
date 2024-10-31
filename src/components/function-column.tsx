@@ -14,6 +14,7 @@ import {
 import { FunctionCard } from "./function-card";
 import { useState } from "react";
 import { TeamSelect } from "./team-select";
+import { useDroppable } from "@dnd-kit/core";
 
 type FunctionFolderProps = {
 	functionId: number;
@@ -50,7 +51,7 @@ export function FunctionColumn({ functionId }: FunctionFolderProps) {
 				p="20px"
 				borderColor="gray.400"
 				minH="100%"
-				backgroundColor="white"
+				backgroundColor={"white"}
 			>
 				<Skeleton isLoaded={!!children.data} minH={60}>
 					<List display="flex" flexDirection="column" gap={2} marginBottom="2">
