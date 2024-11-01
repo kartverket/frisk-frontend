@@ -1,6 +1,7 @@
 import { Flex, Text } from "@kvib/react";
 import { FunctionColumn } from "./function-column";
 import { getIdsFromPath } from "@/lib/utils";
+import { Route } from "@/routes";
 import {
 	DndContext,
 	MouseSensor,
@@ -15,6 +16,8 @@ type FunctionColumnViewProps = {
 };
 
 export function FunctionColumnView({ path }: FunctionColumnViewProps) {
+	const navigate = Route.useNavigate();
+
 	const selectedFunctionIds = getIdsFromPath(path);
 
 	const sensors = useSensors(
@@ -31,16 +34,21 @@ export function FunctionColumnView({ path }: FunctionColumnViewProps) {
 		}),
 	);
 
-	function handleDragEnd(event: DragEndEvent) {
+	async function handleDragEnd(event: DragEndEvent) {
 		const { active, over } = event;
 
 		if (over) {
 			console.log(over.id);
 			console.log(active.id);
 			if (active.data.current && over.id !== active.id) {
-				active.data.current.update.mutate({
+				await active.data.current.update.mutateAsync({
 					...active.data.current.func,
 					parentId: Number(over.id),
+				});
+				navigate({
+					search: {
+						path: active.data.current.func.path,
+					},
 				});
 			}
 		}

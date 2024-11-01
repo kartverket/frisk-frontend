@@ -31,11 +31,8 @@ export function FunctionColumn({ functionId }: FunctionFolderProps) {
 
 	const [isFormVisible, setFormVisible] = useState(false);
 
-	const r = selectedFunctionIds[currentLevel];
-
-	console.log(`Dette er R ${r}`);
 	const { isOver, setNodeRef } = useDroppable({
-		id: r,
+		id: selectedFunctionIds[currentLevel],
 	});
 
 	return (
