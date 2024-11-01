@@ -10,6 +10,7 @@ import {
 	useSensors,
 	type DragEndEvent,
 } from "@dnd-kit/core";
+import { useState } from "react";
 
 type FunctionColumnViewProps = {
 	path: string;

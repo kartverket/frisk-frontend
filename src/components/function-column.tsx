@@ -15,6 +15,7 @@ import { FunctionCard } from "./function-card";
 import { useState } from "react";
 import { TeamSelect } from "./team-select";
 import { useDroppable } from "@dnd-kit/core";
+import { Draggable } from "./draggable";
 
 type FunctionFolderProps = {
 	functionId: number;
@@ -64,10 +65,12 @@ export function FunctionColumn({ functionId }: FunctionFolderProps) {
 							<ListItem
 								key={child.id + child.name + child.parentId + child.path}
 							>
-								<FunctionCard
-									functionId={child.id}
-									selected={selectedFunctionIds.includes(child.id)}
-								/>
+								<Draggable functionId={child.id}>
+									<FunctionCard
+										functionId={child.id}
+										selected={selectedFunctionIds.includes(child.id)}
+									/>
+								</Draggable>
 							</ListItem>
 						))}
 					</List>
