@@ -13,7 +13,6 @@ export function SchemaButton({
 			colorScheme="blue"
 			size="xs"
 			width="fit-content"
-			rightIcon="open_in_new"
 			{...rest}
 			onClick={() => {
 				if (!func.data) return;
@@ -32,6 +31,8 @@ export function SchemaButton({
 					...(teamId && { teamId }),
 					redirect: redirectURL,
 					locked: "true",
+					redirectBackUrl: window.location.href,
+					redirectBackTitle: "Funksjonsregisteret",
 				});
 				const path = `${import.meta.env.VITE_REGELRETT_FRONTEND_URL}/ny?${searchParams.toString()}`;
 				window.location.href = path;
