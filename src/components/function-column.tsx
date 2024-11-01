@@ -58,7 +58,7 @@ export function FunctionColumn({ functionId }: FunctionFolderProps) {
 				p="20px"
 				borderColor="gray.400"
 				minH="100%"
-				backgroundColor={isOver ? "blue.50" : "white"}
+				backgroundColor={isOver ? "blue.100" : "white"}
 				ref={setNodeRef}
 			>
 				<Skeleton isLoaded={!!children.data} minH={60}>

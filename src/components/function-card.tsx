@@ -56,15 +56,14 @@ export function FunctionCard({
 				to={Route.to}
 				search={{ path: func.data?.path, edit: search.edit }}
 				style={{ borderRadius: "inherit" }}
-				onClick={(e) => {
-					e.stopPropagation();
-				}}
 			>
 				<Flex
 					bgColor={
-						(selected && search.edit === undefined) || isOver
-							? "blue.50"
-							: undefined
+						isOver
+							? "blue.100"
+							: selected && search.edit === undefined
+								? "blue.50"
+								: undefined
 					}
 					display="flex"
 					borderRadius="inherit"
