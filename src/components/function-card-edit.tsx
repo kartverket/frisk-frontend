@@ -77,6 +77,8 @@ export function FunctionCardEdit({ functionId }: { functionId: number }) {
 					size="sm"
 					onClick={(e) => {
 						e.preventDefault();
+						e.stopPropagation();
+
 						navigate({ search: { ...search, edit: undefined } });
 					}}
 				>
@@ -88,6 +90,8 @@ export function FunctionCardEdit({ functionId }: { functionId: number }) {
 					size="sm"
 					onClick={(e) => {
 						e.preventDefault();
+						e.stopPropagation();
+
 						save();
 					}}
 				>

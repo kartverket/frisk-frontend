@@ -16,7 +16,8 @@ export function FunctionCard({
 		<Card
 			borderColor="blue.500"
 			borderWidth={1}
-			onClick={() => {
+			onClick={(e) => {
+				e.preventDefault();
 				navigate({ search: { path: func.data?.path, edit: search.edit } });
 			}}
 		>
@@ -51,6 +52,7 @@ export function FunctionCard({
 							style={{ pointerEvents: "auto" }}
 							onClick={(e) => {
 								console.log("tykkk!!");
+								e.stopPropagation();
 								e.preventDefault();
 								navigate({ search: { ...search, edit: functionId } });
 							}}
