@@ -19,9 +19,13 @@ import { Draggable } from "./draggable";
 
 type FunctionFolderProps = {
 	functionId: number;
+	legalDroppable: boolean;
 };
 
-export function FunctionColumn({ functionId }: FunctionFolderProps) {
+export function FunctionColumn({
+	functionId,
+	legalDroppable,
+}: FunctionFolderProps) {
 	const { path } = Route.useSearch();
 	const { children, addFunction, addMetadata } = useFunction(functionId, {
 		includeChildren: true,
@@ -56,7 +60,7 @@ export function FunctionColumn({ functionId }: FunctionFolderProps) {
 				p="20px"
 				borderColor="gray.400"
 				minH="100%"
-				backgroundColor={isOver ? "blue.100" : "white"}
+				backgroundColor={isOver && legalDroppable ? "blue.100" : "white"}
 				ref={setNodeRef}
 			>
 				<Skeleton isLoaded={!!children.data} minH={60}>

@@ -4,6 +4,7 @@ import { getIdsFromPath } from "@/lib/utils";
 import { Route } from "@/routes";
 import {
 	DndContext,
+	DragOverEvent,
 	MouseSensor,
 	TouchSensor,
 	useSensor,
@@ -20,6 +21,7 @@ export function FunctionColumnView({ path }: FunctionColumnViewProps) {
 	const navigate = Route.useNavigate();
 
 	const selectedFunctionIds = getIdsFromPath(path);
+	const [legalDroppable, setLegalDroppable] = useState<boolean>(false);
 
 	const sensors = useSensors(
 		useSensor(MouseSensor, {
@@ -39,8 +41,6 @@ export function FunctionColumnView({ path }: FunctionColumnViewProps) {
 		const { active, over } = event;
 
 		if (over) {
-			console.log(over.id);
-			console.log(active.id);
 			if (active.data.current && over.id !== active.id) {
 				await active.data.current.update.mutateAsync({
 					...active.data.current.func,
@@ -55,8 +55,25 @@ export function FunctionColumnView({ path }: FunctionColumnViewProps) {
 		}
 	}
 
+	function handleDragOver(event: DragOverEvent) {
+		const { active, over } = event;
+		if (over) {
+			if (over.id !== active.id) {
+				setLegalDroppable(true);
+			} else {
+				setLegalDroppable(false);
+			}
+		} else {
+			setLegalDroppable(false);
+		}
+	}
+
 	return (
-		<DndContext onDragEnd={handleDragEnd} sensors={sensors}>
+		<DndContext
+			onDragEnd={handleDragEnd}
+			onDragOver={handleDragOver}
+			sensors={sensors}
+		>
 			<Flex
 				flexDirection="column"
 				paddingY="38"
@@ -71,7 +88,11 @@ export function FunctionColumnView({ path }: FunctionColumnViewProps) {
 				</Text>
 				<Flex>
 					{selectedFunctionIds?.map((id) => (
-						<FunctionColumn key={id} functionId={id} />
+						<FunctionColumn
+							legalDroppable={legalDroppable}
+							key={id}
+							functionId={id}
+						/>
 					))}
 				</Flex>
 			</Flex>
