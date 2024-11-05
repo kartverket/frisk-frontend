@@ -5,7 +5,6 @@ import { Text, Skeleton, Select } from "@kvib/react";
 
 export function TeamSelect({
 	functionId,
-	edit,
 }: { functionId: number; edit?: boolean }) {
 	const { metadata } = useFunction(functionId);
 	const { teams } = useUser();
@@ -25,12 +24,12 @@ export function TeamSelect({
 					size="sm"
 					borderRadius="5px"
 					required
-					placeholder={edit ? "Velg team" : undefined}
-					defaultValue={edit ? undefined : currentTeam.data?.id}
+					placeholder={currentTeam.data?.id ? undefined : "Velg team"}
+					defaultValue={currentTeam.data?.id}
 				>
 					{teams.data?.map((team) => (
 						<option key={team.id} value={team.id}>
-							{team.displayName}
+							{team.displayName.replace(/.* - /, "")}
 						</option>
 					))}
 				</Select>
