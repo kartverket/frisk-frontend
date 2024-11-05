@@ -1,3 +1,4 @@
+import { getregelrettFrontendUrl } from "@/config";
 import { useFunction } from "@/hooks/use-function";
 import { Button } from "@kvib/react";
 import type { ButtonProps } from "@kvib/react";
@@ -34,7 +35,7 @@ export function SchemaButton({
 					redirectBackUrl: window.location.href,
 					redirectBackTitle: "Funksjonsregisteret",
 				});
-				const path = `${import.meta.env.VITE_REGELRETT_FRONTEND_URL}/ny?${searchParams.toString()}`;
+				const path = `${getregelrettFrontendUrl()}/ny?${searchParams.toString()}`;
 				window.location.href = path;
 			}}
 		>

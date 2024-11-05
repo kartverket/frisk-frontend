@@ -1,8 +1,9 @@
 import { array, number, object, string, type z } from "zod";
 import { msalInstance, scopes } from "./msal";
 import { InteractionRequiredAuthError } from "@azure/msal-browser";
+import { getBackendUrl } from "@/config";
 
-const BACKEND_URL = import.meta.env.VITE_BACKEND_URL ?? "http://localhost:8080";
+const BACKEND_URL = getBackendUrl() ?? "http://localhost:8080";
 
 async function getTokens() {
 	const accounts = msalInstance.getAllAccounts();

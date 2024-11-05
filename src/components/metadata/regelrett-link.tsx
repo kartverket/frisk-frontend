@@ -1,3 +1,4 @@
+import { getregelrettFrontendUrl } from "@/config";
 import { Link } from "@kvib/react";
 
 export function RegelrettLink({
@@ -7,7 +8,7 @@ export function RegelrettLink({
 		redirectBackUrl: window.location.href,
 		redirectBackTitle: "Funksjonsregisteret",
 	});
-	const url = `${import.meta.env.VITE_REGELRETT_FRONTEND_URL}/context/${contextId}?${searchParams.toString()}`;
+	const url = `${getregelrettFrontendUrl()}/context/${contextId}?${searchParams.toString()}`;
 	return (
 		<Link
 			href={url}
