@@ -117,7 +117,7 @@ export function FunctionColumn({ functionId }: FunctionFolderProps) {
 									mb="20px"
 									autoFocus
 								/>
-								<TeamSelect functionId={functionId} edit />
+								<TeamSelect functionId={functionId} />
 								<Flex gap="10px">
 									<Button
 										aria-label="delete"
