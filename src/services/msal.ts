@@ -16,7 +16,8 @@ import {
 setConfig(null);
 const config = await getConfig();
 setConfig(config);
-export const clientId = getClientId();
+
+const clientId = getClientId();
 const authority = getAuthority();
 const redirectUri = getRedirectUri();
 
