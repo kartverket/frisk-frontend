@@ -11,6 +11,7 @@ import {
 	Button,
 } from "@kvib/react";
 import { Metadata } from "./metadata/metadata";
+import { getregelrettFrontendUrl } from "@/config";
 
 type FunctionInfoViewProps = {
 	functionId: number;
@@ -82,7 +83,7 @@ export function FunctionInfoView({ functionId }: FunctionInfoViewProps) {
 							...(teamId && { teamId }),
 							redirect: redirectURL,
 						});
-						const path = `${import.meta.env.VITE_REGELRETT_FRONTEND_URL}/ny?${searchParams.toString()}`;
+						const path = `${getregelrettFrontendUrl()}/ny?${searchParams.toString()}`;
 						window.location.href = path;
 					}}
 				>
