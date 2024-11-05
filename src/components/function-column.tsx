@@ -14,22 +14,19 @@ import {
 import { FunctionCard } from "./function-card";
 import { useState } from "react";
 import { TeamSelect } from "./team-select";
-import { useDroppable } from "@dnd-kit/core";
+import { type DragOverEvent, useDndMonitor, useDroppable } from "@dnd-kit/core";
 import { Draggable } from "./draggable";
 
 type FunctionFolderProps = {
 	functionId: number;
-	legalDroppable: boolean;
 };
 
-export function FunctionColumn({
-	functionId,
-	legalDroppable,
-}: FunctionFolderProps) {
+export function FunctionColumn({ functionId }: FunctionFolderProps) {
 	const { path } = Route.useSearch();
 	const { children, addFunction, addMetadata } = useFunction(functionId, {
 		includeChildren: true,
 	});
+	const [disabled, setDisabled] = useState<boolean>(false);
 
 	const selectedFunctionIds = getIdsFromPath(path);
 	const currentLevel = selectedFunctionIds.indexOf(functionId);
@@ -38,6 +35,30 @@ export function FunctionColumn({
 
 	const { isOver, setNodeRef } = useDroppable({
 		id: selectedFunctionIds[currentLevel],
+		disabled: disabled,
+	});
+
+	useDndMonitor({
+		onDragOver(event) {
+			const { active, over } = event;
+			if (over && active.data.current && active.data.current.func.path) {
+				if (over.id === functionId && active.id === over.id) {
+					setDisabled(true);
+				} else if (
+					over.id === functionId &&
+					selectedFunctionIds.includes(active.id as number)
+				) {
+					setDisabled(
+						!getIdsFromPath(active.data.current.func.path).includes(
+							over.id as number,
+						),
+					);
+				}
+			}
+		},
+		onDragEnd() {
+			setDisabled(false);
+		},
 	});
 
 	return (
@@ -60,8 +81,8 @@ export function FunctionColumn({
 				p="20px"
 				borderColor="gray.400"
 				minH="100%"
-				backgroundColor={isOver && legalDroppable ? "blue.100" : "white"}
 				ref={setNodeRef}
+				backgroundColor={isOver ? "blue.100" : "white"}
 			>
 				<Skeleton isLoaded={!!children.data} minH={60}>
 					<List display="flex" flexDirection="column" gap={2} marginBottom="2">
