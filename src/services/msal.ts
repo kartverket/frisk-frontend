@@ -1,4 +1,11 @@
 import {
+	getAuthority,
+	getClientId,
+	getConfig,
+	getRedirectUri,
+	setConfig,
+} from "@/config";
+import {
 	type Configuration,
 	type PopupRequest,
 	PublicClientApplication,
@@ -6,9 +13,12 @@ import {
 	type SsoSilentRequest,
 } from "@azure/msal-browser";
 
-export const clientId = import.meta.env.VITE_CLIENT_ID;
-const authority = import.meta.env.VITE_AUTHORITY;
-const redirectUri = import.meta.env.VITE_LOGIN_REDIRECT_URI;
+setConfig(null);
+const config = await getConfig();
+setConfig(config);
+export const clientId = getClientId();
+const authority = getAuthority();
+const redirectUri = getRedirectUri();
 
 if (!clientId) {
 	throw new Error("Client ID is not set");
