@@ -74,7 +74,9 @@ export async function getChildren(id: number) {
 	return array(BackendFunction).parse(json);
 }
 
-export async function createFunction(newFunction: BackendFunctionCreate) {
+export async function createFunction(
+	newFunction: BackendFunctionWithMetadataCreate,
+) {
 	const response = await fetchFromBackend("/functions", {
 		method: "POST",
 		headers: {
@@ -221,6 +223,10 @@ const BackendFunction = object({
 });
 export type BackendFunction = z.infer<typeof BackendFunction>;
 type BackendFunctionCreate = Omit<BackendFunction, "id" | "path">;
+export type BackendFunctionWithMetadataCreate = {
+	function: BackendFunctionCreate;
+	metadata: Omit<FunctionMetadataCreate, "functionId">[];
+};
 
 const FunctionDependency = object({
 	functionId: number().int(),

@@ -21,7 +21,7 @@ type FunctionFolderProps = {
 
 export function FunctionColumn({ functionId }: FunctionFolderProps) {
 	const { path } = Route.useSearch();
-	const { children, addFunction, addMetadata } = useFunction(functionId, {
+	const { children, addFunction } = useFunction(functionId, {
 		includeChildren: true,
 	});
 
@@ -76,20 +76,21 @@ export function FunctionColumn({ functionId }: FunctionFolderProps) {
 								const teamElement = form.elements.namedItem(
 									"team-value",
 								) as HTMLInputElement;
-								if (!nameElement) return;
+								if (!nameElement || !teamElement) return;
 
-								const { id: newFunctionId } = await addFunction.mutateAsync({
-									name: nameElement.value,
-									description: null,
-									parentId: functionId,
+								addFunction.mutateAsync({
+									function: {
+										name: nameElement.value,
+										description: null,
+										parentId: functionId,
+									},
+									metadata: [
+										{
+											key: "team",
+											value: teamElement.value,
+										},
+									],
 								});
-								if (teamElement) {
-									await addMetadata.mutate({
-										functionId: newFunctionId,
-										key: "team",
-										value: teamElement.value,
-									});
-								}
 								// clear form
 								form.reset();
 								setFormVisible(false);

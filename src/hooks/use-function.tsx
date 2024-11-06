@@ -106,7 +106,7 @@ export function useFunction(functionId: number, opts?: UseFunctionOpts) {
 		onMutate: async (_newFunction) => {
 			const randomNegativeNumber = -Math.floor(Math.random() * 1000);
 			const newFunction: BackendFunction = {
-				..._newFunction,
+				..._newFunction.function,
 				id: randomNegativeNumber,
 				path: `${func.data?.path}.${randomNegativeNumber}`,
 			};
@@ -136,7 +136,7 @@ export function useFunction(functionId: number, opts?: UseFunctionOpts) {
 		},
 		onError: (_, newFunction, context) => {
 			queryClient.setQueryData<BackendFunction[]>(
-				["functions", newFunction.parentId, "children"],
+				["functions", newFunction.function.parentId, "children"],
 				context?.previousChildren ?? [],
 			);
 		},
