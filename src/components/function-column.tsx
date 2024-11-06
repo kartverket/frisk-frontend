@@ -26,7 +26,7 @@ export function FunctionColumn({ functionId }: FunctionFolderProps) {
 	const { children, addFunction, addMetadata } = useFunction(functionId, {
 		includeChildren: true,
 	});
-	const [disabled, setDisabled] = useState<boolean>(false);
+	const [disabled, setDisabled] = useState<boolean>();
 
 	const selectedFunctionIds = getIdsFromPath(path);
 	const currentLevel = selectedFunctionIds.indexOf(functionId);
@@ -46,11 +46,11 @@ export function FunctionColumn({ functionId }: FunctionFolderProps) {
 					setDisabled(true);
 				} else if (
 					over.id === functionId &&
-					selectedFunctionIds.includes(active.id as number)
+					selectedFunctionIds.includes(Number(active.id))
 				) {
 					setDisabled(
 						!getIdsFromPath(active.data.current.func.path).includes(
-							over.id as number,
+							Number(over.id),
 						),
 					);
 				}
