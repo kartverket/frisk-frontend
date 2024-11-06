@@ -31,6 +31,7 @@ export function FunctionCardSelectedView({
 					icon="edit"
 					onClick={(e) => {
 						e.preventDefault();
+						e.stopPropagation();
 						navigate({ search: { ...search, edit: functionId } });
 					}}
 				/>

@@ -14,6 +14,8 @@ import {
 import { FunctionCard } from "./function-card";
 import { useState } from "react";
 import { TeamSelect } from "./team-select";
+import { useDndMonitor, useDroppable } from "@dnd-kit/core";
+import { Draggable } from "./draggable";
 
 type FunctionFolderProps = {
 	functionId: number;
@@ -24,11 +26,40 @@ export function FunctionColumn({ functionId }: FunctionFolderProps) {
 	const { children, addFunction } = useFunction(functionId, {
 		includeChildren: true,
 	});
+	const [disabled, setDisabled] = useState<boolean>();
 
 	const selectedFunctionIds = getIdsFromPath(path);
 	const currentLevel = selectedFunctionIds.indexOf(functionId);
 
 	const [isFormVisible, setFormVisible] = useState(false);
+
+	const { isOver, setNodeRef } = useDroppable({
+		id: selectedFunctionIds[currentLevel],
+		disabled: disabled,
+	});
+
+	useDndMonitor({
+		onDragOver(event) {
+			const { active, over } = event;
+			if (over && active.data.current && active.data.current.func.path) {
+				if (over.id === functionId && active.id === over.id) {
+					setDisabled(true);
+				} else if (
+					over.id === functionId &&
+					selectedFunctionIds.includes(Number(active.id))
+				) {
+					setDisabled(
+						!getIdsFromPath(active.data.current.func.path).includes(
+							Number(over.id),
+						),
+					);
+				}
+			}
+		},
+		onDragEnd() {
+			setDisabled(false);
+		},
+	});
 
 	return (
 		<Flex flexDirection="column" width="380px">
@@ -50,7 +81,8 @@ export function FunctionColumn({ functionId }: FunctionFolderProps) {
 				p="20px"
 				borderColor="gray.400"
 				minH="100%"
-				backgroundColor="white"
+				ref={setNodeRef}
+				backgroundColor={isOver ? "blue.100" : "white"}
 			>
 				<Skeleton isLoaded={!!children.data} minH={60}>
 					<List display="flex" flexDirection="column" gap={2} marginBottom="2">
@@ -58,10 +90,12 @@ export function FunctionColumn({ functionId }: FunctionFolderProps) {
 							<ListItem
 								key={child.id + child.name + child.parentId + child.path}
 							>
-								<FunctionCard
-									functionId={child.id}
-									selected={selectedFunctionIds.includes(child.id)}
-								/>
+								<Draggable functionId={child.id}>
+									<FunctionCard
+										functionId={child.id}
+										selected={selectedFunctionIds.includes(child.id)}
+									/>
+								</Draggable>
 							</ListItem>
 						))}
 					</List>
