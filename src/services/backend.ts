@@ -198,6 +198,21 @@ export async function deleteFunctionMetadata(id: number) {
 	});
 }
 
+export async function patchMetadataValue({
+	id,
+	...metadataValue
+}: MetadataValueUpdate) {
+	await fetchFromBackend(`/metadata/${id}`, {
+		method: "PATCH",
+		headers: {
+			"Content-Type": "application/json",
+		},
+		body: JSON.stringify(metadataValue),
+	});
+}
+
+type MetadataValueUpdate = { id: number; value: string };
+
 export async function getMyMicrosoftTeams() {
 	const response = await fetchFromBackend("/microsoft/me/teams", {
 		method: "GET",

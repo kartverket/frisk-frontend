@@ -7,7 +7,7 @@ import { DeleteFunctionModal } from "@/components/delete-function-modal.tsx";
 import { TeamSelect } from "./team-select";
 
 export function FunctionCardEdit({ functionId }: { functionId: number }) {
-	const { func, updateFunction, metadata, addMetadata, removeMetadata } =
+	const { func, updateFunction, metadata, updateMetadataValue } =
 		useFunction(functionId);
 	const nameInputRef = useRef<HTMLInputElement>(null);
 	const navigate = Route.useNavigate();
@@ -27,17 +27,9 @@ export function FunctionCardEdit({ functionId }: { functionId: number }) {
 			});
 		}
 
-		if (currentTeamId?.id) {
-			await removeMetadata.mutateAsync({
+		if (currentTeamId?.id && newTeam) {
+			await updateMetadataValue.mutateAsync({
 				id: currentTeamId.id,
-				functionId: functionId,
-			});
-		}
-
-		if (newTeam && newTeam.value !== "no-team") {
-			await addMetadata.mutateAsync({
-				functionId: functionId,
-				key: "team",
 				value: newTeam.value,
 			});
 		}

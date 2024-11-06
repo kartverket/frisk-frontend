@@ -14,6 +14,7 @@ import {
 	getFunction,
 	getFunctionMetadata,
 	putFunction,
+	patchMetadataValue,
 } from "@/services/backend";
 
 type UseFunctionOpts = {
@@ -585,6 +586,46 @@ export function useFunction(functionId: number, opts?: UseFunctionOpts) {
 		},
 	});
 
+	const updateMetadataValue = useMutation({
+		mutationFn: patchMetadataValue,
+		onMutate: async (updatedMetadata) => {
+			await queryClient.cancelQueries({
+				queryKey: ["functions", functionId, "metadata"],
+			});
+
+			const previousMetadata = queryClient.getQueryData<FunctionMetadata[]>([
+				"functions",
+				functionId,
+				"metadata",
+			]);
+
+			if (previousMetadata) {
+				const updatedMetadataList = previousMetadata.map((metadata) =>
+					metadata.id === updatedMetadata.id
+						? { ...metadata, value: updatedMetadata.value }
+						: metadata,
+				);
+
+				queryClient.setQueryData<FunctionMetadata[]>(
+					["functions", functionId, "metadata"],
+					updatedMetadataList,
+				);
+			}
+			return { previousMetadata };
+		},
+		onError: (_, __, context) => {
+			queryClient.setQueryData<FunctionMetadata[]>(
+				["functions", functionId, "metadata"],
+				context?.previousMetadata,
+			);
+		},
+		onSettled: (_updatedMetadataValue) => {
+			queryClient.invalidateQueries({
+				queryKey: ["functions", functionId, "metadata"],
+			});
+		},
+	});
+
 	return {
 		func,
 		children,
@@ -598,5 +639,6 @@ export function useFunction(functionId: number, opts?: UseFunctionOpts) {
 		metadata,
 		addMetadata,
 		removeMetadata,
+		updateMetadataValue,
 	};
 }
