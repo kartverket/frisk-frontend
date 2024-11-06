@@ -51,7 +51,6 @@ export function FunctionCard({
 							icon="edit"
 							style={{ pointerEvents: "auto" }}
 							onClick={(e) => {
-								console.log("tykkk!!");
 								e.stopPropagation();
 								e.preventDefault();
 								navigate({ search: { ...search, edit: functionId } });
