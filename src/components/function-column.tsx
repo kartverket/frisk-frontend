@@ -14,7 +14,7 @@ import {
 import { FunctionCard } from "./function-card";
 import { useState } from "react";
 import { TeamSelect } from "./team-select";
-import { type DragOverEvent, useDndMonitor, useDroppable } from "@dnd-kit/core";
+import { useDndMonitor, useDroppable } from "@dnd-kit/core";
 import { Draggable } from "./draggable";
 
 type FunctionFolderProps = {
