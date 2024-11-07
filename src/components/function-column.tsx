@@ -84,21 +84,30 @@ export function FunctionColumn({ functionId }: FunctionFolderProps) {
 				ref={setNodeRef}
 				backgroundColor={isOver ? "blue.100" : "white"}
 			>
-				<Skeleton isLoaded={!!children.data} minH={60}>
-					<List display="flex" flexDirection="column" gap={2} marginBottom="2">
-						{children.data?.map((child) => (
-							<ListItem
-								key={child.id + child.name + child.parentId + child.path}
-							>
-								<Draggable functionId={child.id}>
-									<FunctionCard
-										functionId={child.id}
-										selected={selectedFunctionIds.includes(child.id)}
-									/>
-								</Draggable>
-							</ListItem>
-						))}
-					</List>
+				<Skeleton isLoaded={!children.isLoading} minH={60}>
+					{children.isSuccess ? (
+						<List
+							display="flex"
+							flexDirection="column"
+							gap={2}
+							marginBottom="2"
+						>
+							{children.data?.map((child) => (
+								<ListItem
+									key={child.id + child.name + child.parentId + child.path}
+								>
+									<Draggable functionId={child.id}>
+										<FunctionCard
+											functionId={child.id}
+											selected={selectedFunctionIds.includes(child.id)}
+										/>
+									</Draggable>
+								</ListItem>
+							))}
+						</List>
+					) : children.isError ? (
+						<Text>Det skjedde en feil</Text>
+					) : null}
 					{isFormVisible && (
 						<form
 							onSubmit={async (e) => {
