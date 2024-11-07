@@ -1,6 +1,6 @@
 import { useFunction } from "@/hooks/use-function";
 import { Route } from "@/routes";
-import { Card, Flex, Icon, IconButton, Text } from "@kvib/react";
+import { Card, Flex, Icon, IconButton, Skeleton, Text } from "@kvib/react";
 import { FunctionCardEdit } from "./function-card-edit";
 import { FunctionCardSelectedView } from "./function-card-selected-view";
 
@@ -34,15 +34,17 @@ export function FunctionCard({
 					<FunctionCardSelectedView functionId={functionId} />
 				) : (
 					<>
-						<Text
-							fontWeight="bold"
-							as="span"
-							display="flex"
-							w="100%"
-							paddingLeft="10px"
-						>
-							{func.data?.name}
-						</Text>
+						<Skeleton isLoaded={!func.isLoading} fitContent w="100%">
+							<Text
+								fontWeight="bold"
+								as="span"
+								display="flex"
+								w="100%"
+								paddingLeft="10px"
+							>
+								{func.data?.name ?? "<Det skjedde en feil>"}
+							</Text>
+						</Skeleton>
 						<IconButton
 							type="button"
 							colorScheme="gray"

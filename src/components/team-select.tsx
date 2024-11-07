@@ -16,23 +16,27 @@ export function TeamSelect({
 			<Text fontSize="xs" fontWeight="700" mb="4px">
 				Ansvarlig team for denne funksjonen?*
 			</Text>
-			<Skeleton isLoaded={!!teams.data} fitContent>
-				<Select
-					id="team-value"
-					name="team-value"
-					mb="30px"
-					size="sm"
-					borderRadius="5px"
-					required
-					placeholder={currentTeam.data?.id ? undefined : "Velg team"}
-					defaultValue={currentTeam.data?.id}
-				>
-					{teams.data?.map((team) => (
-						<option key={team.id} value={team.id}>
-							{team.displayName.replace(/.* - /, "")}
-						</option>
-					))}
-				</Select>
+			<Skeleton isLoaded={!teams.isLoading} fitContent>
+				{teams.isSuccess ? (
+					<Select
+						id="team-value"
+						name="team-value"
+						mb="30px"
+						size="sm"
+						borderRadius="5px"
+						required
+						placeholder={currentTeam.data?.id ? undefined : "Velg team"}
+						defaultValue={currentTeam.data?.id}
+					>
+						{teams.data?.map((team) => (
+							<option key={team.id} value={team.id}>
+								{team.displayName.replace(/.* - /, "")}
+							</option>
+						))}
+					</Select>
+				) : teams.isError ? (
+					<Text>Det skjedde en feil</Text>
+				) : null}
 			</Skeleton>
 		</>
 	);
