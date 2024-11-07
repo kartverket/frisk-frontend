@@ -1,4 +1,4 @@
-import { Flex, Text, Icon, IconButton } from "@kvib/react";
+import { Flex, Text, Icon, IconButton, Skeleton } from "@kvib/react";
 import { SchemaButton } from "./schema-button";
 import { RegelrettLink } from "./metadata/regelrett-link";
 import { Route } from "@/routes";
@@ -17,12 +17,16 @@ export function FunctionCardSelectedView({
 		metadata.data?.filter((m) => m.key.startsWith("rr-")) ?? [];
 	const teamDisplayName = team.data?.displayName.replace(/.* - /, "");
 
+	const teamLoaded = !metadata.isLoading && !team.isLoading;
+
 	return (
 		<Flex flexDirection="column" paddingLeft="10px" w="100%">
 			<Flex alignItems="center" w="100%">
-				<Text fontWeight="bold" as="span" display="flex" w="100%">
-					{func.data?.name}
-				</Text>
+				<Skeleton isLoaded={!func.isLoading} fitContent w="100%">
+					<Text fontWeight="bold" as="span" display="flex" w="100%">
+						{func.data?.name ?? "<Det skjedde en feil>"}
+					</Text>
+				</Skeleton>
 				<IconButton
 					type="button"
 					colorScheme="gray"
@@ -37,7 +41,9 @@ export function FunctionCardSelectedView({
 				/>
 				<Icon icon={"arrow_back_ios"} />
 			</Flex>
-			{team && <Text>{teamDisplayName}</Text>}
+			<Skeleton isLoaded={teamLoaded} fitContent>
+				<Text>{teamDisplayName ?? "<Ingen team>"}</Text>
+			</Skeleton>
 			<SchemaButton my="16px" functionId={functionId} />
 			{schemaMetadata.map((item) => (
 				<RegelrettLink
