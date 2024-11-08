@@ -1,7 +1,6 @@
 import { Flex, Text } from "@kvib/react";
 import { FunctionColumn } from "./function-column";
 import { getIdsFromPath } from "@/lib/utils";
-import { Route } from "@/routes";
 import {
 	DndContext,
 	MouseSensor,
