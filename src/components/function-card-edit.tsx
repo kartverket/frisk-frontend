@@ -1,13 +1,4 @@
-import {
-	Flex,
-	Input,
-	Text,
-	Button,
-	useDisclosure,
-	InputLeftAddon,
-	InputGroup,
-	InputRightAddon,
-} from "@kvib/react";
+import { Flex, Input, Text, Button, useDisclosure } from "@kvib/react";
 import { SchemaButton } from "./schema-button";
 import { useRef, useState } from "react";
 import { useFunction } from "@/hooks/use-function";
