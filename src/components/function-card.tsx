@@ -34,6 +34,13 @@ export function FunctionCard({
 					<FunctionCardSelectedView functionId={functionId} />
 				) : (
 					<>
+						<IconButton
+							type="button"
+							colorScheme="gray"
+							variant="ghost"
+							aria-label="drag"
+							icon="drag_indicator"
+						/>
 						<Skeleton isLoaded={!func.isLoading} fitContent w="100%">
 							<Text
 								fontWeight="bold"
