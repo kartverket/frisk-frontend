@@ -1,4 +1,5 @@
 import { useFunction } from "@/hooks/use-function";
+import { Route } from "@/routes";
 import { useDraggable } from "@dnd-kit/core";
 import type { ReactNode } from "react";
 
@@ -8,6 +9,7 @@ type DraggableProps = {
 };
 
 export function Draggable({ functionId, children }: DraggableProps) {
+	const { edit } = Route.useSearch();
 	const { func, updateFunction } = useFunction(functionId);
 
 	const { attributes, listeners, setNodeRef, transform } = useDraggable({
@@ -16,6 +18,7 @@ export function Draggable({ functionId, children }: DraggableProps) {
 			func: func.data,
 			update: updateFunction,
 		},
+		disabled: edit === functionId,
 	});
 
 	const dragableStyle = transform
