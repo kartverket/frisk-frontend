@@ -4,6 +4,7 @@ import { RegelrettLink } from "./metadata/regelrett-link";
 import { Route } from "@/routes";
 import { useFunction } from "@/hooks/use-function";
 import { useTeam } from "@/hooks/use-team";
+import { BackstageLink } from "./metadata/backstage-link";
 
 export function FunctionCardSelectedView({
 	functionId,
@@ -15,6 +16,8 @@ export function FunctionCardSelectedView({
 	const { team } = useTeam(teamId);
 	const schemaMetadata =
 		metadata.data?.filter((m) => m.key.startsWith("rr-")) ?? [];
+	const backstageMetadata =
+		metadata.data?.filter((m) => m.key.startsWith("backstage-url")) ?? [];
 	const teamDisplayName = team.data?.displayName.replace(/.* - /, "");
 
 	const teamLoaded = !metadata.isLoading && !team.isLoading;
@@ -44,6 +47,12 @@ export function FunctionCardSelectedView({
 			<Skeleton isLoaded={teamLoaded} fitContent>
 				<Text>{teamDisplayName ?? "<Ingen team>"}</Text>
 			</Skeleton>
+			{backstageMetadata.map((item) => (
+				<BackstageLink url={item.value} key={item.key} />
+			))}
+			<Text fontSize="xs" fontWeight="700" mb="4px">
+				Funksjonsavhengigheter
+			</Text>
 			<SchemaButton my="16px" functionId={functionId} />
 			{schemaMetadata.map((item) => (
 				<RegelrettLink

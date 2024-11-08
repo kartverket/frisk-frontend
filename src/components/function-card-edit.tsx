@@ -1,24 +1,39 @@
-import { Flex, Input, Text, Button, useDisclosure } from "@kvib/react";
+import {
+	Flex,
+	Input,
+	Text,
+	Button,
+	useDisclosure,
+	InputLeftAddon,
+	InputGroup,
+	InputRightAddon,
+} from "@kvib/react";
 import { SchemaButton } from "./schema-button";
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { useFunction } from "@/hooks/use-function";
 import { Route } from "@/routes";
 import { DeleteFunctionModal } from "@/components/delete-function-modal.tsx";
 import { TeamSelect } from "./team-select";
 
 export function FunctionCardEdit({ functionId }: { functionId: number }) {
-	const { func, updateFunction, metadata, updateMetadataValue } =
+	const { func, updateFunction, metadata, updateMetadataValue, addMetadata } =
 		useFunction(functionId);
 	const nameInputRef = useRef<HTMLInputElement>(null);
+	const backstageUrlRef = useRef<HTMLInputElement>(null);
+	const [isUrlValid, setIsUrlValid] = useState(true);
 	const navigate = Route.useNavigate();
 	const search = Route.useSearch();
 	const { isOpen, onOpen, onClose } = useDisclosure();
 
 	const currentTeamId = metadata.data?.find((m) => m.key === "team");
+	const currentBackstageId = metadata.data?.find(
+		(m) => m.key === "backstage-url",
+	);
 
 	async function save() {
 		const newName = nameInputRef.current?.value;
 		const newTeam = document.getElementById("team-value") as HTMLInputElement;
+		const newBackstageUrl = backstageUrlRef.current?.value;
 
 		if (newName && func.data && newName !== func.data?.name) {
 			await updateFunction.mutateAsync({
@@ -34,7 +49,32 @@ export function FunctionCardEdit({ functionId }: { functionId: number }) {
 			});
 		}
 
-		navigate({ search: { ...search, edit: undefined } });
+		if (newBackstageUrl && isValidUrl(newBackstageUrl)) {
+			if (currentBackstageId?.id) {
+				await updateMetadataValue.mutateAsync({
+					id: currentBackstageId.id,
+					value: newBackstageUrl,
+				});
+			} else {
+				await addMetadata.mutateAsync({
+					functionId,
+					key: "backstage-url",
+					value: newBackstageUrl,
+				});
+			}
+			navigate({ search: { ...search, edit: undefined } });
+		} else {
+			setIsUrlValid(false);
+		}
+	}
+
+	function isValidUrl(urlString: string) {
+		try {
+			new URL(urlString);
+			return true;
+		} catch (error) {
+			return false;
+		}
 	}
 
 	return (
@@ -57,6 +97,29 @@ export function FunctionCardEdit({ functionId }: { functionId: number }) {
 				}}
 			/>
 			<TeamSelect functionId={functionId} />
+			<Text fontSize="xs" fontWeight="700" mb="4px">
+				Lenke til Backstage
+			</Text>
+			<Flex flexDirection="column">
+				<Input
+					placeholder="Input"
+					type="url"
+					variant="outline"
+					ref={backstageUrlRef}
+					size="sm"
+					borderRadius="5px"
+					defaultValue={currentBackstageId?.value}
+					isInvalid={!isUrlValid}
+					onChange={() => setIsUrlValid(true)}
+					marginBottom={isUrlValid ? "32px" : "0px"}
+				/>
+
+				{!isUrlValid && (
+					<Text color="red.500" fontSize="xs" marginBottom="32px">
+						Ugyldig URL
+					</Text>
+				)}
+			</Flex>
 			<Text fontSize="xs" fontWeight="700" mb="10px">
 				Svar på sikkerhetsspørsmål som er relevant for denne funksjonen
 			</Text>
