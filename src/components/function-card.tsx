@@ -18,6 +18,9 @@ export function FunctionCard({
 			borderWidth={1}
 			onClick={(e) => {
 				e.preventDefault();
+				if (search.edit !== undefined) {
+					return;
+				}
 				navigate({ search: { path: func.data?.path } });
 			}}
 		>
