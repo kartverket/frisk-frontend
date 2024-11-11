@@ -1,14 +1,34 @@
-import { Flex, Input, Text, Button, useDisclosure } from "@kvib/react";
-import { SchemaButton } from "./schema-button";
+import {
+	Flex,
+	Input,
+	Text,
+	Button,
+	useDisclosure,
+	FormLabel,
+	SearchAsync,
+	Icon,
+} from "@kvib/react";
 import { useRef, useState } from "react";
 import { useFunction } from "@/hooks/use-function";
 import { Route } from "@/routes";
 import { DeleteFunctionModal } from "@/components/delete-function-modal.tsx";
 import { TeamSelect } from "./team-select";
+import { getFunctions } from "@/services/backend";
 
 export function FunctionCardEdit({ functionId }: { functionId: number }) {
-	const { func, updateFunction, metadata, updateMetadataValue, addMetadata } =
-		useFunction(functionId);
+	const {
+		func,
+		updateFunction,
+		metadata,
+		updateMetadataValue,
+		addMetadata,
+		dependencies,
+		addDependency,
+		removeDependency,
+	} = useFunction(functionId, {
+		includeDependencies: true,
+		includeMetadata: true,
+	});
 	const nameInputRef = useRef<HTMLInputElement>(null);
 	const backstageUrlRef = useRef<HTMLInputElement>(null);
 	const [isUrlValid, setIsUrlValid] = useState(true);
@@ -19,6 +39,15 @@ export function FunctionCardEdit({ functionId }: { functionId: number }) {
 	const currentTeamId = metadata.data?.find((m) => m.key === "team");
 	const currentBackstageId = metadata.data?.find(
 		(m) => m.key === "backstage-url",
+	);
+
+	const [newDependencies, setDependencies] = useState<
+		{ label: string; value: number }[]
+	>(
+		dependencies.data?.map((dependency) => ({
+			label: dependency.name,
+			value: dependency.id,
+		})) ?? [],
 	);
 
 	async function save() {
@@ -56,6 +85,29 @@ export function FunctionCardEdit({ functionId }: { functionId: number }) {
 			navigate({ search: { ...search, edit: undefined } });
 		} else {
 			setIsUrlValid(false);
+		}
+
+		const dependenciesToCreate = newDependencies.filter(
+			(dependency) =>
+				!dependencies.data?.map((dep) => dep.id).includes(dependency.value),
+		);
+		const dependenciesToDelete =
+			dependencies.data?.filter(
+				(dependency) =>
+					!newDependencies.map((dep) => dep.value).includes(dependency.id),
+			) ?? [];
+
+		for (const dependency of dependenciesToDelete) {
+			removeDependency.mutate({
+				functionId,
+				dependencyFunctionId: dependency.id,
+			});
+		}
+		for (const dependency of dependenciesToCreate) {
+			addDependency.mutate({
+				functionId: functionId,
+				dependencyFunctionId: dependency.value,
+			});
 		}
 	}
 
@@ -102,10 +154,39 @@ export function FunctionCardEdit({ functionId }: { functionId: number }) {
 					</Text>
 				)}
 			</Flex>
-			<Text fontSize="xs" fontWeight="700" mb="10px">
+
+			<FormLabel htmlFor="async-search">
+				<Text fontSize="xs" fontWeight="700">
+					Velg andre funksjoner denne funksjonen er avhengig av
+				</Text>
+			</FormLabel>
+			<SearchAsync
+				size="sm"
+				value={newDependencies}
+				isMulti
+				debounceTime={100}
+				defaultOptions
+				dropdownIndicator={<Icon icon="expand_more" weight={400} />}
+				loadOptions={(inputValue, callback) => {
+					getFunctions(inputValue).then((functions) => {
+						const depOpts = functions.map((functionData) => ({
+							label: functionData.name,
+							value: functionData.id,
+						}));
+						// @ts-expect-error
+						callback(depOpts);
+					});
+				}}
+				onChange={(newValue) => {
+					// @ts-expect-error
+					setDependencies(newValue ?? []);
+				}}
+				placeholder="Søk"
+			/>
+			{/* <Text fontSize="xs" fontWeight="700" mb="10px">
 				Svar på sikkerhetsspørsmål som er relevant for denne funksjonen
 			</Text>
-			<SchemaButton functionId={functionId} />
+			<SchemaButton functionId={functionId} /> */}
 			<Flex gap="10px" mt="32px">
 				<Button
 					aria-label="decline"

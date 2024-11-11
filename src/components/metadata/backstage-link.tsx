@@ -7,8 +7,9 @@ export function BackstageLink({
 }) {
 	return (
 		<Link
-			fontSize="xs"
+			fontSize="sm"
 			fontWeight="700"
+			colorScheme="blue"
 			width="fit-content"
 			isExternal
 			href={url}
