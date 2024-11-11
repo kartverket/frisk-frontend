@@ -12,54 +12,60 @@ import {
 	Text,
 } from "@kvib/react";
 import { FunctionCard } from "./function-card";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { TeamSelect } from "./team-select";
 import { useDndMonitor, useDroppable } from "@dnd-kit/core";
 import { Draggable } from "./draggable";
+import { UseQueryResult } from "@tanstack/react-query";
 
 type FunctionFolderProps = {
-	functionId: number;
+	functionIds: number[];
 };
 
-export function FunctionColumn({ functionId }: FunctionFolderProps) {
+export function FunctionColumn({ functionIds }: FunctionFolderProps) {
 	const { path } = Route.useSearch();
-	const { children, addFunction } = useFunction(functionId, {
+	// const { children, addFunction } = useFunction(functionId, {
+	// 	includeChildren: true,
+	// });
+
+	const { children, addFunction } = useFunction(undefined, functionIds, {
 		includeChildren: true,
 	});
 	const [disabled, setDisabled] = useState<boolean>();
 
 	const selectedFunctionIds = getIdsFromPath(path);
-	const currentLevel = selectedFunctionIds.indexOf(functionId);
+	console.log("her er selected functionids:", selectedFunctionIds);
+	const currentLevel = selectedFunctionIds.indexOf(functionIds);
 
 	const [isFormVisible, setFormVisible] = useState(false);
 
-	const { isOver, setNodeRef } = useDroppable({
-		id: selectedFunctionIds[currentLevel],
-		disabled: disabled,
-	});
+	// const { isOver, setNodeRef } = useDroppable({
+	// 	id: selectedFunctionIds[currentLevel],
+	// 	disabled: disabled,
+	// });
 
-	useDndMonitor({
-		onDragOver(event) {
-			const { active, over } = event;
-			if (over && active.data.current && active.data.current.func.path) {
-				if (over.id === functionId && active.id === over.id) {
-					setDisabled(true);
-				} else if (
-					over.id === functionId &&
-					selectedFunctionIds.includes(Number(active.id))
-				) {
-					setDisabled(
-						!getIdsFromPath(active.data.current.func.path).includes(
-							Number(over.id),
-						),
-					);
-				}
-			}
-		},
-		onDragEnd() {
-			setDisabled(false);
-		},
-	});
+	// useDndMonitor({
+	// 	onDragOver(event) {
+	// 		const { active, over } = event;
+	// 		if (over && active.data.current && active.data.current.func.path) {
+	// 			if (over.id === functionId && active.id === over.id) {
+	// 				setDisabled(true);
+	// 			} else if (
+	// 				over.id === functionId &&
+	// 				selectedFunctionIds.includes(Number(active.id))
+	// 			) {
+	// 				setDisabled(
+	// 					!getIdsFromPath(active.data.current.func.path).includes(
+	// 						Number(over.id),
+	// 					),
+	// 				);
+	// 			}
+	// 		}
+	// 	},
+	// 	onDragEnd() {
+	// 		setDisabled(false);
+	// 	},
+	// });
 
 	return (
 		<Flex flexDirection="column" width="380px">
@@ -81,25 +87,30 @@ export function FunctionColumn({ functionId }: FunctionFolderProps) {
 				p="20px"
 				borderColor="gray.400"
 				minH="100%"
-				ref={setNodeRef}
-				backgroundColor={isOver ? "blue.100" : "white"}
+				// ref={setNodeRef}
+				// backgroundColor={isOver ? "blue.100" : "white"}
+				backgroundColor={"white"}
 			>
-				<Skeleton isLoaded={!!children.data} minH={60}>
+				<Skeleton isLoaded={!!children} minH={60}>
 					<List display="flex" flexDirection="column" gap={2} marginBottom="2">
-						{children.data?.map((child) => (
-							<ListItem
-								key={child.id + child.name + child.parentId + child.path}
-							>
-								<Draggable functionId={child.id}>
-									<FunctionCard
-										functionId={child.id}
-										selected={selectedFunctionIds.includes(child.id)}
-									/>
-								</Draggable>
-							</ListItem>
-						))}
+						{children?.map((childre) =>
+							childre.data?.map((child) => (
+								<ListItem
+									key={child.id + child.name + child.parentId + child.path}
+								>
+									<Draggable functionId={child.id}>
+										<FunctionCard
+											functionId={child.id}
+											selected={selectedFunctionIds.some((idList) =>
+												idList.includes(child.id),
+											)}
+										/>
+									</Draggable>
+								</ListItem>
+							)),
+						)}
 					</List>
-					{isFormVisible && (
+					{/* {isFormVisible && (
 						<form
 							onSubmit={async (e) => {
 								e.preventDefault();
@@ -174,7 +185,7 @@ export function FunctionColumn({ functionId }: FunctionFolderProps) {
 								</Flex>
 							</Flex>
 						</form>
-					)}
+					)} */}
 					<Button
 						leftIcon="add"
 						variant="tertiary"

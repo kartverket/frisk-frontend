@@ -18,7 +18,12 @@ export function FunctionCard({
 			borderWidth={1}
 			onClick={(e) => {
 				e.preventDefault();
-				navigate({ search: { path: func.data?.path, edit: search.edit } });
+				navigate({
+					search: {
+						path: [...search.path, `${func?.data?.path}`],
+						edit: search.edit,
+					},
+				});
 			}}
 		>
 			<Flex
@@ -41,7 +46,7 @@ export function FunctionCard({
 							w="100%"
 							paddingLeft="10px"
 						>
-							{func.data?.name}
+							{func?.data?.name}
 						</Text>
 						<IconButton
 							type="button"

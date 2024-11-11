@@ -1,4 +1,9 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import {
+	useMutation,
+	useQueries,
+	useQuery,
+	useQueryClient,
+} from "@tanstack/react-query";
 import {
 	type BackendFunction,
 	createDependency,
@@ -24,83 +29,131 @@ type UseFunctionOpts = {
 	includeMetadata?: boolean;
 };
 
-export function useFunction(functionId: number, opts?: UseFunctionOpts) {
+export function useFunction(
+	functionId?: number,
+	functionIds?: number[],
+	opts?: UseFunctionOpts,
+) {
 	const queryClient = useQueryClient();
 
-	const func = useQuery({
-		refetchOnMount: false,
-		queryKey: ["functions", functionId],
-		queryFn: async () => {
-			const functionData = await getFunction(functionId);
-			return functionData;
-		},
-	});
+	const func = functionId
+		? useQuery({
+				refetchOnMount: false,
+				queryKey: ["functions", functionId],
+				queryFn: async () => {
+					const functionData = await getFunction(functionId);
+					return functionData;
+				},
+			})
+		: null;
 
-	const children = useQuery({
-		queryKey: ["functions", functionId, "children"],
-		queryFn: async () => {
-			const children = await getChildren(functionId);
+	const functions = functionIds
+		? useQueries({
+				queries: functionIds.map((id) => ({
+					refetchOnMount: false,
+					queryKey: ["functions", id],
+					queryFn: async () => {
+						const functionData = await getFunction(id);
+						return functionData;
+					},
+				})),
+			})
+		: null;
 
-			// Set all children in the query cache
-			for (const child of children) {
-				queryClient.setQueryData<BackendFunction>(
-					["functions", child.id],
-					child,
+	const children = functionIds
+		? useQueries({
+				queries: functionIds.map((id) => ({
+					refetchOnMount: false,
+					queryKey: ["functions", id, "children"],
+					queryFn: async () => {
+						const children = await getChildren(id);
+						// Set all children in the query cache
+						for (const child of children) {
+							queryClient.setQueryData<BackendFunction>(
+								["functions", child.id],
+								child,
+							);
+						}
+						return children;
+					},
+					enabled: opts?.includeChildren === true,
+				})),
+			})
+		: null;
+
+	// const children = useQuery({
+	// 	queryKey: ["functions", functionId, "children"],
+	// 	queryFn: async () => {
+	// 		const children = await getChildren(functionId);
+
+	// 		// Set all children in the query cache
+	// 		for (const child of children) {
+	// 			queryClient.setQueryData<BackendFunction>(
+	// 				["functions", child.id],
+	// 				child,
+	// 			);
+	// 		}
+	// 		return children;
+	// 	},
+	// 	enabled: opts?.includeChildren === true,
+	// });
+
+	const dependencies =
+		functionId &&
+		useQuery({
+			queryKey: ["functions", functionId, "dependencies"],
+			queryFn: async () => {
+				const dependencyIds = await getDependencies(functionId);
+				const dependencies = await Promise.all(
+					dependencyIds.map(
+						async (dependencyId) => await getFunction(dependencyId),
+					),
 				);
-			}
-			return children;
-		},
-		enabled: opts?.includeChildren === true,
-	});
+				// Set all dependencies in the query cache
+				for (const dependency of dependencies) {
+					queryClient.setQueryData<BackendFunction>(
+						["functions", dependency.id],
+						dependency,
+					);
+				}
+				return dependencies;
+			},
+			enabled: opts?.includeDependencies === true,
+		});
 
-	const dependencies = useQuery({
-		queryKey: ["functions", functionId, "dependencies"],
-		queryFn: async () => {
-			const dependencyIds = await getDependencies(functionId);
-			const dependencies = await Promise.all(
-				dependencyIds.map(
-					async (dependencyId) => await getFunction(dependencyId),
-				),
-			);
-			// Set all dependencies in the query cache
-			for (const dependency of dependencies) {
-				queryClient.setQueryData<BackendFunction>(
-					["functions", dependency.id],
-					dependency,
+	const dependents =
+		functionId &&
+		useQuery({
+			queryKey: ["functions", functionId, "dependents"],
+			queryFn: async () => {
+				const dependentIds = await getDependents(functionId);
+				const dependents = await Promise.all(
+					dependentIds.map(
+						async (dependentId) => await getFunction(dependentId),
+					),
 				);
-			}
-			return dependencies;
-		},
-		enabled: opts?.includeDependencies === true,
-	});
+				// Set all dependents in the query cache
+				for (const dependent of dependents) {
+					queryClient.setQueryData<BackendFunction>(
+						["functions", dependent.id],
+						dependent,
+					);
+				}
+				return dependents;
+			},
+			enabled: opts?.includeDependents === true,
+		});
 
-	const dependents = useQuery({
-		queryKey: ["functions", functionId, "dependents"],
-		queryFn: async () => {
-			const dependentIds = await getDependents(functionId);
-			const dependents = await Promise.all(
-				dependentIds.map(async (dependentId) => await getFunction(dependentId)),
-			);
-			// Set all dependents in the query cache
-			for (const dependent of dependents) {
-				queryClient.setQueryData<BackendFunction>(
-					["functions", dependent.id],
-					dependent,
-				);
-			}
-			return dependents;
-		},
-		enabled: opts?.includeDependents === true,
-	});
-
-	const metadata = useQuery({
-		queryKey: ["functions", functionId, "metadata"],
-		queryFn: async () => {
-			const functionMetadata = await getFunctionMetadata(functionId);
-			return functionMetadata;
-		},
-		enabled: opts?.includeMetadata === true,
-	});
+	const metadata = functionId
+		? useQuery({
+				queryKey: ["functions", functionId, "metadata"],
+				queryFn: async () => {
+					const functionMetadata = await getFunctionMetadata(functionId);
+					return functionMetadata;
+				},
+				enabled: opts?.includeMetadata === true,
+			})
+		: undefined;
 
 	const addFunction = useMutation({
 		mutationFn: createFunction,
@@ -109,7 +162,7 @@ export function useFunction(functionId: number, opts?: UseFunctionOpts) {
 			const newFunction: BackendFunction = {
 				..._newFunction.function,
 				id: randomNegativeNumber,
-				path: `${func.data?.path}.${randomNegativeNumber}`,
+				path: `${func?.data?.path}.${randomNegativeNumber}`,
 			};
 			await queryClient.cancelQueries({
 				queryKey: ["functions", newFunction.parentId, "children"],
@@ -382,7 +435,7 @@ export function useFunction(functionId: number, opts?: UseFunctionOpts) {
 				);
 			}
 
-			if (func.data) {
+			if (func?.data) {
 				if (previousDependents) {
 					queryClient.setQueryData<BackendFunction[]>(
 						["functions", _newDependency.dependencyFunctionId, "dependents"],
@@ -495,53 +548,55 @@ export function useFunction(functionId: number, opts?: UseFunctionOpts) {
 		},
 	});
 
-	const addMetadata = useMutation({
-		mutationFn: createFunctionMetadata,
-		onMutate: async (_newMetadata) => {
-			await queryClient.cancelQueries({
-				queryKey: ["functions", _newMetadata.functionId, "metadata"],
-			});
+	const addMetadata =
+		functionId &&
+		useMutation({
+			mutationFn: createFunctionMetadata,
+			onMutate: async (_newMetadata) => {
+				await queryClient.cancelQueries({
+					queryKey: ["functions", _newMetadata.functionId, "metadata"],
+				});
 
-			const previousMetadata = queryClient.getQueryData<FunctionMetadata[]>([
-				"functions",
-				functionId,
-				"metadata",
-			]);
+				const previousMetadata = queryClient.getQueryData<FunctionMetadata[]>([
+					"functions",
+					functionId,
+					"metadata",
+				]);
 
-			const randomNegativeNumber = -Math.floor(Math.random() * 1000);
-			const newMetadata: FunctionMetadata = {
-				id: randomNegativeNumber,
-				functionId,
-				key: _newMetadata.key,
-				value: _newMetadata.value,
-			};
+				const randomNegativeNumber = -Math.floor(Math.random() * 1000);
+				const newMetadata: FunctionMetadata = {
+					id: randomNegativeNumber,
+					functionId,
+					key: _newMetadata.key,
+					value: _newMetadata.value,
+				};
 
-			if (previousMetadata) {
+				if (previousMetadata) {
+					queryClient.setQueryData<FunctionMetadata[]>(
+						["functions", _newMetadata.functionId, "metadata"],
+						[...previousMetadata, newMetadata],
+					);
+				} else {
+					queryClient.setQueryData<FunctionMetadata[]>(
+						["functions", _newMetadata.functionId, "metadata"],
+						[newMetadata],
+					);
+				}
+
+				return { previousMetadata };
+			},
+			onError: (_, vars, context) => {
 				queryClient.setQueryData<FunctionMetadata[]>(
-					["functions", _newMetadata.functionId, "metadata"],
-					[...previousMetadata, newMetadata],
+					["functions", vars.functionId, "metadata"],
+					context?.previousMetadata,
 				);
-			} else {
-				queryClient.setQueryData<FunctionMetadata[]>(
-					["functions", _newMetadata.functionId, "metadata"],
-					[newMetadata],
-				);
-			}
-
-			return { previousMetadata };
-		},
-		onError: (_, vars, context) => {
-			queryClient.setQueryData<FunctionMetadata[]>(
-				["functions", vars.functionId, "metadata"],
-				context?.previousMetadata,
-			);
-		},
-		onSettled: (_, __, newMetadata) => {
-			queryClient.invalidateQueries({
-				queryKey: ["functions", newMetadata.functionId, "metadata"],
-			});
-		},
-	});
+			},
+			onSettled: (_, __, newMetadata) => {
+				queryClient.invalidateQueries({
+					queryKey: ["functions", newMetadata.functionId, "metadata"],
+				});
+			},
+		});
 
 	const removeMetadata = useMutation({
 		mutationFn: (args: { id: number; functionId: number }) =>
@@ -628,6 +683,7 @@ export function useFunction(functionId: number, opts?: UseFunctionOpts) {
 
 	return {
 		func,
+		functions,
 		children,
 		addFunction,
 		updateFunction,

@@ -8,20 +8,22 @@ import { useTeam } from "@/hooks/use-team";
 export function FunctionCardSelectedView({
 	functionId,
 }: { functionId: number }) {
-	const { func, metadata } = useFunction(functionId, { includeMetadata: true });
+	const { func, metadata } = useFunction(functionId, undefined, {
+		includeMetadata: true,
+	});
 	const search = Route.useSearch();
 	const navigate = Route.useNavigate();
-	const teamId = metadata.data?.find((m) => m.key === "team")?.value;
+	const teamId = metadata?.data?.find((m) => m.key === "team")?.value;
 	const { team } = useTeam(teamId);
 	const schemaMetadata =
-		metadata.data?.filter((m) => m.key.startsWith("rr-")) ?? [];
+		metadata?.data?.filter((m) => m.key.startsWith("rr-")) ?? [];
 	const teamDisplayName = team.data?.displayName.replace(/.* - /, "");
 
 	return (
 		<Flex flexDirection="column" paddingLeft="10px" w="100%">
 			<Flex alignItems="center" w="100%">
 				<Text fontWeight="bold" as="span" display="flex" w="100%">
-					{func.data?.name}
+					{func?.data?.name}
 				</Text>
 				<IconButton
 					type="button"

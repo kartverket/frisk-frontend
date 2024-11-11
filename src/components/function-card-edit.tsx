@@ -20,7 +20,7 @@ export function FunctionCardEdit({ functionId }: { functionId: number }) {
 		const newName = nameInputRef.current?.value;
 		const newTeam = document.getElementById("team-value") as HTMLInputElement;
 
-		if (newName && func.data && newName !== func.data?.name) {
+		if (newName && func?.data && newName !== func?.data?.name) {
 			await updateFunction.mutateAsync({
 				...func.data,
 				name: newName,
@@ -48,7 +48,7 @@ export function FunctionCardEdit({ functionId }: { functionId: number }) {
 				required
 				ref={nameInputRef}
 				name="name"
-				defaultValue={func.data?.name}
+				defaultValue={func?.data?.name}
 				size="sm"
 				borderRadius="5px"
 				marginBottom="32px"

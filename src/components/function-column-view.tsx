@@ -12,14 +12,14 @@ import {
 } from "@dnd-kit/core";
 
 type FunctionColumnViewProps = {
-	path: string;
+	path: string[];
 };
 
 export function FunctionColumnView({ path }: FunctionColumnViewProps) {
 	const navigate = Route.useNavigate();
 
 	const selectedFunctionIds = getIdsFromPath(path);
-
+	console.log("selected functio ids!", selectedFunctionIds);
 	const sensors = useSensors(
 		useSensor(MouseSensor, {
 			activationConstraint: {
@@ -60,7 +60,7 @@ export function FunctionColumnView({ path }: FunctionColumnViewProps) {
 			<DndContext onDragEnd={handleDragEnd} sensors={sensors}>
 				<Flex>
 					{selectedFunctionIds?.map((id) => (
-						<FunctionColumn key={id} functionId={id} />
+						<FunctionColumn key={id[0]} functionIds={id} />
 					))}
 				</Flex>
 			</DndContext>
