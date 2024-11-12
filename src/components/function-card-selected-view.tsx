@@ -50,9 +50,6 @@ export function FunctionCardSelectedView({
 			{backstageMetadata.map((item) => (
 				<BackstageLink url={item.value} key={item.key} />
 			))}
-			{/* <Text fontSize="xs" fontWeight="700" mb="4px">
-				Funksjonsavhengigheter
-			</Text> */}
 			<SchemaButton my="16px" functionId={functionId} />
 			{schemaMetadata.map((item) => (
 				<RegelrettLink

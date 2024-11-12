@@ -5,6 +5,7 @@ import { useFunction } from "@/hooks/use-function";
 import { Route } from "@/routes";
 import { DeleteFunctionModal } from "@/components/delete-function-modal.tsx";
 import { TeamSelect } from "./team-select";
+import { string } from "zod";
 
 export function FunctionCardEdit({ functionId }: { functionId: number }) {
 	const { func, updateFunction, metadata, updateMetadataValue, addMetadata } =
@@ -40,7 +41,7 @@ export function FunctionCardEdit({ functionId }: { functionId: number }) {
 			});
 		}
 
-		if (newBackstageUrl && isValidUrl(newBackstageUrl)) {
+		if (newBackstageUrl && URL.canParse(newBackstageUrl)) {
 			if (currentBackstageId?.id) {
 				await updateMetadataValue.mutateAsync({
 					id: currentBackstageId.id,
@@ -56,15 +57,6 @@ export function FunctionCardEdit({ functionId }: { functionId: number }) {
 			navigate({ search: { ...search, edit: undefined } });
 		} else {
 			setIsUrlValid(false);
-		}
-	}
-
-	function isValidUrl(urlString: string) {
-		try {
-			new URL(urlString);
-			return true;
-		} catch (error) {
-			return false;
 		}
 	}
 
