@@ -4,8 +4,8 @@ import { useFunction } from "@/hooks/use-function";
 
 export function EditAndSelectButtons({
 	functionId,
-	selected = false,
-}: { functionId: number; selected?: boolean }) {
+	selected,
+}: { functionId: number; selected: boolean }) {
 	const theme = useTheme();
 	const search = Route.useSearch();
 	const navigate = Route.useNavigate();

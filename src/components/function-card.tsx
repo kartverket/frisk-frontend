@@ -56,7 +56,7 @@ export function FunctionCard({
 								{func.data?.name ?? "<Det skjedde en feil>"}
 							</Text>
 						</Skeleton>
-						<EditAndSelectButtons functionId={functionId} />
+						<EditAndSelectButtons functionId={functionId} selected={false} />
 					</>
 				)}
 			</Flex>
