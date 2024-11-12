@@ -5,7 +5,6 @@ import { useFunction } from "@/hooks/use-function";
 import { Route } from "@/routes";
 import { DeleteFunctionModal } from "@/components/delete-function-modal.tsx";
 import { TeamSelect } from "./team-select";
-import { string } from "zod";
 
 export function FunctionCardEdit({ functionId }: { functionId: number }) {
 	const { func, updateFunction, metadata, updateMetadataValue, addMetadata } =
