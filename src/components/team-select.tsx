@@ -6,7 +6,7 @@ import { Text, Skeleton, Select } from "@kvib/react";
 export function TeamSelect({
 	functionId,
 }: { functionId: number; edit?: boolean }) {
-	const { metadata } = useFunction(functionId);
+	const { metadata } = useFunction(functionId, { includeMetadata: true });
 	const { teams } = useUser();
 	const currentTeamValue = metadata.data?.find((m) => m.key === "team")?.value;
 	const { team: currentTeam } = useTeam(currentTeamValue);
