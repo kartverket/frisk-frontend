@@ -43,7 +43,6 @@ export function FunctionCardEdit({ functionId }: { functionId: number }) {
 	const currentBackstageId = metadata.data?.find(
 		(m) => m.key === "backstage-url",
 	);
-	console.log(currentBackstageId);
 
 	const [newDependencies, setDependencies] = useState<
 		{ label: string; value: number }[]
