@@ -110,6 +110,7 @@ export function useFunction(functionId: number, opts?: UseFunctionOpts) {
 				..._newFunction.function,
 				id: randomNegativeNumber,
 				path: `${func.data?.path}.${randomNegativeNumber}`,
+				orderIndex: 999,
 			};
 			await queryClient.cancelQueries({
 				queryKey: ["functions", newFunction.parentId, "children"],

@@ -9,12 +9,17 @@ export interface IConfig {
 }
 
 const defaultConfig: IConfig = {
-	clientId: "3e09bdb6-734c-473e-ab69-1238057dfc5d",
+	clientId:
+		import.meta.env.VITE_CLIENT_ID ?? "3e09bdb6-734c-473e-ab69-1238057dfc5d",
 	authority:
+		import.meta.env.VITE_AUTHORITY ??
 		"https://login.microsoftonline.com/7531b79e-fd42-4826-bff2-131d82c7b557/v2.0",
-	redirect_uri: "http://localhost:5173",
-	backend_url: "https://frisk-backend.fly.dev",
+	redirect_uri:
+		import.meta.env.VITE_LOGIN_REDIRECT_URI ?? "http://localhost:5173",
+	backend_url:
+		import.meta.env.VITE_BACKEND_URL ?? "https://frisk-backend.fly.dev",
 	regelrett_frontend_url:
+		import.meta.env.VITE_REGLERRETT_FRONTEND_URL ??
 		"https://regelrett-frontend-1024826672490.europe-north1.run.app",
 };
 
