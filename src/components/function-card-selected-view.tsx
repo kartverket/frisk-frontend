@@ -1,17 +1,17 @@
-import { Flex, Text, Icon, IconButton, Skeleton } from "@kvib/react";
+import { Flex, Text, Skeleton } from "@kvib/react";
 import { SchemaButton } from "./schema-button";
 import { RegelrettLink } from "./metadata/regelrett-link";
-import { Route } from "@/routes";
 import { useFunction } from "@/hooks/use-function";
 import { useTeam } from "@/hooks/use-team";
 import { BackstageLink } from "./metadata/backstage-link";
+import { EditAndSelectButtons } from "./edit-and-select-buttons";
 
 export function FunctionCardSelectedView({
 	functionId,
 }: { functionId: number }) {
-	const { func, metadata } = useFunction(functionId, { includeMetadata: true });
-	const search = Route.useSearch();
-	const navigate = Route.useNavigate();
+	const { func, metadata } = useFunction(functionId, {
+		includeMetadata: true,
+	});
 	const teamId = metadata.data?.find((m) => m.key === "team")?.value;
 	const { team } = useTeam(teamId);
 	const schemaMetadata =
@@ -30,19 +30,7 @@ export function FunctionCardSelectedView({
 						{func.data?.name ?? "<Det skjedde en feil>"}
 					</Text>
 				</Skeleton>
-				<IconButton
-					type="button"
-					colorScheme="gray"
-					variant="ghost"
-					aria-label="edit"
-					icon="edit"
-					onClick={(e) => {
-						e.preventDefault();
-						e.stopPropagation();
-						navigate({ search: { ...search, edit: functionId } });
-					}}
-				/>
-				<Icon icon={"arrow_back_ios"} />
+				<EditAndSelectButtons functionId={functionId} selected />
 			</Flex>
 			<Skeleton isLoaded={teamLoaded} fitContent>
 				<Text>{teamDisplayName ?? "<Ingen team>"}</Text>
