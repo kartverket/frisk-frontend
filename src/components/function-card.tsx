@@ -25,7 +25,7 @@ export function FunctionCard({
 			}}
 		>
 			<Flex
-				bgColor={selected && search.edit === undefined ? "blue.50" : undefined}
+				bgColor={selected && search.edit !== functionId ? "blue.50" : undefined}
 				display="flex"
 				borderRadius="inherit"
 				alignItems="center"
