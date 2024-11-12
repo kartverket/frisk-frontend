@@ -14,6 +14,7 @@ import { Route } from "@/routes";
 import { DeleteFunctionModal } from "@/components/delete-function-modal.tsx";
 import { TeamSelect } from "./team-select";
 import { getFunctions } from "@/services/backend";
+import { useIsMutating } from "@tanstack/react-query";
 
 export function FunctionCardEdit({ functionId }: { functionId: number }) {
 	const {
@@ -22,6 +23,7 @@ export function FunctionCardEdit({ functionId }: { functionId: number }) {
 		metadata,
 		updateMetadataValue,
 		addMetadata,
+		removeMetadata,
 		dependencies,
 		addDependency,
 		removeDependency,
@@ -35,11 +37,13 @@ export function FunctionCardEdit({ functionId }: { functionId: number }) {
 	const navigate = Route.useNavigate();
 	const search = Route.useSearch();
 	const { isOpen, onOpen, onClose } = useDisclosure();
+	const isMutating = useIsMutating();
 
 	const currentTeamId = metadata.data?.find((m) => m.key === "team");
 	const currentBackstageId = metadata.data?.find(
 		(m) => m.key === "backstage-url",
 	);
+	console.log(currentBackstageId);
 
 	const [newDependencies, setDependencies] = useState<
 		{ label: string; value: number }[]
@@ -54,6 +58,7 @@ export function FunctionCardEdit({ functionId }: { functionId: number }) {
 		const newName = nameInputRef.current?.value;
 		const newTeam = document.getElementById("team-value") as HTMLInputElement;
 		const newBackstageUrl = backstageUrlRef.current?.value;
+		let validSave = true;
 
 		if (newName && func.data && newName !== func.data?.name) {
 			await updateFunction.mutateAsync({
@@ -69,22 +74,36 @@ export function FunctionCardEdit({ functionId }: { functionId: number }) {
 			});
 		}
 
-		if (newBackstageUrl && URL.canParse(newBackstageUrl)) {
-			if (currentBackstageId?.id) {
-				await updateMetadataValue.mutateAsync({
-					id: currentBackstageId.id,
-					value: newBackstageUrl,
-				});
+		if (newBackstageUrl) {
+			if (URL.canParse(newBackstageUrl)) {
+				if (currentBackstageId?.id) {
+					await updateMetadataValue.mutateAsync({
+						id: currentBackstageId.id,
+						value: newBackstageUrl,
+					});
+				} else {
+					await addMetadata.mutateAsync({
+						functionId,
+						key: "backstage-url",
+						value: newBackstageUrl,
+					});
+				}
+			} else if (newBackstageUrl.trim().length === 0) {
+				if (currentBackstageId?.id) {
+					await removeMetadata.mutateAsync({
+						id: currentBackstageId.id,
+						functionId,
+					});
+				}
 			} else {
-				await addMetadata.mutateAsync({
-					functionId,
-					key: "backstage-url",
-					value: newBackstageUrl,
-				});
+				setIsUrlValid(false);
+				validSave = false;
 			}
-			navigate({ search: { ...search, edit: undefined } });
-		} else {
-			setIsUrlValid(false);
+		} else if (currentBackstageId?.id) {
+			await removeMetadata.mutateAsync({
+				id: currentBackstageId.id,
+				functionId,
+			});
 		}
 
 		const dependenciesToCreate = newDependencies.filter(
@@ -97,17 +116,27 @@ export function FunctionCardEdit({ functionId }: { functionId: number }) {
 					!newDependencies.map((dep) => dep.value).includes(dependency.id),
 			) ?? [];
 
+		const promises: Promise<unknown>[] = [];
 		for (const dependency of dependenciesToDelete) {
-			removeDependency.mutate({
-				functionId,
-				dependencyFunctionId: dependency.id,
-			});
+			promises.push(
+				removeDependency.mutateAsync({
+					functionId,
+					dependencyFunctionId: dependency.id,
+				}),
+			);
 		}
 		for (const dependency of dependenciesToCreate) {
-			addDependency.mutate({
-				functionId: functionId,
-				dependencyFunctionId: dependency.value,
-			});
+			promises.push(
+				addDependency.mutateAsync({
+					functionId: functionId,
+					dependencyFunctionId: dependency.value,
+				}),
+			);
+		}
+		await Promise.all(promises);
+
+		if (validSave) {
+			navigate({ search: { ...search, edit: undefined } });
 		}
 	}
 
@@ -183,10 +212,6 @@ export function FunctionCardEdit({ functionId }: { functionId: number }) {
 				}}
 				placeholder="Søk"
 			/>
-			{/* <Text fontSize="xs" fontWeight="700" mb="10px">
-				Svar på sikkerhetsspørsmål som er relevant for denne funksjonen
-			</Text>
-			<SchemaButton functionId={functionId} /> */}
 			<Flex gap="10px" mt="32px">
 				<Button
 					aria-label="decline"
@@ -199,6 +224,7 @@ export function FunctionCardEdit({ functionId }: { functionId: number }) {
 
 						navigate({ search: { ...search, edit: undefined } });
 					}}
+					isLoading={isMutating > 0}
 				>
 					Avbryt
 				</Button>
@@ -212,6 +238,7 @@ export function FunctionCardEdit({ functionId }: { functionId: number }) {
 
 						save();
 					}}
+					isLoading={isMutating > 0}
 				>
 					Lagre
 				</Button>
@@ -223,6 +250,7 @@ export function FunctionCardEdit({ functionId }: { functionId: number }) {
 					colorScheme="blue"
 					ml="auto"
 					onClick={onOpen}
+					isLoading={isMutating > 0}
 				>
 					Slett funksjon
 				</Button>
