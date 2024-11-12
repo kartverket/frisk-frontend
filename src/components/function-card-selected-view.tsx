@@ -1,13 +1,4 @@
-import {
-	Flex,
-	Text,
-	Icon,
-	IconButton,
-	Skeleton,
-	List,
-	ListItem,
-	Box,
-} from "@kvib/react";
+import { Flex, Text, Skeleton, List, ListItem, Box } from "@kvib/react";
 import { SchemaButton } from "./schema-button";
 import { RegelrettLink } from "./metadata/regelrett-link";
 import { useFunction } from "@/hooks/use-function";
@@ -22,8 +13,6 @@ export function FunctionCardSelectedView({
 		includeMetadata: true,
 		includeDependencies: true,
 	});
-	const search = Route.useSearch();
-	const navigate = Route.useNavigate();
 	const teamId = metadata.data?.find((m) => m.key === "team")?.value;
 	const { team } = useTeam(teamId);
 	const schemaMetadata =
