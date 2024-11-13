@@ -18,9 +18,23 @@ export function FunctionCard({
 			borderWidth={1}
 			onClick={(e) => {
 				e.preventDefault();
+				console.log("PAAATH", search.path);
+				console.log("PAAATH", func?.data?.path);
+				console.log(
+					search.path.filter((path) => path !== `${func?.data?.path}`),
+				);
+
 				navigate({
 					search: {
-						path: [...search.path, `${func?.data?.path}`],
+						path: [
+							...search.path.filter(
+								(path) =>
+									!func?.data?.path.includes(path) &&
+									!path.includes(`${func?.data?.path}`),
+							),
+							`${func?.data?.path}`,
+						],
+
 						edit: search.edit,
 					},
 				});

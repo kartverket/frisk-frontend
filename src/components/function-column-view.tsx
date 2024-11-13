@@ -19,7 +19,7 @@ export function FunctionColumnView({ path }: FunctionColumnViewProps) {
 	const navigate = Route.useNavigate();
 
 	const selectedFunctionIds = getIdsFromPath(path);
-	console.log("selected functio ids!", selectedFunctionIds);
+
 	const sensors = useSensors(
 		useSensor(MouseSensor, {
 			activationConstraint: {
@@ -40,11 +40,6 @@ export function FunctionColumnView({ path }: FunctionColumnViewProps) {
 			await active.data.current.update.mutateAsync({
 				...active.data.current.func,
 				parentId: Number(over.id),
-			});
-			navigate({
-				search: {
-					path: active.data.current.func.path,
-				},
 			});
 		}
 	}

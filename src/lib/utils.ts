@@ -14,8 +14,6 @@
 // }
 
 export function getIdsFromPath(paths: string[]) {
-	console.log("Path input     ", paths);
-
 	const nestedPaths = paths.map((path) => path.split(".").map(Number));
 
 	let max = 0;
@@ -37,9 +35,13 @@ export function getIdsFromPath(paths: string[]) {
 	);
 }
 
+// TODO: fix
+
 export function getIdFromPath(path: string) {
 	return getIdsFromPath(path).at(-1);
 }
+
+// TODO: fix
 
 export function isURL(url: string) {
 	return URL.canParse(url);

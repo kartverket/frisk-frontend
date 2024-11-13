@@ -45,7 +45,7 @@ export function useFunction(
 					return functionData;
 				},
 			})
-		: null;
+		: null; // TODO: fix
 
 	const functions = functionIds
 		? useQueries({

@@ -13,7 +13,7 @@ export function Draggable({ functionId, children }: DraggableProps) {
 	const { attributes, listeners, setNodeRef, transform } = useDraggable({
 		id: functionId,
 		data: {
-			func: func.data,
+			func: func?.data,
 			update: updateFunction,
 		},
 	});

@@ -44,6 +44,8 @@ function Index() {
 
 	useEffect(() => {
 		functions?.map((func, i) => {
+			// TODO: trenger man denne?
+
 			if (func.error) {
 				// if function id is invalid, navigate to parent until it is valid
 				const updatedPathArray = idArrays.map((id, index) =>
