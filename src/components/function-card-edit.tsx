@@ -140,7 +140,13 @@ export function FunctionCardEdit({ functionId }: { functionId: number }) {
 	}
 
 	return (
-		<Flex flexDirection="column" paddingLeft="10px" p="2" bgColor="white">
+		<Flex
+			flexDirection="column"
+			paddingLeft="10px"
+			p="2"
+			bgColor="white"
+			maxWidth="100%"
+		>
 			<Text fontSize="xs" fontWeight="700" mb="4px">
 				Funksjonsnavn*
 			</Text>
