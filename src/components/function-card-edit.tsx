@@ -166,11 +166,11 @@ export function FunctionCardEdit({ functionId }: { functionId: number }) {
 			/>
 			<TeamSelect functionId={functionId} />
 			<Text fontSize="xs" fontWeight="700" mb="4px">
-				Lenke til Backstage
+				Lenke til utviklerportalen
 			</Text>
 			<Flex flexDirection="column">
 				<Input
-					placeholder="Input"
+					placeholder="Sett inn lenke"
 					type="url"
 					variant="outline"
 					ref={backstageUrlRef}
