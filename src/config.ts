@@ -13,7 +13,7 @@ const defaultConfig: IConfig = {
 	authority:
 		"https://login.microsoftonline.com/7531b79e-fd42-4826-bff2-131d82c7b557/v2.0",
 	redirect_uri: "http://localhost:5173",
-	backend_url: "https://frisk-backend.fly.dev",
+	backend_url: "http://0.0.0.0:8080",
 	regelrett_frontend_url:
 		"https://regelrett-frontend-1024826672490.europe-north1.run.app",
 };

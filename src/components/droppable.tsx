@@ -1,7 +1,5 @@
-import { getIdsFromPath } from "@/lib/utils";
 import { useDndMonitor, useDroppable } from "@dnd-kit/core";
 import { Box } from "@kvib/react";
-import { Route } from "@/routes";
 import { useState, type ReactNode } from "react";
 import { useFunction } from "@/hooks/use-function";
 
@@ -13,9 +11,6 @@ type DroppableProps = {
 export function Droppable({ id, children }: DroppableProps) {
 	const { func } = useFunction(id);
 
-	const { path } = Route.useSearch();
-
-	const selectedFunctionIds = getIdsFromPath(path);
 	const [disabled, setDisabled] = useState<boolean>(false);
 
 	const { isOver, setNodeRef } = useDroppable({
@@ -29,10 +24,7 @@ export function Droppable({ id, children }: DroppableProps) {
 			if (func?.data && over && active.data.current) {
 				if (over.id === id && active.data.current.func.parentId === over.id) {
 					setDisabled(true);
-				} else if (
-					over.id === id &&
-					selectedFunctionIds.some((ids) => ids.includes(Number(active.id)))
-				) {
+				} else if (over.id === id) {
 					setDisabled(func.data.path.includes(active.id.toString()));
 				}
 			}

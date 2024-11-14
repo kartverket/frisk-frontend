@@ -7,6 +7,7 @@ import { useFunction } from "@/hooks/use-function";
 import { useEffect } from "react";
 import { Main } from "@/components/main";
 import { CreateAndRedirectEffect } from "@/effects/create-and-redirect-effect";
+import { useFunctions } from "@/hooks/use-functions";
 
 const functionSearchSchema = object({
 	path: fallback(
@@ -33,17 +34,15 @@ export const Route = createFileRoute("/")({
 function Index() {
 	const { path } = Route.useSearch();
 	const navigate = Route.useNavigate();
-	// const idArray = path.split(".").map((part) => Number.parseInt(part));
-	// const id = idArray.pop() ?? 1;
 
 	const idArrays = path.map((pathArray) =>
 		pathArray.split(".").map((part) => Number.parseInt(part)),
 	);
 	const ids = idArrays.map((pathArray) => pathArray.pop() ?? 1);
-	const { functions } = useFunction(undefined, ids);
+	const { functions } = useFunctions(ids);
 
 	useEffect(() => {
-		functions?.map((func, i) => {
+		functions.map((func, i) => {
 			// TODO: trenger man denne?
 
 			if (func.error) {

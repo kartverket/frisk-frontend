@@ -8,7 +8,7 @@ import { useTeam } from "@/hooks/use-team";
 export function FunctionCardSelectedView({
 	functionId,
 }: { functionId: number }) {
-	const { func, metadata } = useFunction(functionId, undefined, {
+	const { func, metadata } = useFunction(functionId, {
 		includeMetadata: true,
 	});
 	const search = Route.useSearch();

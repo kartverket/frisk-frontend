@@ -13,7 +13,7 @@ export function FunctionCardEdit({ functionId }: { functionId: number }) {
 	const navigate = Route.useNavigate();
 	const search = Route.useSearch();
 	const { isOpen, onOpen, onClose } = useDisclosure();
-
+	// TODO
 	const currentTeamId = metadata.data?.find((m) => m.key === "team");
 
 	async function save() {

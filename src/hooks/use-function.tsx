@@ -1,9 +1,4 @@
-import {
-	useMutation,
-	useQueries,
-	useQuery,
-	useQueryClient,
-} from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
 	type BackendFunction,
 	createDependency,
@@ -27,133 +22,86 @@ type UseFunctionOpts = {
 	includeDependencies?: boolean;
 	includeDependents?: boolean;
 	includeMetadata?: boolean;
+	useFunctions?: boolean;
 };
 
-export function useFunction(
-	functionId?: number,
-	functionIds?: number[],
-	opts?: UseFunctionOpts,
-) {
+export function useFunction(functionId: number, opts?: UseFunctionOpts) {
 	const queryClient = useQueryClient();
 
-	const func = functionId
-		? useQuery({
-				refetchOnMount: false,
-				queryKey: ["functions", functionId],
-				queryFn: async () => {
-					const functionData = await getFunction(functionId);
-					return functionData;
-				},
-			})
-		: null; // TODO: fix
+	const func = useQuery({
+		refetchOnMount: false,
+		queryKey: ["functions", functionId],
+		queryFn: async () => {
+			const functionData = await getFunction(functionId);
+			return functionData;
+		},
+	});
 
-	const functions = functionIds
-		? useQueries({
-				queries: functionIds.map((id) => ({
-					refetchOnMount: false,
-					queryKey: ["functions", id],
-					queryFn: async () => {
-						const functionData = await getFunction(id);
-						return functionData;
-					},
-				})),
-			})
-		: null;
+	const children = useQuery({
+		queryKey: ["functions", functionId, "children"],
+		queryFn: async () => {
+			const children = await getChildren(functionId);
 
-	const children = functionIds
-		? useQueries({
-				queries: functionIds.map((id) => ({
-					refetchOnMount: false,
-					queryKey: ["functions", id, "children"],
-					queryFn: async () => {
-						const children = await getChildren(id);
-						// Set all children in the query cache
-						for (const child of children) {
-							queryClient.setQueryData<BackendFunction>(
-								["functions", child.id],
-								child,
-							);
-						}
-						return children;
-					},
-					enabled: opts?.includeChildren === true,
-				})),
-			})
-		: null;
-
-	// const children = useQuery({
-	// 	queryKey: ["functions", functionId, "children"],
-	// 	queryFn: async () => {
-	// 		const children = await getChildren(functionId);
-
-	// 		// Set all children in the query cache
-	// 		for (const child of children) {
-	// 			queryClient.setQueryData<BackendFunction>(
-	// 				["functions", child.id],
-	// 				child,
-	// 			);
-	// 		}
-	// 		return children;
-	// 	},
-	// 	enabled: opts?.includeChildren === true,
-	// });
-
-	const dependencies =
-		functionId &&
-		useQuery({
-			queryKey: ["functions", functionId, "dependencies"],
-			queryFn: async () => {
-				const dependencyIds = await getDependencies(functionId);
-				const dependencies = await Promise.all(
-					dependencyIds.map(
-						async (dependencyId) => await getFunction(dependencyId),
-					),
+			// Set all children in the query cache
+			for (const child of children) {
+				queryClient.setQueryData<BackendFunction>(
+					["functions", child.id],
+					child,
 				);
-				// Set all dependencies in the query cache
-				for (const dependency of dependencies) {
-					queryClient.setQueryData<BackendFunction>(
-						["functions", dependency.id],
-						dependency,
-					);
-				}
-				return dependencies;
-			},
-			enabled: opts?.includeDependencies === true,
-		});
+			}
+			return children;
+		},
+		enabled: opts?.includeChildren === true,
+	});
 
-	const dependents =
-		functionId &&
-		useQuery({
-			queryKey: ["functions", functionId, "dependents"],
-			queryFn: async () => {
-				const dependentIds = await getDependents(functionId);
-				const dependents = await Promise.all(
-					dependentIds.map(
-						async (dependentId) => await getFunction(dependentId),
-					),
+	const dependencies = useQuery({
+		queryKey: ["functions", functionId, "dependencies"],
+		queryFn: async () => {
+			const dependencyIds = await getDependencies(functionId);
+			const dependencies = await Promise.all(
+				dependencyIds.map(
+					async (dependencyId) => await getFunction(dependencyId),
+				),
+			);
+			// Set all dependencies in the query cache
+			for (const dependency of dependencies) {
+				queryClient.setQueryData<BackendFunction>(
+					["functions", dependency.id],
+					dependency,
 				);
-				// Set all dependents in the query cache
-				for (const dependent of dependents) {
-					queryClient.setQueryData<BackendFunction>(
-						["functions", dependent.id],
-						dependent,
-					);
-				}
-				return dependents;
-			},
-			enabled: opts?.includeDependents === true,
-		});
+			}
+			return dependencies;
+		},
+		enabled: opts?.includeDependencies === true,
+	});
 
-	const metadata = functionId
-		? useQuery({
-				queryKey: ["functions", functionId, "metadata"],
-				queryFn: async () => {
-					const functionMetadata = await getFunctionMetadata(functionId);
-					return functionMetadata;
-				},
-				enabled: opts?.includeMetadata === true,
-			})
-		: undefined;
+	const dependents = useQuery({
+		queryKey: ["functions", functionId, "dependents"],
+		queryFn: async () => {
+			const dependentIds = await getDependents(functionId);
+			const dependents = await Promise.all(
+				dependentIds.map(async (dependentId) => await getFunction(dependentId)),
+			);
+			// Set all dependents in the query cache
+			for (const dependent of dependents) {
+				queryClient.setQueryData<BackendFunction>(
+					["functions", dependent.id],
+					dependent,
+				);
+			}
+			return dependents;
+		},
+		enabled: opts?.includeDependents === true,
+	});
+
+	const metadata = useQuery({
+		queryKey: ["functions", functionId, "metadata"],
+		queryFn: async () => {
+			const functionMetadata = await getFunctionMetadata(functionId);
+			return functionMetadata;
+		},
+		enabled: opts?.includeMetadata === true,
+	});
 
 	const addFunction = useMutation({
 		mutationFn: createFunction,
@@ -683,7 +631,6 @@ export function useFunction(
 
 	return {
 		func,
-		functions,
 		children,
 		addFunction,
 		updateFunction,

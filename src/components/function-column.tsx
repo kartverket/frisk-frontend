@@ -1,4 +1,3 @@
-import { useFunction } from "@/hooks/use-function";
 import { getIdsFromPath } from "@/lib/utils";
 import { Route } from "@/routes";
 import {
@@ -14,10 +13,9 @@ import {
 import { FunctionCard } from "./function-card";
 import { useState } from "react";
 import { TeamSelect } from "./team-select";
-
 import { Draggable } from "./draggable";
-
 import { Droppable } from "./droppable";
+import { useFunctions } from "@/hooks/use-functions";
 
 type FunctionFolderProps = {
 	functionIds: number[];
@@ -26,13 +24,9 @@ type FunctionFolderProps = {
 export function FunctionColumn({ functionIds }: FunctionFolderProps) {
 	const { path } = Route.useSearch();
 
-	const { functions, children, addFunction } = useFunction(
-		undefined,
-		functionIds,
-		{
-			includeChildren: true,
-		},
-	);
+	const { functions, children, addFunction } = useFunctions(functionIds, {
+		includeChildren: true,
+	});
 
 	const selectedFunctionIds = getIdsFromPath(path);
 	const currentLevel = selectedFunctionIds.findIndex(
