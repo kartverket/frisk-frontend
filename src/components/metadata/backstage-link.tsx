@@ -16,7 +16,7 @@ export function BackstageLink({
 			onClick={(e) => e.stopPropagation()}
 			marginBottom="10px"
 		>
-			Lenke Backstage
+			Utviklerportalen
 		</Link>
 	);
 }
