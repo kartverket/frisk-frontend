@@ -1,21 +1,13 @@
 import { getIdsFromPath } from "@/lib/utils";
 import { Route } from "@/routes";
-import {
-	Box,
-	Button,
-	Flex,
-	Input,
-	List,
-	ListItem,
-	Skeleton,
-	Text,
-} from "@kvib/react";
+import { Box, Button, Flex, List, ListItem, Skeleton, Text } from "@kvib/react";
 import { FunctionCard } from "./function-card";
-import { useState } from "react";
-import { TeamSelect } from "./team-select";
+import { useRef, useState } from "react";
 import { Draggable } from "./draggable";
 import { Droppable } from "./droppable";
 import { useFunctions } from "@/hooks/use-functions";
+import { AddFunctionForm } from "./add-function-form";
+import { set } from "zod";
 
 type FunctionFolderProps = {
 	functionIds: number[];
@@ -24,7 +16,7 @@ type FunctionFolderProps = {
 export function FunctionColumn({ functionIds }: FunctionFolderProps) {
 	const { path } = Route.useSearch();
 
-	const { functions, children, addFunction } = useFunctions(functionIds, {
+	const { functions, children } = useFunctions(functionIds, {
 		includeChildren: true,
 	});
 
@@ -34,6 +26,8 @@ export function FunctionColumn({ functionIds }: FunctionFolderProps) {
 	);
 
 	const [isFormVisible, setFormVisible] = useState(false);
+
+	const functionIdRef = useRef<number>();
 
 	return (
 		<Flex flexDirection="column" width="380px">
@@ -57,118 +51,61 @@ export function FunctionColumn({ functionIds }: FunctionFolderProps) {
 				minH="100%"
 				backgroundColor={"white"}
 			>
-				<Skeleton isLoaded={!!children} minH={60}>
-					<List display="flex" flexDirection="column" gap={2} marginBottom="2">
-						{/* TODO: fikse sånn at du ikke må dobbelt loope */}
+				{children?.map((childre, i) => (
+					<Skeleton key={"hei"} isLoaded={!childre.isLoading} minH={60}>
+						{childre.isSuccess ? (
+							<List
+								display="flex"
+								flexDirection="column"
+								gap={2}
+								marginBottom="2"
+							>
+								{/* TODO: fikse sånn at du ikke må dobbelt loope */}
 
-						{children?.map((childre, i) => (
-							<Box key={"hei"}>
-								<Droppable id={functionIds[i]}>
-									<h1>{functions?.[i].data?.name}</h1>
-									{childre.data?.map((child) => (
-										<ListItem
-											key={child.id + child.name + child.parentId + child.path}
+								<Box key={"hei"}>
+									<Droppable id={functionIds[i]}>
+										<h1>{functions?.[i].data?.name}</h1>
+										{childre.data?.map((child) => (
+											<ListItem
+												key={
+													child.id + child.name + child.parentId + child.path
+												}
+											>
+												<Draggable functionId={child.id}>
+													<FunctionCard
+														functionId={child.id}
+														selected={selectedFunctionIds.some((idList) =>
+															idList.includes(child.id),
+														)}
+													/>
+												</Draggable>
+											</ListItem>
+										))}
+										<Button
+											leftIcon="add"
+											variant="tertiary"
+											colorScheme="blue"
+											onClick={() => {
+												setFormVisible(true);
+												functionIdRef.current = functionIds[i];
+											}}
 										>
-											<Draggable functionId={child.id}>
-												<FunctionCard
-													functionId={child.id}
-													selected={selectedFunctionIds.some((idList) =>
-														idList.includes(child.id),
-													)}
-												/>
-											</Draggable>
-										</ListItem>
-									))}
-									<Button
-										leftIcon="add"
-										variant="tertiary"
-										colorScheme="blue"
-										onClick={() => setFormVisible(true)}
-									>
-										Legg til funksjon
-									</Button>
-								</Droppable>
-
-								{isFormVisible && (
-									<form
-										onSubmit={async (e) => {
-											e.preventDefault();
-											const form = e.target as HTMLFormElement;
-											const nameElement = form.elements.namedItem(
-												"name",
-											) as HTMLInputElement | null;
-											const teamElement = form.elements.namedItem(
-												"team-value",
-											) as HTMLInputElement;
-											if (!nameElement || !teamElement) return;
-
-											addFunction.mutateAsync({
-												function: {
-													name: nameElement.value,
-													description: null,
-													parentId: functionIds[i],
-												},
-												metadata: [
-													{
-														key: "team",
-														value: teamElement.value,
-													},
-												],
-											});
-											// clear form
-											form.reset();
-											setFormVisible(false);
-										}}
-									>
-										<Flex
-											border="1px"
-											borderRadius="8px"
-											borderColor="blue.500"
-											pt="14px"
-											px="25px"
-											pb="30px"
-											flexDirection="column"
-										>
-											<Text fontSize="xs" fontWeight="700" mb="4px">
-												Funksjonsnavn*
-											</Text>
-											<Input
-												type="text"
-												name="name"
-												placeholder="Navn"
-												required
-												size="sm"
-												borderRadius="5px"
-												mb="20px"
-												autoFocus
-											/>
-											<TeamSelect functionId={functionIds[i]} />
-											<Flex gap="10px">
-												<Button
-													aria-label="delete"
-													variant="secondary"
-													colorScheme="blue"
-													size="sm"
-													onClick={() => setFormVisible(false)}
-												>
-													Avbryt
-												</Button>
-												<Button
-													type="submit"
-													aria-label="check"
-													colorScheme="blue"
-													size="sm"
-												>
-													Lagre
-												</Button>
-											</Flex>
-										</Flex>
-									</form>
-								)}
-							</Box>
-						))}
-					</List>
-				</Skeleton>
+											Legg til funksjon
+										</Button>
+									</Droppable>
+								</Box>
+							</List>
+						) : childre.isError ? (
+							<Text>Det skjedde en feil</Text>
+						) : null}
+					</Skeleton>
+				))}
+				{isFormVisible && functionIdRef.current && (
+					<AddFunctionForm
+						functionId={functionIdRef.current}
+						setFormVisible={setFormVisible}
+					/>
+				)}
 			</Box>
 		</Flex>
 	);

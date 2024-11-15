@@ -1,8 +1,9 @@
 import { useFunction } from "@/hooks/use-function";
 import { Route } from "@/routes";
-import { Card, Flex, Icon, IconButton, Text } from "@kvib/react";
+import { Card, Flex, IconButton, Skeleton, Text } from "@kvib/react";
 import { FunctionCardEdit } from "./function-card-edit";
 import { FunctionCardSelectedView } from "./function-card-selected-view";
+import { EditAndSelectButtons } from "./edit-and-select-buttons";
 
 export function FunctionCard({
 	functionId,
@@ -23,7 +24,9 @@ export function FunctionCard({
 				console.log(
 					search.path.filter((path) => path !== `${func?.data?.path}`),
 				);
-
+				if (search.edit !== undefined) {
+					return;
+				}
 				navigate({
 					search: {
 						path: [
@@ -41,7 +44,7 @@ export function FunctionCard({
 			}}
 		>
 			<Flex
-				bgColor={selected && search.edit === undefined ? "blue.50" : undefined}
+				bgColor={selected && search.edit !== functionId ? "blue.50" : undefined}
 				display="flex"
 				borderRadius="inherit"
 				alignItems="center"
@@ -53,29 +56,25 @@ export function FunctionCard({
 					<FunctionCardSelectedView functionId={functionId} />
 				) : (
 					<>
-						<Text
-							fontWeight="bold"
-							as="span"
-							display="flex"
-							w="100%"
-							paddingLeft="10px"
-						>
-							{func?.data?.name}
-						</Text>
 						<IconButton
 							type="button"
 							colorScheme="gray"
 							variant="ghost"
-							aria-label="edit"
-							icon="edit"
-							style={{ pointerEvents: "auto" }}
-							onClick={(e) => {
-								e.stopPropagation();
-								e.preventDefault();
-								navigate({ search: { ...search, edit: functionId } });
-							}}
+							aria-label="drag"
+							icon="drag_indicator"
 						/>
-						<Icon icon={"arrow_forward_ios"} />
+						<Skeleton isLoaded={!func.isLoading} fitContent w="100%">
+							<Text
+								fontWeight="bold"
+								as="span"
+								display="flex"
+								w="100%"
+								paddingLeft="10px"
+							>
+								{func.data?.name ?? "<Det skjedde en feil>"}
+							</Text>
+						</Skeleton>
+						<EditAndSelectButtons functionId={functionId} selected={false} />
 					</>
 				)}
 			</Flex>

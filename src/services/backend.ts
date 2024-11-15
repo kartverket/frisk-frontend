@@ -235,9 +235,13 @@ const BackendFunction = object({
 	description: string().nullable(),
 	path: string(),
 	parentId: number().int().nullable(),
+	orderIndex: number().int(),
 });
 export type BackendFunction = z.infer<typeof BackendFunction>;
-type BackendFunctionCreate = Omit<BackendFunction, "id" | "path">;
+type BackendFunctionCreate = Omit<
+	BackendFunction,
+	"id" | "path" | "orderIndex"
+>;
 export type BackendFunctionWithMetadataCreate = {
 	function: BackendFunctionCreate;
 	metadata: Omit<FunctionMetadataCreate, "functionId">[];
