@@ -18,7 +18,7 @@ export function FunctionCard({
 			borderColor="blue.500"
 			borderWidth={1}
 			onClick={(e) => {
-				e.preventDefault();
+				//e.preventDefault();
 				if (search.edit !== undefined) {
 					return;
 				}

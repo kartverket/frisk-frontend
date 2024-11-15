@@ -16,6 +16,8 @@ import { useState } from "react";
 import { TeamSelect } from "./team-select";
 import { useDndMonitor, useDroppable } from "@dnd-kit/core";
 import { Draggable } from "./draggable";
+import { BackstageInput } from "./metadata/backstage-input";
+import { DependenciesSelect } from "./metadata/dependencies-select";
 
 type FunctionFolderProps = {
 	functionId: number;
@@ -23,10 +25,17 @@ type FunctionFolderProps = {
 
 export function FunctionColumn({ functionId }: FunctionFolderProps) {
 	const { path } = Route.useSearch();
-	const { children, addFunction } = useFunction(functionId, {
-		includeChildren: true,
-	});
+	const { children, addFunction, addDependency, dependencies } = useFunction(
+		functionId,
+		{
+			includeChildren: true,
+			includeDependencies: true,
+		},
+	);
 	const [disabled, setDisabled] = useState<boolean>();
+
+	//const backstageUrlRef = useRef<HTMLInputElement>(null);
+	//const [isUrlValid, setIsUrlValid] = useState(true);
 
 	const selectedFunctionIds = getIdsFromPath(path);
 	const currentLevel = selectedFunctionIds.indexOf(functionId);
@@ -119,7 +128,26 @@ export function FunctionColumn({ functionId }: FunctionFolderProps) {
 								const teamElement = form.elements.namedItem(
 									"team-value",
 								) as HTMLInputElement;
+								const backstageUrlElement = form.elements.namedItem(
+									"backstage-url",
+								) as HTMLInputElement;
+								const dependenciesElement = form.elements.namedItem(
+									"dependencies",
+								) as HTMLSelectElement;
+
 								if (!nameElement || !teamElement) return;
+								const metadata = [
+									{
+										key: "team",
+										value: teamElement.value,
+									},
+								];
+
+								backstageUrlElement?.value &&
+									metadata.push({
+										key: "backstage-url",
+										value: backstageUrlElement.value,
+									});
 
 								addFunction.mutateAsync({
 									function: {
@@ -127,13 +155,33 @@ export function FunctionColumn({ functionId }: FunctionFolderProps) {
 										description: null,
 										parentId: functionId,
 									},
-									metadata: [
-										{
-											key: "team",
-											value: teamElement.value,
-										},
-									],
+									metadata: metadata,
 								});
+
+								const dependenciesSelected: number[] = JSON.parse(
+									dependenciesElement.value,
+								) as number[];
+								console.log(dependenciesSelected);
+
+								const dependenciesToCreate = dependenciesSelected.filter(
+									(dependency) =>
+										!dependencies.data
+											?.map((dep) => dep.id)
+											.includes(dependency),
+								);
+								console.log(dependenciesToCreate);
+
+								const promises: Promise<unknown>[] = [];
+								for (const dependency of dependenciesToCreate) {
+									promises.push(
+										addDependency.mutateAsync({
+											functionId: functionId,
+											dependencyFunctionId: dependency,
+										}),
+									);
+								}
+								await Promise.all(promises);
+
 								// clear form
 								form.reset();
 								setFormVisible(false);
@@ -162,6 +210,8 @@ export function FunctionColumn({ functionId }: FunctionFolderProps) {
 									autoFocus
 								/>
 								<TeamSelect functionId={functionId} />
+								<BackstageInput />
+								<DependenciesSelect />
 								<Flex gap="10px">
 									<Button
 										aria-label="delete"
