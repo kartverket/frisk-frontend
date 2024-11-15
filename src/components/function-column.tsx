@@ -25,9 +25,7 @@ export function FunctionColumn({ functionIds }: FunctionFolderProps) {
 		(ids) => ids.join() === functionIds.join(),
 	);
 
-	const [isFormVisible, setFormVisible] = useState(false);
-
-	const functionIdRef = useRef<number>();
+	const [selectedForm, setSelectedForm] = useState<number | null>(null);
 
 	return (
 		<Flex flexDirection="column" width="380px">
@@ -62,50 +60,45 @@ export function FunctionColumn({ functionIds }: FunctionFolderProps) {
 							>
 								{/* TODO: fikse sånn at du ikke må dobbelt loope */}
 
-								<Box key={"hei"}>
-									<Droppable id={functionIds[i]}>
-										<h1>{functions?.[i].data?.name}</h1>
-										{childre.data?.map((child) => (
-											<ListItem
-												key={
-													child.id + child.name + child.parentId + child.path
-												}
-											>
-												<Draggable functionId={child.id}>
-													<FunctionCard
-														functionId={child.id}
-														selected={selectedFunctionIds.some((idList) =>
-															idList.includes(child.id),
-														)}
-													/>
-												</Draggable>
-											</ListItem>
-										))}
-										<Button
-											leftIcon="add"
-											variant="tertiary"
-											colorScheme="blue"
-											onClick={() => {
-												setFormVisible(true);
-												functionIdRef.current = functionIds[i];
-											}}
+								<Droppable id={functionIds[i]}>
+									<h1>{functions?.[i].data?.name}</h1>
+									{childre.data?.map((child) => (
+										<ListItem
+											key={child.id + child.name + child.parentId + child.path}
 										>
-											Legg til funksjon
-										</Button>
-									</Droppable>
-								</Box>
+											<Draggable functionId={child.id}>
+												<FunctionCard
+													functionId={child.id}
+													selected={selectedFunctionIds.some((idList) =>
+														idList.includes(child.id),
+													)}
+												/>
+											</Draggable>
+										</ListItem>
+									))}
+									<Button
+										leftIcon="add"
+										variant="tertiary"
+										colorScheme="blue"
+										onClick={() => {
+											setSelectedForm(functionIds[i]);
+										}}
+									>
+										Legg til funksjon
+									</Button>
+								</Droppable>
 							</List>
 						) : childre.isError ? (
 							<Text>Det skjedde en feil</Text>
 						) : null}
+						{selectedForm === functionIds[i] && (
+							<AddFunctionForm
+								functionId={functionIds[i]}
+								setSelectedForm={setSelectedForm}
+							/>
+						)}
 					</Skeleton>
 				))}
-				{isFormVisible && functionIdRef.current && (
-					<AddFunctionForm
-						functionId={functionIdRef.current}
-						setFormVisible={setFormVisible}
-					/>
-				)}
 			</Box>
 		</Flex>
 	);

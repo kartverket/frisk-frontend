@@ -4,12 +4,12 @@ import { TeamSelect } from "./team-select";
 
 type AddFunctionFormProps = {
 	functionId: number;
-	setFormVisible: React.Dispatch<React.SetStateAction<boolean>>;
+	setSelectedForm: React.Dispatch<React.SetStateAction<number | null>>;
 };
 
 export function AddFunctionForm({
 	functionId,
-	setFormVisible,
+	setSelectedForm,
 }: AddFunctionFormProps) {
 	const { addFunction } = useFunction(functionId);
 	return (
@@ -40,7 +40,7 @@ export function AddFunctionForm({
 				});
 				// clear form
 				form.reset();
-				setFormVisible(false);
+				setSelectedForm(null);
 			}}
 		>
 			<Flex
@@ -72,7 +72,7 @@ export function AddFunctionForm({
 						variant="secondary"
 						colorScheme="blue"
 						size="sm"
-						onClick={() => setFormVisible(false)}
+						onClick={() => setSelectedForm(null)}
 					>
 						Avbryt
 					</Button>
