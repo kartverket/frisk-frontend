@@ -34,9 +34,6 @@ export function FunctionColumn({ functionId }: FunctionFolderProps) {
 	);
 	const [disabled, setDisabled] = useState<boolean>();
 
-	//const backstageUrlRef = useRef<HTMLInputElement>(null);
-	//const [isUrlValid, setIsUrlValid] = useState(true);
-
 	const selectedFunctionIds = getIdsFromPath(path);
 	const currentLevel = selectedFunctionIds.indexOf(functionId);
 
@@ -149,7 +146,7 @@ export function FunctionColumn({ functionId }: FunctionFolderProps) {
 										value: backstageUrlElement.value,
 									});
 
-								addFunction.mutateAsync({
+								const newFunction = await addFunction.mutateAsync({
 									function: {
 										name: nameElement.value,
 										description: null,
@@ -161,7 +158,6 @@ export function FunctionColumn({ functionId }: FunctionFolderProps) {
 								const dependenciesSelected: number[] = JSON.parse(
 									dependenciesElement.value,
 								) as number[];
-								console.log(dependenciesSelected);
 
 								const dependenciesToCreate = dependenciesSelected.filter(
 									(dependency) =>
@@ -169,13 +165,12 @@ export function FunctionColumn({ functionId }: FunctionFolderProps) {
 											?.map((dep) => dep.id)
 											.includes(dependency),
 								);
-								console.log(dependenciesToCreate);
 
 								const promises: Promise<unknown>[] = [];
 								for (const dependency of dependenciesToCreate) {
 									promises.push(
 										addDependency.mutateAsync({
-											functionId: functionId,
+											functionId: newFunction.id,
 											dependencyFunctionId: dependency,
 										}),
 									);
