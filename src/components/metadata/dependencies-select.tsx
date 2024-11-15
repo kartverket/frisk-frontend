@@ -13,19 +13,10 @@ type Dependency = {
 };
 
 export function DependenciesSelect({
-	// functionId,
-	// isNewFunction,
 	existingDependencies,
 }: {
-	// functionId?: number;
-	// isNewFunction?: boolean;
 	existingDependencies?: UseQueryResult<Dependency[]>;
 }) {
-	// const { existingDependencies } = useFunction(functionId, {
-	// 	includeDependencies: true,
-	// 	includeMetadata: true,
-	// });
-
 	const [dependencies, setDependencies] = useState<
 		{ label: string; value: number }[]
 	>(
