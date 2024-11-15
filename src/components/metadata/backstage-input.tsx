@@ -8,12 +8,12 @@ export const BackstageInput = ({
 	return (
 		<>
 			<Text fontSize="xs" fontWeight="700" mb="4px">
-				Lenke til Backstage
+				Lenke til utviklerportalen
 			</Text>
 			<Flex flexDirection="column">
 				<Input
 					name="backstage-url"
-					placeholder="Input"
+					placeholder="Sett inn lenke"
 					type="url"
 					variant="outline"
 					size="sm"
