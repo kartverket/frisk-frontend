@@ -1,4 +1,13 @@
-import { Flex, Input, Text, Button, useDisclosure } from "@kvib/react";
+import {
+	Flex,
+	Input,
+	Text,
+	Button,
+	useDisclosure,
+	FormLabel,
+	FormControl,
+	Stack,
+} from "@kvib/react";
 import { useFunction } from "@/hooks/use-function";
 import { Route } from "@/routes";
 import { DeleteFunctionModal } from "@/components/delete-function-modal.tsx";
@@ -137,76 +146,70 @@ export function FunctionCardEdit({ functionId }: { functionId: number }) {
 	}
 
 	return (
-		<Flex
-			flexDirection="column"
-			paddingLeft="10px"
-			p="2"
-			bgColor="white"
-			maxWidth="100%"
-		>
-			<form
-				onSubmit={async (e) => {
-					await handleSubmit(e);
-				}}
-			>
-				<Text fontSize="xs" fontWeight="700" mb="4px">
-					Funksjonsnavn*
-				</Text>
-				<Input
-					autoFocus
-					type="text"
-					required
-					name="name"
-					defaultValue={func.data?.name}
-					size="sm"
-					borderRadius="5px"
-					marginBottom="32px"
-				/>
-				<TeamSelect functionId={functionId} />
-				<BackstageInput defaultValue={currentBackstageId?.value} />
+		<>
+			<form onSubmit={handleSubmit}>
+				<Stack
+					paddingLeft="10px"
+					p="2"
+					bgColor="white"
+					maxWidth="100%"
+					gap="20px"
+				>
+					<FormControl isRequired>
+						<FormLabel style={{ fontSize: "small", fontWeight: "medium" }}>
+							Funksjonsnavn
+						</FormLabel>
+						<Input
+							autoFocus
+							type="text"
+							name="name"
+							defaultValue={func.data?.name}
+							size="sm"
+							borderRadius="5px"
+						/>
+					</FormControl>
+					<TeamSelect functionId={functionId} />
+					<BackstageInput defaultValue={currentBackstageId?.value} />
+					<DependenciesSelect existingDependencies={dependencies} />
+					<Flex gap="10px">
+						<Button
+							aria-label="decline"
+							variant="secondary"
+							colorScheme="blue"
+							size="sm"
+							onClick={(e) => {
+								e.preventDefault();
+								e.stopPropagation();
 
-				<Text fontSize="xs" fontWeight="700">
-					Velg andre funksjoner denne funksjonen er avhengig av
-				</Text>
-				<DependenciesSelect existingDependencies={dependencies} />
-				<Flex gap="10px" mt="32px">
-					<Button
-						aria-label="decline"
-						variant="secondary"
-						colorScheme="blue"
-						size="sm"
-						onClick={(e) => {
-							e.preventDefault();
-							e.stopPropagation();
-
-							navigate({ search: { ...search, edit: undefined } });
-						}}
-						isLoading={isMutating > 0}
-					>
-						Avbryt
-					</Button>
-					<Button
-						type="submit"
-						aria-label="check"
-						colorScheme="blue"
-						size="sm"
-						isLoading={isMutating > 0}
-					>
-						Lagre
-					</Button>
-					<Button
-						aria-label="delete"
-						variant="tertiary"
-						leftIcon="delete"
-						size="sm"
-						colorScheme="blue"
-						ml="auto"
-						onClick={onOpen}
-						isLoading={isMutating > 0}
-					>
-						Slett funksjon
-					</Button>
-				</Flex>
+								navigate({ search: { ...search, edit: undefined } });
+							}}
+							isLoading={isMutating > 0}
+						>
+							Avbryt
+						</Button>
+						<Button
+							type="submit"
+							aria-label="check"
+							colorScheme="blue"
+							size="sm"
+							isLoading={isMutating > 0}
+						>
+							Lagre
+						</Button>
+						<Button
+							aria-label="delete"
+							variant="tertiary"
+							leftIcon="delete"
+							size="sm"
+							colorScheme="blue"
+							ml="auto"
+							onClick={onOpen}
+							isLoading={isMutating > 0}
+						>
+							Slett funksjon
+						</Button>
+					</Flex>
+				</Stack>
 			</form>
 			<DeleteFunctionModal
 				onOpen={onOpen}
@@ -217,6 +220,6 @@ export function FunctionCardEdit({ functionId }: { functionId: number }) {
 				isOpen={isOpen}
 				functionId={functionId}
 			/>
-		</Flex>
+		</>
 	);
 }

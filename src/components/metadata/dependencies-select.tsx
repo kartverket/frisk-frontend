@@ -1,4 +1,12 @@
-import { Text, SearchAsync, Icon, Input } from "@kvib/react";
+import {
+	Text,
+	SearchAsync,
+	Icon,
+	Input,
+	Stack,
+	FormControl,
+	FormLabel,
+} from "@kvib/react";
 import { useState } from "react";
 import { getFunctions } from "@/services/backend";
 import type { UseQueryResult } from "@tanstack/react-query";
@@ -27,10 +35,10 @@ export function DependenciesSelect({
 	);
 
 	return (
-		<>
-			<Text fontSize="xs" fontWeight="700">
+		<FormControl isRequired={false}>
+			<FormLabel style={{ fontSize: "small", fontWeight: "medium" }}>
 				Velg andre funksjoner denne funksjonen er avhengig av
-			</Text>
+			</FormLabel>
 			<SearchAsync
 				id="dependencies"
 				size="sm"
@@ -60,6 +68,6 @@ export function DependenciesSelect({
 				name="dependencies"
 				value={JSON.stringify(dependencies.map((dep) => dep.value))}
 			/>
-		</>
+		</FormControl>
 	);
 }

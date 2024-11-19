@@ -1,4 +1,4 @@
-import { Flex, Input, Text } from "@kvib/react";
+import { FormControl, FormLabel, Input } from "@kvib/react";
 
 export const BackstageInput = ({
 	defaultValue = "",
@@ -6,21 +6,24 @@ export const BackstageInput = ({
 	defaultValue?: string;
 }) => {
 	return (
-		<>
-			<Text fontSize="xs" fontWeight="700" mb="4px">
+		<FormControl isRequired={false}>
+			<FormLabel
+				style={{
+					fontSize: "small",
+					fontWeight: "medium",
+				}}
+			>
 				Lenke til utviklerportalen
-			</Text>
-			<Flex flexDirection="column">
-				<Input
-					name="backstage-url"
-					placeholder="Sett inn lenke"
-					type="url"
-					variant="outline"
-					size="sm"
-					borderRadius="5px"
-					defaultValue={defaultValue}
-				/>
-			</Flex>
-		</>
+			</FormLabel>
+			<Input
+				name="backstage-url"
+				placeholder="Sett inn lenke"
+				type="url"
+				variant="outline"
+				size="sm"
+				borderRadius="5px"
+				defaultValue={defaultValue}
+			/>
+		</FormControl>
 	);
 };
