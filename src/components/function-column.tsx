@@ -21,6 +21,9 @@ import { useDndMonitor, useDroppable } from "@dnd-kit/core";
 import { Draggable } from "./draggable";
 import { BackstageInput } from "./metadata/backstage-input";
 import { DependenciesSelect } from "./metadata/dependencies-select";
+import { config } from "@/frisk.config";
+import { Metadata } from "./metadata/metadata";
+import { MetadataInput } from "./metadata/metadata-input";
 
 type FunctionFolderProps = {
 	functionId: number;
@@ -192,6 +195,13 @@ export function FunctionColumn({ functionId }: FunctionFolderProps) {
 								pb="30px"
 								gap="20px"
 							>
+								{config.metadata.map((meta) => (
+									<MetadataInput
+										key={meta.displayName}
+										metadata={meta}
+										functionId={functionId}
+									/>
+								))}
 								<FormControl isRequired>
 									<FormLabel
 										style={{
