@@ -1,7 +1,6 @@
 import {
 	Flex,
 	Input,
-	Text,
 	Button,
 	useDisclosure,
 	FormLabel,
