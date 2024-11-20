@@ -1,45 +1,31 @@
 import type { HTMLInputTypeAttribute } from "react";
+import { getMyMicrosoftTeams, getTeam } from "./services/backend";
 
 export const config: FriskConfig = {
 	metadata: [
 		{
 			key: "team",
 			type: "select",
-			displayName: "Team",
+			displayName: "Ansvarlig team for denne funksjonen?",
 			getOptions: async () => {
-				return [
-					{ value: "team1", name: "team1!" },
-					{ value: "team2", name: "team2!" },
-				];
+				const teams = await getMyMicrosoftTeams();
+				return teams.map((team) => ({
+					name: team.displayName,
+					value: team.id,
+				}));
 			},
 			selectMode: "multi",
 			showOn: "createAndUpdate",
-			isRequired: false,
-			placeholder: "velg team",
+			isRequired: true,
+			placeholder: "Velg team",
 		},
 		{
-			key: "name",
-			type: "text",
-			displayName: "Name",
-			showOn: "createAndUpdate",
-			isRequired: false,
-			placeholder: "skriv inn navn",
-		},
-		{
-			key: "money",
-			type: "number",
-			displayName: "Money",
-			showOn: "createAndUpdate",
-			isRequired: false,
-			placeholder: "skriv inn cash",
-		},
-		{
-			key: "lenke",
+			key: "backstage-url",
 			type: "url",
-			displayName: "Lenke",
+			displayName: "Lenke til utviklerportalen",
 			showOn: "createAndUpdate",
 			isRequired: false,
-			placeholder: "skriv inn lenke",
+			placeholder: "Sett inn lenke",
 		},
 	],
 };

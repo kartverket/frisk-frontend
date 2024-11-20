@@ -16,13 +16,13 @@ import {
 } from "@kvib/react";
 import { FunctionCard } from "./function-card";
 import { useState } from "react";
-import { TeamSelect } from "./team-select";
+
 import { useDndMonitor, useDroppable } from "@dnd-kit/core";
 import { Draggable } from "./draggable";
-import { BackstageInput } from "./metadata/backstage-input";
+
 import { DependenciesSelect } from "./metadata/dependencies-select";
 import { config } from "@/frisk.config";
-import { Metadata } from "./metadata/metadata";
+
 import { MetadataInput } from "./metadata/metadata-input";
 
 type FunctionFolderProps = {
@@ -79,29 +79,23 @@ export function FunctionColumn({ functionId }: FunctionFolderProps) {
 		const nameElement = form.elements.namedItem(
 			"name",
 		) as HTMLInputElement | null;
-		const teamElement = form.elements.namedItem(
-			"team-value",
-		) as HTMLInputElement;
-		const backstageUrlElement = form.elements.namedItem(
-			"backstage-url",
-		) as HTMLInputElement;
+
 		const dependenciesElement = form.elements.namedItem(
 			"dependencies",
 		) as HTMLSelectElement;
 
-		if (!nameElement || !teamElement) return;
-		const metadata = [
-			{
-				key: "team",
-				value: teamElement.value,
-			},
-		];
+		const metadata = [];
 
-		backstageUrlElement?.value &&
-			metadata.push({
-				key: "backstage-url",
-				value: backstageUrlElement.value,
-			});
+		for (const md of config.metadata) {
+			const exists = form.elements.namedItem(md.key) as
+				| HTMLInputElement
+				| HTMLSelectElement
+				| null;
+			console.log("metaverdi input", exists?.value);
+			if (exists?.value) metadata.push({ key: md.key, value: exists.value });
+		}
+
+		if (!nameElement) return;
 
 		const newFunction = await addFunction.mutateAsync({
 			function: {
@@ -195,14 +189,7 @@ export function FunctionColumn({ functionId }: FunctionFolderProps) {
 								pb="30px"
 								gap="20px"
 							>
-								{config.metadata.map((meta) => (
-									<MetadataInput
-										key={meta.displayName}
-										metadata={meta}
-										functionId={functionId}
-									/>
-								))}
-								{/* <FormControl isRequired>
+								<FormControl isRequired>
 									<FormLabel
 										style={{
 											fontSize: "small",
@@ -217,14 +204,18 @@ export function FunctionColumn({ functionId }: FunctionFolderProps) {
 										placeholder="Navn"
 										size="sm"
 										borderRadius="5px"
-										//mb="20px"
 										autoFocus
 									/>
 								</FormControl>
 
-								<TeamSelect functionId={functionId} />
-								<BackstageInput />
-								<DependenciesSelect /> */}
+								{config.metadata.map((meta) => (
+									<MetadataInput
+										key={meta.displayName}
+										metadata={meta}
+										functionId={undefined}
+									/>
+								))}
+								<DependenciesSelect />
 								<Flex gap="10px">
 									<Button
 										aria-label="delete"

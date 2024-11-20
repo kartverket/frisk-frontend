@@ -56,13 +56,12 @@ function SelectInput({ metadata, functionId }: SelectInputProps) {
 					fontWeight: "medium",
 				}}
 			>
-				Ansvarlig team for denne funksjonen?
+				{metadata.displayName}
 			</FormLabel>
 			<Skeleton isLoaded={!options.isLoading} fitContent>
 				{options.isSuccess ? (
 					<Select
-						id="team-value"
-						name="team-value"
+						name={metadata.key}
 						size="sm"
 						borderRadius="5px"
 						placeholder={currentMetadataValue ?? metadata.placeholder}
@@ -102,7 +101,7 @@ function InputField({ metadata, functionId }: InputProps) {
 			<Input
 				autoFocus
 				type={metadata.type}
-				name={metadata.displayName}
+				name={metadata.key}
 				defaultValue={currentMetadataValue}
 				placeholder={metadata.placeholder}
 				size="sm"
