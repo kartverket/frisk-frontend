@@ -1,4 +1,4 @@
-import { Flex, Text, Skeleton, List, ListItem, Box } from "@kvib/react";
+import { Flex, Text, Skeleton, List, ListItem, Box, Stack } from "@kvib/react";
 import { SchemaButton } from "./schema-button";
 import { RegelrettLink } from "./metadata/regelrett-link";
 import { useFunction } from "@/hooks/use-function";
@@ -23,7 +23,7 @@ export function FunctionCardSelectedView({
 	const teamLoaded = !metadata.isLoading && !team.isLoading;
 
 	return (
-		<Flex flexDirection="column" paddingLeft="10px" w="100%">
+		<Stack paddingLeft="10px" w="100%">
 			<Flex alignItems="center" w="100%">
 				<Skeleton isLoaded={!func.isLoading} fitContent w="100%">
 					<Text fontWeight="bold" as="span" display="flex" w="100%">
@@ -74,6 +74,6 @@ export function FunctionCardSelectedView({
 					}}
 				/>
 			))}
-		</Flex>
+		</Stack>
 	);
 }
