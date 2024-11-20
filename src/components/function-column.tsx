@@ -1,17 +1,39 @@
 import { getIdsFromPath } from "@/lib/utils";
 import { Route } from "@/routes";
-import { Box, Button, Flex, List, ListItem, Skeleton, Text } from "@kvib/react";
+import {
+	Box,
+	Button,
+	Flex,
+	GridItem,
+	List,
+	ListItem,
+	Skeleton,
+	Text,
+} from "@kvib/react";
 import { FunctionCard } from "./function-card";
 import { useRef, useState } from "react";
 import { Draggable } from "./draggable";
 import { Droppable } from "./droppable";
 import { useFunctions } from "@/hooks/use-functions";
 import { AddFunctionForm } from "./add-function-form";
-import { set } from "zod";
+import { number, set } from "zod";
 
 type FunctionFolderProps = {
 	functionIds: number[];
 };
+
+function getChildrenFromPath(pathArray: string[], x: number): string[] {
+	console.log("JAAA", pathArray);
+	console.log("JAAA", x);
+
+	const ja = pathArray.filter((path) => {
+		const etterX = path.split(`${x}.`);
+		return etterX.length > 1 && etterX[1].split(".")[0];
+	});
+
+	console.log("JAAA", ja);
+	return ja;
+}
 
 export function FunctionColumn({ functionIds }: FunctionFolderProps) {
 	const { path } = Route.useSearch();
@@ -56,7 +78,8 @@ export function FunctionColumn({ functionIds }: FunctionFolderProps) {
 								display="flex"
 								flexDirection="column"
 								gap={2}
-								marginBottom="2"
+								spacing="100"
+								marginBottom="3"
 							>
 								{/* TODO: fikse sånn at du ikke må dobbelt loope */}
 
@@ -65,7 +88,15 @@ export function FunctionColumn({ functionIds }: FunctionFolderProps) {
 									{childre.data?.map((child) => (
 										<ListItem
 											key={child.id + child.name + child.parentId + child.path}
+											marginBottom={getChildrenFromPath(path, child.id).length}
 										>
+											{/* <GridItem
+												bg="red.400"
+												id="Grid_ITEM"
+												h="100%"
+												w="100%"
+												rowSpan={getChildrenFromPath(path, child.id).length}
+											> */}
 											<Draggable functionId={child.id}>
 												<FunctionCard
 													functionId={child.id}
@@ -74,6 +105,7 @@ export function FunctionColumn({ functionIds }: FunctionFolderProps) {
 													)}
 												/>
 											</Draggable>
+											{/* </GridItem> */}
 										</ListItem>
 									))}
 									<Button
