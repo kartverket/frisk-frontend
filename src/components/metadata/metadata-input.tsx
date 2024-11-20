@@ -1,11 +1,18 @@
-import type { config, SelectMetadata } from "@/frisk.config";
+import type { config, InputMetadata, SelectMetadata } from "@/frisk.config";
 import { useMetadata } from "@/hooks/use-metadata";
-import { FormControl, FormLabel, Select, Skeleton, Text } from "@kvib/react";
+import {
+	FormControl,
+	FormLabel,
+	Input,
+	Select,
+	Skeleton,
+	Text,
+} from "@kvib/react";
 import { useQuery } from "@tanstack/react-query";
 
 type MetadataInputProps = {
 	metadata: (typeof config.metadata)[number];
-	functionId: number;
+	functionId: number | undefined;
 };
 
 export function MetadataInput({ metadata, functionId }: MetadataInputProps) {
@@ -13,6 +20,10 @@ export function MetadataInput({ metadata, functionId }: MetadataInputProps) {
 	switch (metadataType) {
 		case "select":
 			return <SelectInput metadata={metadata} functionId={functionId} />;
+		case "text":
+		case "number":
+		case "url":
+			return <InputField metadata={metadata} functionId={functionId} />;
 		default:
 			metadataType satisfies never;
 			console.error("Unsupported data type");
@@ -22,7 +33,7 @@ export function MetadataInput({ metadata, functionId }: MetadataInputProps) {
 
 type SelectInputProps = {
 	metadata: SelectMetadata;
-	functionId: number;
+	functionId: number | undefined;
 };
 
 function SelectInput({ metadata, functionId }: SelectInputProps) {
@@ -54,8 +65,7 @@ function SelectInput({ metadata, functionId }: SelectInputProps) {
 						name="team-value"
 						size="sm"
 						borderRadius="5px"
-						required
-						placeholder={currentMetadataValue ? undefined : "Velg team"}
+						placeholder={currentMetadataValue ?? metadata.placeholder}
 						defaultValue={currentMetadataValue}
 					>
 						{options.data?.map((option) => (
@@ -68,6 +78,36 @@ function SelectInput({ metadata, functionId }: SelectInputProps) {
 					<Text>Det skjedde en feil</Text>
 				) : null}
 			</Skeleton>
+		</FormControl>
+	);
+}
+
+type InputProps = {
+	metadata: InputMetadata;
+	functionId: number | undefined;
+};
+
+function InputField({ metadata, functionId }: InputProps) {
+	const currentMetadata = useMetadata(functionId);
+
+	const currentMetadataValue = currentMetadata.data?.find(
+		(m) => metadata.key === m.key,
+	)?.value;
+
+	return (
+		<FormControl isRequired={metadata.isRequired}>
+			<FormLabel style={{ fontSize: "small", fontWeight: "medium" }}>
+				{metadata.displayName}
+			</FormLabel>
+			<Input
+				autoFocus
+				type={metadata.type}
+				name={metadata.displayName}
+				defaultValue={currentMetadataValue}
+				placeholder={metadata.placeholder}
+				size="sm"
+				borderRadius="5px"
+			/>
 		</FormControl>
 	);
 }

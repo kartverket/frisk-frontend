@@ -1,3 +1,5 @@
+import type { HTMLInputTypeAttribute } from "react";
+
 export const config: FriskConfig = {
 	metadata: [
 		{
@@ -13,37 +15,68 @@ export const config: FriskConfig = {
 			selectMode: "multi",
 			showOn: "createAndUpdate",
 			isRequired: false,
+			placeholder: "velg team",
+		},
+		{
+			key: "name",
+			type: "text",
+			displayName: "Name",
+			showOn: "createAndUpdate",
+			isRequired: false,
+			placeholder: "skriv inn navn",
+		},
+		{
+			key: "money",
+			type: "number",
+			displayName: "Money",
+			showOn: "createAndUpdate",
+			isRequired: false,
+			placeholder: "skriv inn cash",
+		},
+		{
+			key: "lenke",
+			type: "url",
+			displayName: "Lenke",
+			showOn: "createAndUpdate",
+			isRequired: false,
+			placeholder: "skriv inn lenke",
 		},
 	],
 };
 
 type FriskConfig = {
-	metadata: SelectMetadata[];
+	metadata: Metadata[];
 };
 
-type GeneralMetadata = {
+type GeneralMetadataContent = {
 	key: string;
-	type: MetadataType;
 	displayName: string;
 };
 
-type MetadataType = "select";
-
-type GeneralRequiredMetadata = GeneralMetadata & {
+type GeneralRequiredMetadata = GeneralMetadataContent & {
 	isRequired: true;
 	showOn: "createAndUpdate";
 };
 
-type GeneralOptionalMetadata = GeneralMetadata & {
+type GeneralOptionalMetadata = GeneralMetadataContent & {
 	isRequired: false;
 	showOn: "update" | "createAndUpdate";
 };
 
-type Metadata = GeneralRequiredMetadata | GeneralOptionalMetadata;
+type GeneralMetadata = GeneralRequiredMetadata | GeneralOptionalMetadata;
 
-export type SelectMetadata = Metadata & {
+export type SelectMetadata = GeneralMetadata & {
 	getOptions: () => Promise<SelectOption[]>;
 	selectMode: "single" | "multi";
+	type: "select";
+	placeholder: string;
 };
+
+export type InputMetadata = GeneralMetadata & {
+	type: Extract<HTMLInputTypeAttribute, "number" | "text" | "url">;
+	placeholder: string;
+};
+
+type Metadata = SelectMetadata | InputMetadata;
 
 type SelectOption = { value: string; name: string };

@@ -202,7 +202,7 @@ export function FunctionColumn({ functionId }: FunctionFolderProps) {
 										functionId={functionId}
 									/>
 								))}
-								<FormControl isRequired>
+								{/* <FormControl isRequired>
 									<FormLabel
 										style={{
 											fontSize: "small",
@@ -224,7 +224,7 @@ export function FunctionColumn({ functionId }: FunctionFolderProps) {
 
 								<TeamSelect functionId={functionId} />
 								<BackstageInput />
-								<DependenciesSelect />
+								<DependenciesSelect /> */}
 								<Flex gap="10px">
 									<Button
 										aria-label="delete"
