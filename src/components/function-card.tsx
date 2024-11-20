@@ -17,7 +17,7 @@ export function FunctionCard({
 		<Card
 			borderColor="blue.500"
 			borderWidth={1}
-			onClick={(e) => {
+			onClick={() => {
 				if (search.edit !== undefined) {
 					return;
 				}
