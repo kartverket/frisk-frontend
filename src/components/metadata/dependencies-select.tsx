@@ -1,12 +1,4 @@
-import {
-	Text,
-	SearchAsync,
-	Icon,
-	Input,
-	Stack,
-	FormControl,
-	FormLabel,
-} from "@kvib/react";
+import { SearchAsync, Icon, Input, FormControl, FormLabel } from "@kvib/react";
 import { useState } from "react";
 import { getFunctions } from "@/services/backend";
 import type { UseQueryResult } from "@tanstack/react-query";
