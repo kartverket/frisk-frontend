@@ -16,11 +16,14 @@ import {
 } from "@kvib/react";
 import { FunctionCard } from "./function-card";
 import { useState } from "react";
-import { TeamSelect } from "./team-select";
+
 import { useDndMonitor, useDroppable } from "@dnd-kit/core";
 import { Draggable } from "./draggable";
-import { BackstageInput } from "./metadata/backstage-input";
+
 import { DependenciesSelect } from "./metadata/dependencies-select";
+import { config } from "../../frisk.config";
+
+import { MetadataInput } from "./metadata/metadata-input";
 
 type FunctionFolderProps = {
 	functionId: number;
@@ -76,29 +79,25 @@ export function FunctionColumn({ functionId }: FunctionFolderProps) {
 		const nameElement = form.elements.namedItem(
 			"name",
 		) as HTMLInputElement | null;
-		const teamElement = form.elements.namedItem(
-			"team-value",
-		) as HTMLInputElement;
-		const backstageUrlElement = form.elements.namedItem(
-			"backstage-url",
-		) as HTMLInputElement;
+
 		const dependenciesElement = form.elements.namedItem(
 			"dependencies",
 		) as HTMLSelectElement;
 
-		if (!nameElement || !teamElement) return;
-		const metadata = [
-			{
-				key: "team",
-				value: teamElement.value,
-			},
-		];
+		const metadata = [];
 
-		backstageUrlElement?.value &&
-			metadata.push({
-				key: "backstage-url",
-				value: backstageUrlElement.value,
-			});
+		for (const md of config.metadata) {
+			const formElement = form.elements.namedItem(md.key) as
+				| HTMLInputElement
+				| HTMLSelectElement
+				| null;
+
+			if (formElement?.value) {
+				metadata.push({ key: md.key, value: formElement.value });
+			}
+		}
+
+		if (!nameElement) return;
 
 		const newFunction = await addFunction.mutateAsync({
 			function: {
@@ -207,13 +206,18 @@ export function FunctionColumn({ functionId }: FunctionFolderProps) {
 										placeholder="Navn"
 										size="sm"
 										borderRadius="5px"
-										//mb="20px"
 										autoFocus
 									/>
 								</FormControl>
 
-								<TeamSelect functionId={functionId} />
-								<BackstageInput />
+								{config.metadata.map((meta) => (
+									<MetadataInput
+										key={meta.displayName}
+										metadata={meta}
+										parentFunctionId={functionId}
+										functionId={undefined}
+									/>
+								))}
 								<DependenciesSelect />
 								<Flex gap="10px">
 									<Button
