@@ -87,12 +87,14 @@ export function FunctionColumn({ functionId }: FunctionFolderProps) {
 		const metadata = [];
 
 		for (const md of config.metadata) {
-			const exists = form.elements.namedItem(md.key) as
+			const formElement = form.elements.namedItem(md.key) as
 				| HTMLInputElement
 				| HTMLSelectElement
 				| null;
-			console.log("metaverdi input", exists?.value);
-			if (exists?.value) metadata.push({ key: md.key, value: exists.value });
+
+			if (formElement?.value) {
+				metadata.push({ key: md.key, value: formElement.value });
+			}
 		}
 
 		if (!nameElement) return;
