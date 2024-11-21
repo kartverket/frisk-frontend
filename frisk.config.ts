@@ -14,8 +14,8 @@ export const config: FriskConfig = {
 					value: team.id,
 				}));
 			},
-			getValue: async (value: string) => {
-				const team = await getTeam(value);
+			getValue: async (input) => {
+				const team = await getTeam(input.value);
 				return team.displayName;
 			},
 			selectMode: "multi",
@@ -44,7 +44,7 @@ type GeneralMetadataContent = {
 	key: string;
 	displayName: string;
 	inheritFromParent: boolean;
-	getValue?: (key: string, value: string) => Promise<string>;
+	getValue?: (input: { key: string; value: string }) => Promise<string>;
 };
 
 type GeneralRequiredMetadata = GeneralMetadataContent & {
