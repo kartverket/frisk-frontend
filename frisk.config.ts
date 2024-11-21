@@ -1,18 +1,22 @@
 import type { HTMLInputTypeAttribute } from "react";
-import { getMyMicrosoftTeams } from "@/services/backend";
+import { getMyMicrosoftTeams, getTeam } from "@/services/backend";
 
 export const config: FriskConfig = {
 	metadata: [
 		{
 			key: "team",
 			type: "select",
-			displayName: "Ansvarlig team for denne funksjonen?",
+			label: "Ansvarlig team for denne funksjonen?",
 			getOptions: async () => {
 				const teams = await getMyMicrosoftTeams();
 				return teams.map((team) => ({
 					name: team.displayName,
 					value: team.id,
 				}));
+			},
+			getDisplayValue: async (input) => {
+				const team = await getTeam(input.value);
+				return team.displayName;
 			},
 			selectMode: "multi",
 			showOn: "createAndUpdate",
@@ -23,7 +27,7 @@ export const config: FriskConfig = {
 		{
 			key: "backstage-url",
 			type: "url",
-			displayName: "Lenke til utviklerportalen",
+			label: "Lenke til utviklerportalen",
 			showOn: "createAndUpdate",
 			isRequired: false,
 			placeholder: "Sett inn lenke",
@@ -38,8 +42,9 @@ type FriskConfig = {
 
 type GeneralMetadataContent = {
 	key: string;
-	displayName: string;
+	label: string;
 	inheritFromParent: boolean;
+	getDisplayValue?: (input: { key: string; value: string }) => Promise<string>;
 };
 
 type GeneralRequiredMetadata = GeneralMetadataContent & {

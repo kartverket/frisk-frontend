@@ -87,7 +87,7 @@ function SelectInput({
 					fontWeight: "medium",
 				}}
 			>
-				{metadata.displayName}
+				{metadata.label}
 			</FormLabel>
 			<Skeleton isLoaded={!options.isLoading} fitContent>
 				{options.isSuccess ? (
@@ -136,7 +136,7 @@ function InputField({ metadata, functionId, parentFunctionId }: InputProps) {
 	return (
 		<FormControl isRequired={metadata.isRequired}>
 			<FormLabel style={{ fontSize: "small", fontWeight: "medium" }}>
-				{metadata.displayName}
+				{metadata.label}
 			</FormLabel>
 			<Input
 				autoFocus
