@@ -212,7 +212,7 @@ export function FunctionColumn({ functionId }: FunctionFolderProps) {
 
 								{config.metadata.map((meta) => (
 									<MetadataInput
-										key={meta.displayName}
+										key={meta.label}
 										metadata={meta}
 										parentFunctionId={functionId}
 										functionId={undefined}

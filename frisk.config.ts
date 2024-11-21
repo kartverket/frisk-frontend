@@ -6,7 +6,7 @@ export const config: FriskConfig = {
 		{
 			key: "team",
 			type: "select",
-			displayName: "Ansvarlig team for denne funksjonen?",
+			label: "Ansvarlig team for denne funksjonen?",
 			getOptions: async () => {
 				const teams = await getMyMicrosoftTeams();
 				return teams.map((team) => ({
@@ -14,7 +14,7 @@ export const config: FriskConfig = {
 					value: team.id,
 				}));
 			},
-			getValue: async (input) => {
+			getDisplayValue: async (input) => {
 				const team = await getTeam(input.value);
 				return team.displayName;
 			},
@@ -27,7 +27,7 @@ export const config: FriskConfig = {
 		{
 			key: "backstage-url",
 			type: "url",
-			displayName: "Lenke til utviklerportalen",
+			label: "Lenke til utviklerportalen",
 			showOn: "createAndUpdate",
 			isRequired: false,
 			placeholder: "Sett inn lenke",
@@ -42,9 +42,9 @@ type FriskConfig = {
 
 type GeneralMetadataContent = {
 	key: string;
-	displayName: string;
+	label: string;
 	inheritFromParent: boolean;
-	getValue?: (input: { key: string; value: string }) => Promise<string>;
+	getDisplayValue?: (input: { key: string; value: string }) => Promise<string>;
 };
 
 type GeneralRequiredMetadata = GeneralMetadataContent & {
