@@ -1,5 +1,5 @@
 import type { HTMLInputTypeAttribute } from "react";
-import { getMyMicrosoftTeams } from "@/services/backend";
+import { getMyMicrosoftTeams, getTeam } from "@/services/backend";
 
 export const config: FriskConfig = {
 	metadata: [
@@ -13,6 +13,10 @@ export const config: FriskConfig = {
 					name: team.displayName,
 					value: team.id,
 				}));
+			},
+			getValue: async (value: string) => {
+				const team = await getTeam(value);
+				return team.displayName;
 			},
 			selectMode: "multi",
 			showOn: "createAndUpdate",
@@ -40,6 +44,7 @@ type GeneralMetadataContent = {
 	key: string;
 	displayName: string;
 	inheritFromParent: boolean;
+	getValue?: (key: string, value: string) => Promise<string>;
 };
 
 type GeneralRequiredMetadata = GeneralMetadataContent & {
