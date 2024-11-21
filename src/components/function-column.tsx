@@ -214,6 +214,7 @@ export function FunctionColumn({ functionId }: FunctionFolderProps) {
 									<MetadataInput
 										key={meta.displayName}
 										metadata={meta}
+										parentFunctionId={functionId}
 										functionId={undefined}
 									/>
 								))}

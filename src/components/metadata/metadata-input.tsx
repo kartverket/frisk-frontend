@@ -16,18 +16,35 @@ import { useQuery } from "@tanstack/react-query";
 
 type MetadataInputProps = {
 	metadata: (typeof config.metadata)[number];
+	parentFunctionId: number;
 	functionId: number | undefined;
 };
 
-export function MetadataInput({ metadata, functionId }: MetadataInputProps) {
+export function MetadataInput({
+	metadata,
+	functionId,
+	parentFunctionId,
+}: MetadataInputProps) {
 	const metadataType = metadata.type;
 	switch (metadataType) {
 		case "select":
-			return <SelectInput metadata={metadata} functionId={functionId} />;
+			return (
+				<SelectInput
+					metadata={metadata}
+					functionId={functionId}
+					parentFunctionId={parentFunctionId}
+				/>
+			);
 		case "text":
 		case "number":
 		case "url":
-			return <InputField metadata={metadata} functionId={functionId} />;
+			return (
+				<InputField
+					metadata={metadata}
+					functionId={functionId}
+					parentFunctionId={parentFunctionId}
+				/>
+			);
 		default:
 			metadataType satisfies never;
 			console.error("Unsupported data type");
@@ -38,12 +55,22 @@ export function MetadataInput({ metadata, functionId }: MetadataInputProps) {
 type SelectInputProps = {
 	metadata: SelectMetadata;
 	functionId: number | undefined;
+	parentFunctionId: number;
 };
 
-function SelectInput({ metadata, functionId }: SelectInputProps) {
+function SelectInput({
+	metadata,
+	functionId,
+	parentFunctionId,
+}: SelectInputProps) {
 	const currentMetadata = useMetadata(functionId);
+	const parentMetadata = useMetadata(parentFunctionId);
 
 	const currentMetadataValue = currentMetadata.data?.find(
+		(m) => metadata.key === m.key,
+	)?.value;
+
+	const parentMetadataValue = parentMetadata.data?.find(
 		(m) => metadata.key === m.key,
 	)?.value;
 
@@ -69,7 +96,10 @@ function SelectInput({ metadata, functionId }: SelectInputProps) {
 						size="sm"
 						borderRadius="5px"
 						placeholder={currentMetadataValue ?? metadata.placeholder}
-						defaultValue={currentMetadataValue}
+						defaultValue={
+							currentMetadataValue ??
+							(metadata.inheritFromParent ? parentMetadataValue : undefined)
+						}
 					>
 						{options.data?.map((option) => (
 							<option key={option.value} value={option.value}>
@@ -88,12 +118,18 @@ function SelectInput({ metadata, functionId }: SelectInputProps) {
 type InputProps = {
 	metadata: InputMetadata;
 	functionId: number | undefined;
+	parentFunctionId: number;
 };
 
-function InputField({ metadata, functionId }: InputProps) {
+function InputField({ metadata, functionId, parentFunctionId }: InputProps) {
 	const currentMetadata = useMetadata(functionId);
+	const parentMetadata = useMetadata(parentFunctionId);
 
 	const currentMetadataValue = currentMetadata.data?.find(
+		(m) => metadata.key === m.key,
+	)?.value;
+
+	const parentMetadataValue = parentMetadata.data?.find(
 		(m) => metadata.key === m.key,
 	)?.value;
 
@@ -106,7 +142,10 @@ function InputField({ metadata, functionId }: InputProps) {
 				autoFocus
 				type={metadata.type}
 				name={metadata.key}
-				defaultValue={currentMetadataValue}
+				defaultValue={
+					currentMetadataValue ??
+					(metadata.inheritFromParent ? parentMetadataValue : undefined)
+				}
 				placeholder={metadata.placeholder}
 				size="sm"
 				borderRadius="5px"

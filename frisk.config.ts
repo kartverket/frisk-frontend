@@ -18,6 +18,7 @@ export const config: FriskConfig = {
 			showOn: "createAndUpdate",
 			isRequired: true,
 			placeholder: "Velg team",
+			inheritFromParent: true,
 		},
 		{
 			key: "backstage-url",
@@ -26,6 +27,7 @@ export const config: FriskConfig = {
 			showOn: "createAndUpdate",
 			isRequired: false,
 			placeholder: "Sett inn lenke",
+			inheritFromParent: false,
 		},
 	],
 };
@@ -37,6 +39,7 @@ type FriskConfig = {
 type GeneralMetadataContent = {
 	key: string;
 	displayName: string;
+	inheritFromParent: boolean;
 };
 
 type GeneralRequiredMetadata = GeneralMetadataContent & {
