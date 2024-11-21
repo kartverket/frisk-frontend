@@ -1,5 +1,5 @@
 import type { HTMLInputTypeAttribute } from "react";
-import { getMyMicrosoftTeams } from "./services/backend";
+import { getMyMicrosoftTeams } from "@/services/backend";
 
 export const config: FriskConfig = {
 	metadata: [

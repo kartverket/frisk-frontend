@@ -1,4 +1,8 @@
-import type { config, InputMetadata, SelectMetadata } from "@/frisk.config";
+import type {
+	config,
+	InputMetadata,
+	SelectMetadata,
+} from "../../../frisk.config";
 import { useMetadata } from "@/hooks/use-metadata";
 import {
 	FormControl,

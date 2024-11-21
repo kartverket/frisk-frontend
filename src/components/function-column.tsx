@@ -21,7 +21,7 @@ import { useDndMonitor, useDroppable } from "@dnd-kit/core";
 import { Draggable } from "./draggable";
 
 import { DependenciesSelect } from "./metadata/dependencies-select";
-import { config } from "@/frisk.config";
+import { config } from "../../frisk.config";
 
 import { MetadataInput } from "./metadata/metadata-input";
 
