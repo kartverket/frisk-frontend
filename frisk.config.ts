@@ -25,27 +25,6 @@ export const config: FriskConfig = {
 			inheritFromParent: true,
 		},
 		{
-			key: "team2",
-			type: "select",
-			label: "Ansvarlig team for denne funksjonen?",
-			getOptions: async () => {
-				const teams = await getMyMicrosoftTeams();
-				return teams.map((team) => ({
-					name: team.displayName,
-					value: team.id,
-				}));
-			},
-			getDisplayValue: async (input) => {
-				const team = await getTeam(input.value);
-				return team.displayName;
-			},
-			selectMode: "multi",
-			showOn: "createAndUpdate",
-			isRequired: true,
-			placeholder: "Velg team",
-			inheritFromParent: true,
-		},
-		{
 			key: "backstage-url",
 			type: "url",
 			label: "Lenke til utviklerportalen",
