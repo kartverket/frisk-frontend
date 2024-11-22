@@ -25,8 +25,11 @@ export function MetadataInput({
 	functionId,
 	parentFunctionId,
 }: MetadataInputProps) {
-	const metadataType = metadata.type;
-	switch (metadataType) {
+	if (metadata.showOn === "readOnly") return null;
+	if (metadata.showOn === "update" && functionId === undefined) return null;
+
+	const metadataInputType = metadata.type;
+	switch (metadataInputType) {
 		case "select":
 			return (
 				<SelectInput
@@ -46,7 +49,7 @@ export function MetadataInput({
 				/>
 			);
 		default:
-			metadataType satisfies never;
+			metadataInputType satisfies never;
 			console.error("Unsupported data type");
 			return null;
 	}
