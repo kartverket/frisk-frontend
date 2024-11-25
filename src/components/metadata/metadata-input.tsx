@@ -182,35 +182,44 @@ function MultiSelect({
 	setCurrentMetadataValues,
 }: MultiSelectProps) {
 	return (
-		<SearchAsync
-			id={metadata.key}
-			size="sm"
-			value={
-				currentMetadataValues ??
-				(metadata.inheritFromParent ? parentMetadataValues : undefined)
-			}
-			isMulti
-			debounceTime={100}
-			defaultOptions
-			dropdownIndicator={<Icon icon="expand_more" weight={400} />}
-			loadOptions={(inputValue, callback) => {
-				const filteredOptions = options.data
-					?.filter((option) =>
-						option.name.toLowerCase().includes(inputValue.toLowerCase()),
-					)
-					.map((option) => ({
-						value: option.value,
-						label: option.name,
-					}));
-				// @ts-expect-error
-				callback(filteredOptions);
-			}}
-			onChange={(newValue) => {
-				// @ts-expect-error
-				setCurrentMetadataValues(newValue ?? []);
-			}}
-			placeholder="Søk"
-		/>
+		<>
+			<SearchAsync
+				size="sm"
+				value={
+					currentMetadataValues ??
+					(metadata.inheritFromParent ? parentMetadataValues : undefined)
+				}
+				isMulti
+				debounceTime={100}
+				defaultOptions
+				dropdownIndicator={<Icon icon="expand_more" weight={400} />}
+				loadOptions={(inputValue, callback) => {
+					const filteredOptions = options.data
+						?.filter((option) =>
+							option.name.toLowerCase().includes(inputValue.toLowerCase()),
+						)
+						.map((option) => ({
+							value: option.value,
+							label: option.name,
+						}));
+					// @ts-expect-error
+					callback(filteredOptions);
+				}}
+				onChange={(newValue) => {
+					// @ts-expect-error
+					setCurrentMetadataValues(newValue ?? []);
+				}}
+				placeholder={metadata.placeholder}
+			/>
+			<Input
+				type="hidden"
+				name={metadata.key}
+				value={JSON.stringify(
+					currentMetadataValues ??
+						(metadata.inheritFromParent ? parentMetadataValues : undefined),
+				)}
+			/>
+		</>
 	);
 }
 

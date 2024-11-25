@@ -1,5 +1,10 @@
 import type { HTMLInputTypeAttribute } from "react";
-import { getMyMicrosoftTeams, getTeam } from "@/services/backend";
+import {
+	getFunctionMetadata,
+	getFunctions,
+	getMyMicrosoftTeams,
+	getTeam,
+} from "@/services/backend";
 
 export const config: FriskConfig = {
 	metadata: [
@@ -33,6 +38,31 @@ export const config: FriskConfig = {
 			placeholder: "Sett inn lenke",
 			inheritFromParent: false,
 		},
+		{
+			key: "dependencies",
+			type: "select",
+			label: "Velg andre funksjoner denne funksjonen er avhengig avv",
+			getOptions: async () => {
+				const functions = await getFunctions();
+				return functions.map((func) => ({
+					name: func.name,
+					value: String(func.id),
+				}));
+			},
+			// getDisplayValue: async (input) => {
+			// 	const functionId: number = Number.parseInt(input.key);
+			// 	const metadata = await getFunctionMetadata(functionId);
+			// 	const dependencies = metadata?.filter((m) => m.key === "dependencies");
+			// 	return dependencies.map((m) => {
+			// 		m.value;
+			// 	});
+			// },
+			selectMode: "multi",
+			showOn: "createAndUpdate",
+			isRequired: false,
+			placeholder: "Søk etter funksjoner",
+			inheritFromParent: true,
+		},
 	],
 };
 
@@ -44,7 +74,9 @@ type GeneralMetadataContent = {
 	key: string;
 	label: string;
 	inheritFromParent: boolean;
-	getDisplayValue?: (input: { key: string; value: string }) => Promise<string>;
+	getDisplayValue?: (input: { key: string; value: string }) => Promise<
+		string | string[]
+	>;
 };
 
 type GeneralRequiredMetadata = GeneralMetadataContent & {

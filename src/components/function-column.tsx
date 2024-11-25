@@ -19,8 +19,6 @@ import { useState } from "react";
 
 import { useDndMonitor, useDroppable } from "@dnd-kit/core";
 import { Draggable } from "./draggable";
-
-import { DependenciesSelect } from "./metadata/dependencies-select";
 import { config } from "../../frisk.config";
 
 import { MetadataInput } from "./metadata/metadata-input";
@@ -80,10 +78,6 @@ export function FunctionColumn({ functionId }: FunctionFolderProps) {
 			"name",
 		) as HTMLInputElement | null;
 
-		const dependenciesElement = form.elements.namedItem(
-			"dependencies",
-		) as HTMLSelectElement;
-
 		const metadata = [];
 
 		for (const md of config.metadata) {
@@ -98,8 +92,9 @@ export function FunctionColumn({ functionId }: FunctionFolderProps) {
 		}
 
 		if (!nameElement) return;
+		console.log(metadata);
 
-		const newFunction = await addFunction.mutateAsync({
+		await addFunction.mutateAsync({
 			function: {
 				name: nameElement.value,
 				description: null,
@@ -107,26 +102,6 @@ export function FunctionColumn({ functionId }: FunctionFolderProps) {
 			},
 			metadata: metadata,
 		});
-
-		const dependenciesSelected: number[] = JSON.parse(
-			dependenciesElement.value,
-		) as number[];
-
-		const dependenciesToCreate = dependenciesSelected.filter(
-			(dependency) =>
-				!dependencies.data?.map((dep) => dep.id).includes(dependency),
-		);
-
-		const promises: Promise<unknown>[] = [];
-		for (const dependency of dependenciesToCreate) {
-			promises.push(
-				addDependency.mutateAsync({
-					functionId: newFunction.id,
-					dependencyFunctionId: dependency,
-				}),
-			);
-		}
-		await Promise.all(promises);
 
 		// clear form
 		form.reset();
@@ -218,7 +193,6 @@ export function FunctionColumn({ functionId }: FunctionFolderProps) {
 										functionId={undefined}
 									/>
 								))}
-								<DependenciesSelect />
 								<Flex gap="10px">
 									<Button
 										aria-label="delete"
