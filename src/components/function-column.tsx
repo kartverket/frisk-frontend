@@ -87,13 +87,28 @@ export function FunctionColumn({ functionId }: FunctionFolderProps) {
 		const metadata = [];
 
 		for (const md of config.metadata) {
-			const formElement = form.elements.namedItem(md.key) as
-				| HTMLInputElement
-				| HTMLSelectElement
-				| null;
+			if (md.type === "select" && md.selectMode === "multi") {
+				const formElement = form.elements.namedItem(
+					md.key,
+				) as HTMLSelectElement;
+				const values = JSON.parse(formElement.value) as {
+					label: string;
+					value: string;
+				}[];
+				console.log(values);
 
-			if (formElement?.value) {
-				metadata.push({ key: md.key, value: formElement.value });
+				for (const value of values) {
+					metadata.push({ key: md.key, value: value.value });
+				}
+			} else {
+				const formElement = form.elements.namedItem(md.key) as
+					| HTMLInputElement
+					| HTMLSelectElement
+					| null;
+
+				if (formElement?.value) {
+					metadata.push({ key: md.key, value: formElement.value });
+				}
 			}
 		}
 

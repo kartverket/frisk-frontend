@@ -15,7 +15,7 @@ import {
 	Skeleton,
 	Text,
 } from "@kvib/react";
-import { useQuery } from "@tanstack/react-query";
+import { useQueries, useQuery } from "@tanstack/react-query";
 import type { UseQueryResult } from "@tanstack/react-query";
 import { useState } from "react";
 
@@ -68,29 +68,65 @@ function SelectInput({
 	functionId,
 	parentFunctionId,
 }: SelectInputProps) {
-	const currentMetadata = useMetadata(functionId);
 	const parentMetadata = useMetadata(parentFunctionId);
 
-	const currentMetadataValue = currentMetadata.data?.find(
+	const { data: currentMetadata, isPending: isCurrentMetadataLoading } =
+		useMetadata(functionId);
+
+	const metadataToDisplay = currentMetadata?.filter(
+		(m) => metadata.key === m.key,
+	);
+
+	const currentMetadataValue = currentMetadata?.find(
 		(m) => metadata.key === m.key,
 	)?.value;
 
+	const displayValues = useQueries({
+		queries:
+			metadataToDisplay?.map((m) => ({
+				queryKey: [functionId, metadata.key, m.value, "getDisplayValue"],
+				queryFn: async () => {
+					return metadata.getDisplayValue?.(m) ?? m.value;
+				},
+			})) ?? [],
+	});
+
 	const [currentMetadataValues, setCurrentMetadataValues] = useState<
-		SelectOption[] | undefined
+		MultiSelectOption[] | undefined
 	>(
-		currentMetadata.data
+		currentMetadata
 			?.filter((m) => metadata.key === m.key)
-			?.map((m) => ({ value: m.key, name: m.value })),
+			?.map((m, i) => ({
+				value: m.value,
+				label: displayValues[i].data ?? m.value,
+			})),
 	);
+
+	const parentMetadataToDisplay = parentMetadata.data?.filter(
+		(m) => metadata.key === m.key,
+	);
+
+	const parentDisplayValues = useQueries({
+		queries:
+			parentMetadata.data?.map((m) => ({
+				queryKey: [functionId, metadata.key, m.value, "getDisplayValue"],
+				queryFn: async () => {
+					return metadata.getDisplayValue?.(m) ?? m.value;
+				},
+			})) ?? [],
+	});
 
 	const parentMetadataValue = parentMetadata.data?.find(
 		(m) => metadata.key === m.key,
 	)?.value;
 
-	const parentMetadataValues: SelectOption[] =
-		parentMetadata.data
+	const parentMetadataValues: { value: string; label: string }[] =
+		parentMetadataToDisplay
 			?.filter((m) => metadata.key === m.key)
-			?.map((m) => ({ value: m.key, name: m.value })) ?? [];
+			?.map((m, i) => ({
+				value: m.value,
+				label: parentDisplayValues[i].data ?? m.value,
+			})) ?? [];
 
 	const options = useQuery({
 		queryKey: [metadata],
@@ -166,12 +202,17 @@ function SingleSelect({
 	);
 }
 
+type MultiSelectOption = {
+	value: string;
+	label: string;
+};
+
 type MultiSelectProps = {
 	metadata: SelectMetadata;
 	options: UseQueryResult<SelectOption[]>;
-	currentMetadataValues: SelectOption[] | undefined;
-	parentMetadataValues: SelectOption[] | undefined;
-	setCurrentMetadataValues: (values: SelectOption[]) => void;
+	currentMetadataValues: MultiSelectOption[] | undefined;
+	parentMetadataValues: MultiSelectOption[] | undefined;
+	setCurrentMetadataValues: (values: MultiSelectOption[]) => void;
 };
 
 function MultiSelect({
@@ -182,35 +223,44 @@ function MultiSelect({
 	setCurrentMetadataValues,
 }: MultiSelectProps) {
 	return (
-		<SearchAsync
-			id={metadata.key}
-			size="sm"
-			value={
-				currentMetadataValues ??
-				(metadata.inheritFromParent ? parentMetadataValues : undefined)
-			}
-			isMulti
-			debounceTime={100}
-			defaultOptions
-			dropdownIndicator={<Icon icon="expand_more" weight={400} />}
-			loadOptions={(inputValue, callback) => {
-				const filteredOptions = options.data
-					?.filter((option) =>
-						option.name.toLowerCase().includes(inputValue.toLowerCase()),
-					)
-					.map((option) => ({
-						value: option.value,
-						label: option.name,
-					}));
-				// @ts-expect-error
-				callback(filteredOptions);
-			}}
-			onChange={(newValue) => {
-				// @ts-expect-error
-				setCurrentMetadataValues(newValue ?? []);
-			}}
-			placeholder="Søk"
-		/>
+		<>
+			<SearchAsync
+				size="sm"
+				value={
+					currentMetadataValues ??
+					(metadata.inheritFromParent ? parentMetadataValues : undefined)
+				}
+				isMulti
+				debounceTime={100}
+				defaultOptions
+				dropdownIndicator={<Icon icon="expand_more" weight={400} />}
+				loadOptions={(inputValue, callback) => {
+					const filteredOptions = options.data
+						?.filter((option) =>
+							option.name.toLowerCase().includes(inputValue.toLowerCase()),
+						)
+						.map((option) => ({
+							value: option.value,
+							label: option.name,
+						}));
+					// @ts-expect-error
+					callback(filteredOptions);
+				}}
+				onChange={(newValue) => {
+					// @ts-expect-error
+					setCurrentMetadataValues(newValue ?? []);
+				}}
+				placeholder="Søk"
+			/>
+			<Input
+				type="hidden"
+				name={metadata.key}
+				value={JSON.stringify(
+					currentMetadataValues ??
+						(metadata.inheritFromParent ? parentMetadataValues : undefined),
+				)}
+			/>
+		</>
 	);
 }
 
