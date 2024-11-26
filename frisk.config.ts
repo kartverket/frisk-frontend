@@ -33,6 +33,9 @@ export const config: FriskConfig = {
 			isRequired: false,
 			placeholder: "Sett inn lenke",
 			inheritFromParent: false,
+			getDisplayValue: async () => {
+				return { displayValue: "Utviklerportalen" };
+			},
 		},
 		{
 			key: "rr-skjema",

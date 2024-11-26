@@ -78,7 +78,7 @@ function SelectInput({
 	)?.value;
 
 	const options = useQuery({
-		queryKey: [metadata],
+		queryKey: [metadata.key, "getOptions"],
 		queryFn: metadata.getOptions,
 	});
 
