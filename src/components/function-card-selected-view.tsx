@@ -56,6 +56,7 @@ export function FunctionCardSelectedView({
 				))}
 			</List>
 			<SchemaButton my="16px" functionId={functionId} />
+			{/* Keep this for backwards compatibility with old metadata */}
 			{schemaMetadata.map((item) => (
 				<RegelrettLink
 					key={item.key}
