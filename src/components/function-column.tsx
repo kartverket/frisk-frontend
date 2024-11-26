@@ -87,13 +87,18 @@ export function FunctionColumn({ functionId }: FunctionFolderProps) {
 		const metadata = [];
 
 		for (const md of config.metadata) {
-			const formElement = form.elements.namedItem(md.key) as
-				| HTMLInputElement
-				| HTMLSelectElement
-				| null;
+			const formElementValue = (
+				form.elements.namedItem(md.key) as
+					| HTMLInputElement
+					| HTMLSelectElement
+					| null
+			)?.value;
 
-			if (formElement?.value) {
-				metadata.push({ key: md.key, value: formElement.value });
+			const defaultValue = await md.getDefaultValue?.();
+			if (formElementValue) {
+				metadata.push({ key: md.key, value: formElementValue });
+			} else if (defaultValue) {
+				metadata.push({ key: md.key, value: defaultValue });
 			}
 		}
 
@@ -210,14 +215,16 @@ export function FunctionColumn({ functionId }: FunctionFolderProps) {
 									/>
 								</FormControl>
 
-								{config.metadata.map((meta) => (
-									<MetadataInput
-										key={meta.key}
-										metadata={meta}
-										parentFunctionId={functionId}
-										functionId={undefined}
-									/>
-								))}
+								{config.metadata
+									.filter((md) => md.showOn === "createAndUpdate")
+									.map((meta) => (
+										<MetadataInput
+											key={meta.key}
+											metadata={meta}
+											parentFunctionId={functionId}
+											functionId={undefined}
+										/>
+									))}
 								<DependenciesSelect />
 								<Flex gap="10px">
 									<Button

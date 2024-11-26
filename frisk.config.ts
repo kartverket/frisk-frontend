@@ -44,17 +44,26 @@ type GeneralMetadataContent = {
 	key: string;
 	label: string;
 	inheritFromParent: boolean;
+	getDefaultValue?: () => Promise<string | undefined>;
 	getDisplayValue?: (input: { key: string; value: string }) => Promise<string>;
 };
 
-type GeneralRequiredMetadata = GeneralMetadataContent & {
-	isRequired: true;
-	showOn: "createAndUpdate";
-};
+type GeneralRequiredMetadata = GeneralMetadataContent &
+	(
+		| {
+				isRequired: true;
+				showOn: "createAndUpdate";
+		  }
+		| {
+				getDefaultValue: () => Promise<string | undefined>;
+				isRequired: true;
+				showOn: "readOnly";
+		  }
+	);
 
 type GeneralOptionalMetadata = GeneralMetadataContent & {
 	isRequired: false;
-	showOn: "update" | "createAndUpdate";
+	showOn: "update" | "createAndUpdate" | "readOnly";
 };
 
 type GeneralMetadata = GeneralRequiredMetadata | GeneralOptionalMetadata;
