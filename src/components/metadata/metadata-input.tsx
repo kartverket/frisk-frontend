@@ -120,7 +120,7 @@ function SelectInput({
 		(m) => metadata.key === m.key,
 	)?.value;
 
-	const parentMetadataValues: { value: string; label: string }[] =
+	const parentMetadataValues: MultiSelectOption[] =
 		parentMetadataToDisplay
 			?.filter((m) => metadata.key === m.key)
 			?.map((m, i) => ({
