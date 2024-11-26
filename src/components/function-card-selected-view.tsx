@@ -26,7 +26,7 @@ export function FunctionCardSelectedView({
 				</Skeleton>
 				<EditAndSelectButtons functionId={functionId} selected />
 			</Flex>
-			{config.metadata.map((meta) => (
+			{config.metadata?.map((meta) => (
 				<MetadataView key={meta.key} metadata={meta} functionId={functionId} />
 			))}
 			{dependencies.data && dependencies.data?.length > 0 && (

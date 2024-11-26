@@ -1,6 +1,6 @@
 import type {
-	config,
 	InputMetadata,
+	Metadata,
 	SelectMetadata,
 } from "../../../frisk.config";
 import { useMetadata } from "@/hooks/use-metadata";
@@ -15,7 +15,7 @@ import {
 import { useQuery } from "@tanstack/react-query";
 
 type MetadataInputProps = {
-	metadata: (typeof config.metadata)[number];
+	metadata: Metadata;
 	parentFunctionId: number;
 	functionId: number | undefined;
 };

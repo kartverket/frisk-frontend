@@ -63,7 +63,7 @@ export const config: FriskConfig = {
 };
 
 type FriskConfig = {
-	metadata: Metadata[];
+	metadata?: Metadata[];
 };
 
 type GeneralMetadataContent = {
@@ -113,6 +113,6 @@ export type InputMetadata = GeneralMetadata & {
 	placeholder: string;
 };
 
-type Metadata = SelectMetadata | InputMetadata;
+export type Metadata = SelectMetadata | InputMetadata;
 
 type SelectOption = { value: string; name: string };

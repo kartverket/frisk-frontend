@@ -1,10 +1,10 @@
 import { useMetadata } from "@/hooks/use-metadata";
 import { Link, Skeleton, Text } from "@kvib/react";
-import { useQuery } from "@tanstack/react-query";
-import type { config } from "frisk.config";
+import { useQueries } from "@tanstack/react-query";
+import type { Metadata } from "../../../frisk.config";
 
 type Props = {
-	metadata: (typeof config.metadata)[number];
+	metadata: Metadata;
 	functionId: number | undefined;
 };
 
@@ -12,52 +12,65 @@ export function MetadataView({ metadata, functionId }: Props) {
 	const { data: currentMetadata, isPending: isCurrentMetadataLoading } =
 		useMetadata(functionId);
 
-	const metadataToDisplay = currentMetadata?.find(
+	const metadataToDisplay = currentMetadata?.filter(
 		(m) => metadata.key === m.key,
 	);
 
-	const { data: displayValue, isPending: isDisplayValueLoading } = useQuery({
-		queryKey: [functionId, metadata.key, "getDisplayValue"],
-		queryFn: async (): ReturnType<
-			NonNullable<typeof metadata.getDisplayValue>
-		> => {
-			if (metadata.getDisplayValue)
-				// biome-ignore lint/style/noNonNullAssertion: <explanation>
-				return metadata.getDisplayValue(metadataToDisplay!);
-			// biome-ignore lint/style/noNonNullAssertion: <explanation>
-			return { displayValue: metadataToDisplay!.value };
-		},
-		enabled: !!metadataToDisplay,
+	const displayValues = useQueries({
+		queries:
+			metadataToDisplay?.map((m) => ({
+				queryKey: [functionId, metadata.key, m.value, "getDisplayValue"],
+				queryFn: async () => {
+					return (
+						metadata.getDisplayValue?.(m) ?? {
+							displayValue: m.value,
+							value: m.value,
+							displayType: metadata.type,
+						}
+					);
+				},
+			})) ?? [],
 	});
 
-	const metadataType = displayValue?.displayType ?? metadata.type;
-	const metaDataValue = displayValue?.value ?? metadataToDisplay?.value;
-
-	if (!metadataToDisplay && !isCurrentMetadataLoading) return null;
-
-	switch (metadataType) {
-		case "text":
-		case "number":
-		case "select":
-			return (
-				<TextView
-					displayValue={displayValue?.displayValue}
-					isLoading={isCurrentMetadataLoading && isDisplayValueLoading}
-				/>
-			);
-		case "url":
-			return (
-				<LinkView
-					url={metaDataValue}
-					displayValue={displayValue?.displayValue}
-					isLoading={isCurrentMetadataLoading && isDisplayValueLoading}
-				/>
-			);
-		default:
-			metadataType satisfies never;
-			console.error("Unsupported data type");
-			return null;
+	if (displayValues.length === 0 && !isCurrentMetadataLoading) {
+		return null;
 	}
+
+	return (
+		<>
+			{displayValues.map((dv, i) => {
+				const isDisplayValueLoading = dv.isLoading;
+				const displayValue = dv.data?.displayValue;
+				const metadataType = dv.data?.displayType ?? metadata.type;
+				const metaDataValue = dv.data?.value ?? metadataToDisplay?.[i]?.value;
+				const isLoading = isCurrentMetadataLoading || isDisplayValueLoading;
+				const isNoMetadata = !currentMetadata && !isCurrentMetadataLoading;
+
+				if (isNoMetadata) return null;
+
+				switch (metadataType) {
+					case "text":
+					case "number":
+					case "select":
+						return (
+							<TextView displayValue={displayValue} isLoading={isLoading} />
+						);
+					case "url":
+						return (
+							<LinkView
+								url={metaDataValue}
+								displayValue={displayValue}
+								isLoading={isLoading}
+							/>
+						);
+					default:
+						metadataType satisfies never;
+						console.error("Unsupported data type");
+						return null;
+				}
+			})}
+		</>
+	);
 }
 
 type TextViewProps = {
@@ -68,7 +81,7 @@ type TextViewProps = {
 function TextView({ displayValue, isLoading }: TextViewProps) {
 	return (
 		<Skeleton isLoaded={!isLoading} fitContent>
-			<Text>{displayValue}</Text>
+			<Text>{displayValue ?? "<Ingen tekst>"}</Text>
 		</Skeleton>
 	);
 }
@@ -92,7 +105,7 @@ function LinkView({ url, displayValue, isLoading }: LinkViewProps) {
 				onClick={(e) => e.stopPropagation()}
 				marginBottom="10px"
 			>
-				{displayValue}
+				{displayValue ?? "<Ingen lenke>"}
 			</Link>
 		</Skeleton>
 	);

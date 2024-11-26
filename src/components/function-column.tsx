@@ -86,7 +86,7 @@ export function FunctionColumn({ functionId }: FunctionFolderProps) {
 
 		const metadata = [];
 
-		for (const md of config.metadata) {
+		for (const md of config.metadata ?? []) {
 			const formElement = form.elements.namedItem(md.key) as
 				| HTMLInputElement
 				| HTMLSelectElement
@@ -210,7 +210,7 @@ export function FunctionColumn({ functionId }: FunctionFolderProps) {
 									/>
 								</FormControl>
 
-								{config.metadata.map((meta) => (
+								{config.metadata?.map((meta) => (
 									<MetadataInput
 										key={meta.key}
 										metadata={meta}
