@@ -79,8 +79,6 @@ function SelectInput({
 		queryFn: metadata.getOptions,
 	});
 
-	console.log("test", options.data);
-
 	return (
 		<FormControl isRequired={metadata.isRequired}>
 			<FormLabel
