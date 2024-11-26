@@ -53,11 +53,16 @@ export function MetadataView({ metadata, functionId }: Props) {
 					case "number":
 					case "select":
 						return (
-							<TextView displayValue={displayValue} isLoading={isLoading} />
+							<TextView
+								key={metaDataValue}
+								displayValue={displayValue}
+								isLoading={isLoading}
+							/>
 						);
 					case "url":
 						return (
 							<LinkView
+								key={metaDataValue}
 								url={metaDataValue}
 								displayValue={displayValue}
 								isLoading={isLoading}

@@ -59,7 +59,7 @@ export function FunctionCardSelectedView({
 			{/* Keep this for backwards compatibility with old metadata */}
 			{schemaMetadata.map((item) => (
 				<RegelrettLink
-					key={item.key}
+					key={`legacy-${item.key}-${item.value}`}
 					metadata={{
 						key: item.key,
 						contextId: item.value,
