@@ -16,7 +16,7 @@ export const config: FriskConfig = {
 			},
 			getDisplayValue: async (input) => {
 				const team = await getTeam(input.value);
-				return team.displayName.replace(/.* - /, "");
+				return team.displayName;
 			},
 			selectMode: "multi",
 			showOn: "createAndUpdate",
