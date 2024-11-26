@@ -52,7 +52,11 @@ export const config: FriskConfig = {
 					redirectBackTitle: "Funksjonsregisteret",
 				});
 				const url = `${getregelrettFrontendUrl()}/context/${contextId}?${searchParams.toString()}`;
-				return { displayValue: tableName, value: url, displayType: "url" };
+				return {
+					displayValue: tableName.replaceAll("+", " "),
+					value: url,
+					displayType: "url",
+				};
 			},
 		},
 	],
