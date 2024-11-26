@@ -16,8 +16,6 @@ export function MetadataView({ metadata, functionId }: Props) {
 		(m) => metadata.key === m.key,
 	);
 
-	functionId === 228 &&
-		console.log({ metadataToDisplay, currentMetadata, metadata });
 	const { data: displayValue, isPending: isDisplayValueLoading } = useQuery({
 		queryKey: [metadata, "getDisplayValue"],
 		queryFn: () => {
@@ -31,6 +29,8 @@ export function MetadataView({ metadata, functionId }: Props) {
 	});
 
 	const metadataType = metadata.type;
+	if (!metadataToDisplay && !isCurrentMetadataLoading) return null;
+
 	switch (metadataType) {
 		case "text":
 		case "number":
@@ -44,8 +44,9 @@ export function MetadataView({ metadata, functionId }: Props) {
 		case "url":
 			return (
 				<LinkView
-					url={metadataToDisplay?.value ?? ""}
+					url={metadataToDisplay?.value}
 					displayValue={displayValue}
+					isLoading={isCurrentMetadataLoading && isDisplayValueLoading}
 				/>
 			);
 		default:
@@ -69,23 +70,26 @@ function TextView({ displayValue, isLoading }: TextViewProps) {
 }
 
 type LinkViewProps = {
-	url: string;
+	url: string | undefined;
 	displayValue: string | undefined;
+	isLoading: boolean;
 };
 
-function LinkView({ url, displayValue }: LinkViewProps) {
+function LinkView({ url, displayValue, isLoading }: LinkViewProps) {
 	return (
-		<Link
-			fontSize="sm"
-			fontWeight="700"
-			colorScheme="blue"
-			width="fit-content"
-			isExternal
-			href={url}
-			onClick={(e) => e.stopPropagation()}
-			marginBottom="10px"
-		>
-			{displayValue}
-		</Link>
+		<Skeleton isLoaded={!isLoading} fitContent>
+			<Link
+				fontSize="sm"
+				fontWeight="700"
+				colorScheme="blue"
+				width="fit-content"
+				isExternal
+				href={url}
+				onClick={(e) => e.stopPropagation()}
+				marginBottom="10px"
+			>
+				{displayValue}
+			</Link>
+		</Skeleton>
 	);
 }

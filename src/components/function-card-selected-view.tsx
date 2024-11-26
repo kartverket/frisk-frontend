@@ -2,7 +2,6 @@ import { Flex, Text, Skeleton, List, ListItem, Box, Stack } from "@kvib/react";
 import { SchemaButton } from "./schema-button";
 import { RegelrettLink } from "./metadata/regelrett-link";
 import { useFunction } from "@/hooks/use-function";
-import { useTeam } from "@/hooks/use-team";
 import { EditAndSelectButtons } from "./edit-and-select-buttons";
 import { config } from "../../frisk.config";
 import { MetadataView } from "./metadata/metadata-view";
@@ -14,14 +13,8 @@ export function FunctionCardSelectedView({
 		includeMetadata: true,
 		includeDependencies: true,
 	});
-	const teamId = metadata.data?.find((m) => m.key === "team")?.value;
-	const { team } = useTeam(teamId);
 	const schemaMetadata =
 		metadata.data?.filter((m) => m.key.startsWith("rr-")) ?? [];
-	const backstageMetadata =
-		metadata.data?.filter((m) => m.key.startsWith("backstage-url")) ?? [];
-	const teamDisplayName = team.data?.displayName.replace(/.* - /, "");
-	const teamLoaded = !metadata.isLoading && !team.isLoading;
 
 	return (
 		<Stack paddingLeft="10px" w="100%">
