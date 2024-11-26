@@ -75,9 +75,11 @@ function SelectInput({
 	)?.value;
 
 	const options = useQuery({
-		queryKey: [metadata],
+		queryKey: [metadata, "getOptions"],
 		queryFn: metadata.getOptions,
 	});
+
+	console.log("test", options.data);
 
 	return (
 		<FormControl isRequired={metadata.isRequired}>

@@ -16,7 +16,7 @@ export const config: FriskConfig = {
 			},
 			getDisplayValue: async (input) => {
 				const team = await getTeam(input.value);
-				return team.displayName;
+				return team.displayName.replace(/.* - /, "");
 			},
 			selectMode: "multi",
 			showOn: "createAndUpdate",
@@ -32,6 +32,9 @@ export const config: FriskConfig = {
 			isRequired: false,
 			placeholder: "Sett inn lenke",
 			inheritFromParent: false,
+			getDisplayValue: async () => {
+				return "Utviklerportalen";
+			},
 		},
 	],
 };
