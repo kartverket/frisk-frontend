@@ -157,7 +157,7 @@ export function FunctionColumn({ functionId }: FunctionFolderProps) {
 				minH="46px"
 			>
 				<Text size="lg" fontWeight="700">
-					Funksjon nivå {currentLevel + 1}
+					{config.columnName} nivå {currentLevel + 1}
 				</Text>
 			</Box>
 			<Box
@@ -259,7 +259,7 @@ export function FunctionColumn({ functionId }: FunctionFolderProps) {
 						colorScheme="blue"
 						onClick={() => setFormVisible(true)}
 					>
-						Legg til funksjon
+						{config.addButtonName}
 					</Button>
 				</Skeleton>
 			</Box>
