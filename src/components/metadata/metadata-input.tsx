@@ -70,8 +70,7 @@ function SelectInput({
 }: SelectInputProps) {
 	const parentMetadata = useMetadata(parentFunctionId);
 
-	const { data: currentMetadata, isPending: isCurrentMetadataLoading } =
-		useMetadata(functionId);
+	const { data: currentMetadata } = useMetadata(functionId);
 
 	const metadataToDisplay = currentMetadata?.filter(
 		(m) => metadata.key === m.key,
