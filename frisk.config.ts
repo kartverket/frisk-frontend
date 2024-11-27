@@ -18,7 +18,7 @@ export const config: FriskConfig = {
 				const team = await getTeam(input.value);
 				return team.displayName;
 			},
-			selectMode: "multi",
+			selectMode: "single",
 			showOn: "createAndUpdate",
 			isRequired: true,
 			placeholder: "Velg team",
@@ -76,4 +76,4 @@ export type InputMetadata = GeneralMetadata & {
 
 type Metadata = SelectMetadata | InputMetadata;
 
-type SelectOption = { value: string; name: string };
+export type SelectOption = { value: string; name: string };
