@@ -23,7 +23,8 @@ import { Draggable } from "./draggable";
 import { DependenciesSelect } from "./metadata/dependencies-select";
 import { config } from "../../frisk.config";
 
-import { MetadataInput, MultiSelectOption } from "./metadata/metadata-input";
+import type { MultiSelectOption } from "./metadata/metadata-input";
+import { MetadataInput } from "./metadata/metadata-input";
 
 type FunctionFolderProps = {
 	functionId: number;
