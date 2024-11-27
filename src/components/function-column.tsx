@@ -23,7 +23,7 @@ import { Draggable } from "./draggable";
 import { DependenciesSelect } from "./metadata/dependencies-select";
 import { config } from "../../frisk.config";
 
-import { MetadataInput } from "./metadata/metadata-input";
+import { MetadataInput, MultiSelectOption } from "./metadata/metadata-input";
 
 type FunctionFolderProps = {
 	functionId: number;
@@ -91,11 +91,7 @@ export function FunctionColumn({ functionId }: FunctionFolderProps) {
 				const formElement = form.elements.namedItem(
 					md.key,
 				) as HTMLSelectElement;
-				const values = JSON.parse(formElement.value) as {
-					label: string;
-					value: string;
-				}[];
-				console.log(values);
+				const values = JSON.parse(formElement.value) as MultiSelectOption[];
 
 				for (const value of values) {
 					metadata.push({ key: md.key, value: value.value });

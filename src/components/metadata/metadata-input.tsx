@@ -202,7 +202,7 @@ function SingleSelect({
 	);
 }
 
-type MultiSelectOption = {
+export type MultiSelectOption = {
 	value: string;
 	label: string;
 };
