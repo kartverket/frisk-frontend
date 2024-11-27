@@ -21,7 +21,7 @@ import { useState } from "react";
 
 type MetadataInputProps = {
 	metadata: (typeof config.metadata)[number];
-	parentFunctionId: number;
+	parentFunctionId: number | undefined;
 	functionId: number | undefined;
 };
 
@@ -60,7 +60,7 @@ export function MetadataInput({
 type SelectInputProps = {
 	metadata: SelectMetadata;
 	functionId: number | undefined;
-	parentFunctionId: number;
+	parentFunctionId: number | undefined;
 };
 
 function SelectInput({
@@ -266,7 +266,7 @@ function MultiSelect({
 type InputProps = {
 	metadata: InputMetadata;
 	functionId: number | undefined;
-	parentFunctionId: number;
+	parentFunctionId: number | undefined;
 };
 
 function InputField({ metadata, functionId, parentFunctionId }: InputProps) {
