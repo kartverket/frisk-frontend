@@ -2,6 +2,7 @@ import { useFunction } from "@/hooks/use-function";
 import { Route } from "@/routes";
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink } from "@kvib/react";
 import { Link as TSRLink } from "@tanstack/react-router";
+import { config } from "../../frisk.config";
 
 type BreadcrumbsProps = {
 	path: string;
@@ -31,7 +32,7 @@ function CustomBreadcrumbLink({ functionId }: BreadcrumbItemProps) {
 	return (
 		<TSRLink to={Route.to} search={{ path: func.data?.path }}>
 			<BreadcrumbLink as="span" isCurrentPage={path === func.data?.path}>
-				{func.data?.name}
+				{functionId === 1 ? config.rootNodeName : func.data?.name}
 			</BreadcrumbLink>
 		</TSRLink>
 	);
