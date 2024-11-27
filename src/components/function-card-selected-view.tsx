@@ -13,8 +13,12 @@ export function FunctionCardSelectedView({
 		includeMetadata: true,
 		includeDependencies: true,
 	});
+
+	// TODO: remove when backend is migrated
 	const schemaMetadata =
-		metadata.data?.filter((m) => m.key.startsWith("rr-")) ?? [];
+		metadata.data?.filter(
+			(m) => m.key.startsWith("rr-") && m.key !== "rr-skjema",
+		) ?? [];
 
 	return (
 		<Stack paddingLeft="10px" w="100%">
@@ -57,6 +61,7 @@ export function FunctionCardSelectedView({
 			</List>
 			<SchemaButton my="16px" functionId={functionId} />
 			{/* Keep this for backwards compatibility with old metadata */}
+			{/* TODO: remove when backend is migrated */}
 			{schemaMetadata.map((item) => (
 				<RegelrettLink
 					key={`legacy-${item.key}-${item.value}`}
