@@ -63,22 +63,30 @@ export function FunctionCardEdit({ functionId }: { functionId: number }) {
 			if (md.type === "select" && md.selectMode === "multi") {
 				const values = JSON.parse(formElement.value) as MultiSelectOption[];
 				// delete existing metadata
+				const deletePromises: Promise<unknown>[] = [];
 				if (metaDataKeyExists) {
 					for (const md of existingMetadata) {
-						await removeMetadata.mutateAsync({
-							id: md.id,
-							functionId,
-						});
+						deletePromises.push(
+							removeMetadata.mutateAsync({
+								id: md.id,
+								functionId,
+							}),
+						);
 					}
+					await Promise.all(deletePromises);
 				}
 				// for each metadata -> add new metadata
+				const addPromises: Promise<unknown>[] = [];
 				for (const value of values) {
-					await addMetadata.mutateAsync({
-						functionId,
-						key: md.key,
-						value: value.value,
-					});
+					addPromises.push(
+						addMetadata.mutateAsync({
+							functionId,
+							key: md.key,
+							value: value.value,
+						}),
+					);
 				}
+				await Promise.all(addPromises);
 			} else {
 				const existingMd = existingMetadata[0];
 				// if metadatakey not exists: addMetadata
