@@ -10,7 +10,9 @@ export function Header() {
 	return (
 		<header>
 			<CustomHeader>
-				<a href={config.logo.logoLink ?? "/"}>{config.logo.svg}</a>
+				<a href={config.logo.logoLink ?? "/"}>
+					<img src={config.logo.imageSource} alt="logo" />
+				</a>
 				<Button
 					variant="tertiary"
 					leftIcon="logout"
