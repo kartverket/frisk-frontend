@@ -46,6 +46,7 @@ export const config: FriskConfig = {
 		{
 			key: "rr-skjema",
 			type: "text",
+			title: "Skjema",
 			label: "Regelrett skjema",
 			showOn: "readOnly",
 			isRequired: false,
@@ -71,6 +72,7 @@ export const config: FriskConfig = {
 		{
 			key: "dependencies",
 			type: "select",
+			title: "Funksjonsavhengigheter",
 			label: "Velg andre funksjoner denne funksjonen er avhengig av",
 			getOptions: async () => {
 				const functions = await getFunctions();
@@ -82,7 +84,7 @@ export const config: FriskConfig = {
 			getDisplayValue: async (input) => {
 				const functionId = Number.parseInt(input.value);
 				const func = await getFunction(functionId);
-				return { displayValue: func.name };
+				return { displayValue: func.name, displayOptions: { type: "pill" } };
 			},
 			selectMode: "multi",
 			showOn: "createAndUpdate",
@@ -115,6 +117,7 @@ type FriskConfig = {
 type GeneralMetadataContent = {
 	key: string;
 	label: string;
+	title?: string;
 	inheritFromParent: boolean;
 
 	/**
@@ -134,6 +137,9 @@ type GeneralMetadataContent = {
 		displayOptions?:
 			| {
 					type: "text";
+			  }
+			| {
+					type: "pill";
 			  }
 			| {
 					type: "url";

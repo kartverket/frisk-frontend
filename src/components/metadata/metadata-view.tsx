@@ -1,5 +1,5 @@
 import { useMetadata } from "@/hooks/use-metadata";
-import { Link, Skeleton, Text } from "@kvib/react";
+import { Box, Link, Skeleton, Text } from "@kvib/react";
 import { useQueries } from "@tanstack/react-query";
 import type { Metadata } from "../../../frisk.config";
 
@@ -31,7 +31,12 @@ export function MetadataView({ metadata, functionId }: Props) {
 	}
 
 	return (
-		<>
+		<Box my={1}>
+			{metadata.title ? (
+				<Text fontSize="xs" fontWeight="700">
+					{metadata.title}:
+				</Text>
+			) : null}
 			{displayValues.map((dv, i) => {
 				const isDisplayValueLoading = dv.isLoading;
 				const displayValue =
@@ -60,6 +65,15 @@ export function MetadataView({ metadata, functionId }: Props) {
 								url={metaDataValue}
 								displayValue={displayValue}
 								isExternal={dv.data?.displayOptions?.isExternal ?? true}
+								isLoading={isLoading}
+							/>
+						);
+
+					case "pill":
+						return (
+							<PillView
+								key={metaDataValue}
+								displayValue={displayValue}
 								isLoading={isLoading}
 							/>
 						);
@@ -97,7 +111,7 @@ export function MetadataView({ metadata, functionId }: Props) {
 						return null;
 				}
 			})}
-		</>
+		</Box>
 	);
 }
 
@@ -132,10 +146,33 @@ function LinkView({ url, displayValue, isExternal, isLoading }: LinkViewProps) {
 				isExternal={isExternal}
 				href={url}
 				onClick={(e) => e.stopPropagation()}
-				marginBottom="10px"
 			>
 				{displayValue ?? "<Ingen lenke>"}
 			</Link>
+		</Skeleton>
+	);
+}
+
+type PillViewProps = {
+	displayValue: string | undefined;
+	isLoading: boolean;
+};
+
+function PillView({ displayValue, isLoading }: PillViewProps) {
+	return (
+		<Skeleton isLoaded={!isLoading} fitContent>
+			<Box
+				bg="#BAD7F8"
+				paddingRight={1}
+				paddingLeft={1}
+				borderRadius="md"
+				w="fit-content"
+				my={1}
+			>
+				<Text fontSize="xs" fontWeight="500">
+					{displayValue ?? "<Ingen verdi>"}
+				</Text>
+			</Box>
 		</Skeleton>
 	);
 }
