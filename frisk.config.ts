@@ -56,7 +56,7 @@ export const config: FriskConfig = {
 				return {
 					displayValue: tableName.replaceAll("+", " "),
 					value: url,
-					display: {
+					displayOptions: {
 						type: "url",
 						isExternal: false,
 					},
@@ -89,7 +89,7 @@ type GeneralMetadataContent = {
 	getDisplayValue?: (input: { key: string; value: string }) => Promise<{
 		displayValue: string;
 		value?: string;
-		display?:
+		displayOptions?:
 			| {
 					type: "text";
 			  }

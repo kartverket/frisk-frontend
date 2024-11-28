@@ -26,7 +26,7 @@ export function MetadataView({ metadata, functionId }: Props) {
 						({
 							displayValue: m.value,
 							value: m.value,
-							display: undefined,
+							displayOptions: undefined,
 						} satisfies Awaited<
 							ReturnType<NonNullable<Metadata["getDisplayValue"]>>
 						>)
@@ -44,7 +44,7 @@ export function MetadataView({ metadata, functionId }: Props) {
 			{displayValues.map((dv, i) => {
 				const isDisplayValueLoading = dv.isLoading;
 				const displayValue = dv.data?.displayValue;
-				const metadataDisplayType = dv.data?.display?.type;
+				const metadataDisplayType = dv.data?.displayOptions?.type;
 				const metadataType = metadata.type;
 				const metaDataValue = dv.data?.value ?? metadataToDisplay?.[i]?.value;
 				const isLoading = isCurrentMetadataLoading || isDisplayValueLoading;
@@ -67,7 +67,7 @@ export function MetadataView({ metadata, functionId }: Props) {
 								key={metaDataValue}
 								url={metaDataValue}
 								displayValue={displayValue}
-								isExternal={dv.data?.display?.isExternal ?? true}
+								isExternal={dv.data?.displayOptions?.isExternal ?? true}
 								isLoading={isLoading}
 							/>
 						);
