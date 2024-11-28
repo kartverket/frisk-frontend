@@ -74,21 +74,19 @@ export function FunctionCardEdit({ functionId }: { functionId: number }) {
 						!newMetadata.some((m) => m.value === existingMd.value),
 				);
 
-				const deletePromises: Promise<unknown>[] = [];
+				const promises: Promise<unknown>[] = [];
 				if (metaDataKeyExists) {
 					for (const md of metadataToDelete) {
-						deletePromises.push(
+						promises.push(
 							removeMetadata.mutateAsync({
 								id: md.id,
 								functionId,
 							}),
 						);
 					}
-					await Promise.all(deletePromises);
 				}
-				const addPromises: Promise<unknown>[] = [];
 				for (const newMd of metadataToAdd) {
-					addPromises.push(
+					promises.push(
 						addMetadata.mutateAsync({
 							functionId,
 							key: md.key,
@@ -96,7 +94,7 @@ export function FunctionCardEdit({ functionId }: { functionId: number }) {
 						}),
 					);
 				}
-				await Promise.all(addPromises);
+				await Promise.all(promises);
 			} else {
 				const existingMd = existingMetadata[0];
 				// if metadatakey not exists: addMetadata
