@@ -26,11 +26,7 @@ export function FunctionCardEdit({ functionId }: { functionId: number }) {
 		updateMetadataValue,
 		addMetadata,
 		removeMetadata,
-		dependencies,
-		addDependency,
-		removeDependency,
 	} = useFunction(functionId, {
-		includeDependencies: true,
 		includeMetadata: true,
 	});
 	const navigate = Route.useNavigate();
@@ -45,10 +41,6 @@ export function FunctionCardEdit({ functionId }: { functionId: number }) {
 			"name",
 		) as HTMLInputElement | null;
 		if (!nameElement) return;
-
-		const dependenciesElement = form.elements.namedItem(
-			"dependencies",
-		) as HTMLSelectElement;
 
 		for (const md of config.metadata) {
 			const existingMetadata =
@@ -137,41 +129,6 @@ export function FunctionCardEdit({ functionId }: { functionId: number }) {
 			});
 		}
 
-		if (dependenciesElement.value) {
-			const dependenciesSelected: number[] = JSON.parse(
-				dependenciesElement.value,
-			) as number[];
-
-			const dependenciesToCreate = dependenciesSelected.filter(
-				(dependency) =>
-					!dependencies.data?.map((dep) => dep.id).includes(dependency),
-			);
-			const dependenciesToDelete =
-				dependencies.data?.filter(
-					(dependency) =>
-						!dependenciesSelected.map((dep) => dep).includes(dependency.id),
-				) ?? [];
-
-			const promises: Promise<unknown>[] = [];
-			for (const dependency of dependenciesToDelete) {
-				promises.push(
-					removeDependency.mutateAsync({
-						functionId,
-						dependencyFunctionId: dependency.id,
-					}),
-				);
-			}
-			for (const dependency of dependenciesToCreate) {
-				promises.push(
-					addDependency.mutateAsync({
-						functionId: functionId,
-						dependencyFunctionId: dependency,
-					}),
-				);
-			}
-			await Promise.all(promises);
-		}
-
 		navigate({ search: { ...search, edit: undefined } });
 	}
 
@@ -206,7 +163,6 @@ export function FunctionCardEdit({ functionId }: { functionId: number }) {
 							functionId={functionId}
 						/>
 					))}
-					<DependenciesSelect existingDependencies={dependencies} />
 					<Flex gap="10px">
 						<Button
 							aria-label="decline"

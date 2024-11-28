@@ -1,5 +1,11 @@
 import type { HTMLInputTypeAttribute } from "react";
-import { getMyMicrosoftTeams, getTeam } from "@/services/backend";
+import {
+	getFunction,
+	getFunctionMetadata,
+	getFunctions,
+	getMyMicrosoftTeams,
+	getTeam,
+} from "@/services/backend";
 
 export const config: FriskConfig = {
 	metadata: [
@@ -35,6 +41,28 @@ export const config: FriskConfig = {
 			getDisplayValue: async () => {
 				return "Utviklerportalen";
 			},
+		},
+		{
+			key: "dependencies",
+			type: "select",
+			label: "Velg andre funksjoner denne funksjonen er avhengig av",
+			getOptions: async () => {
+				const functions = await getFunctions();
+				return functions.map((func) => ({
+					name: func.name,
+					value: String(func.id),
+				}));
+			},
+			getDisplayValue: async (input) => {
+				const functionId = Number.parseInt(input.value);
+				const func = await getFunction(functionId);
+				return func.name;
+			},
+			selectMode: "multi",
+			showOn: "createAndUpdate",
+			isRequired: false,
+			placeholder: "Søk etter funksjoner",
+			inheritFromParent: false,
 		},
 	],
 	logo: {
