@@ -88,12 +88,7 @@ function SelectInput({
 			metadataToDisplay?.map((m) => ({
 				queryKey: [functionId, metadata.key, m.value, "getDisplayValue"],
 				queryFn: async () => {
-					return (
-						metadata.getDisplayValue?.(m) ?? {
-							value: m.value,
-							displayValue: m.value,
-						}
-					);
+					return metadata.getDisplayValue?.(m);
 				},
 			})) ?? [],
 	});
@@ -118,12 +113,7 @@ function SelectInput({
 			parentMetadata.data?.map((m) => ({
 				queryKey: [functionId, metadata.key, m.value, "getDisplayValue"],
 				queryFn: async () => {
-					return (
-						metadata.getDisplayValue?.(m) ?? {
-							value: m.value,
-							displayValue: m.value,
-						}
-					);
+					return metadata.getDisplayValue?.(m);
 				},
 			})) ?? [],
 	});
