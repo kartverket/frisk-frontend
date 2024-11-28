@@ -41,7 +41,7 @@ export function FunctionCardEdit({ functionId }: { functionId: number }) {
 		) as HTMLInputElement | null;
 		if (!nameElement) return;
 
-		for (const md of config.metadata) {
+		for (const md of config.metadata ?? []) {
 			const existingMetadata =
 				metadata.data?.filter((m) => m.key === md.key) || [];
 			const metaDataKeyExists: boolean =
@@ -154,7 +154,7 @@ export function FunctionCardEdit({ functionId }: { functionId: number }) {
 							borderRadius="5px"
 						/>
 					</FormControl>
-					{config.metadata.map((meta) => (
+					{config.metadata?.map((meta) => (
 						<MetadataInput
 							key={meta.key}
 							metadata={meta}

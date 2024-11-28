@@ -13,8 +13,12 @@ export function FunctionCardSelectedView({
 		includeMetadata: true,
 		includeDependencies: true,
 	});
+
+	// TODO: remove when backend is migrated
 	const schemaMetadata =
-		metadata.data?.filter((m) => m.key.startsWith("rr-")) ?? [];
+		metadata.data?.filter(
+			(m) => m.key.startsWith("rr-") && m.key !== "rr-skjema",
+		) ?? [];
 
 	return (
 		<Stack paddingLeft="10px" w="100%">
@@ -26,13 +30,23 @@ export function FunctionCardSelectedView({
 				</Skeleton>
 				<EditAndSelectButtons functionId={functionId} selected />
 			</Flex>
-			{config.metadata.map((meta) => (
+			{config.metadata?.map((meta) => (
 				<MetadataView key={meta.key} metadata={meta} functionId={functionId} />
 			))}
 			{dependencies.data && dependencies.data?.length > 0 && (
-				<Text fontSize="xs" fontWeight="700" mb="4px">
-					Funksjonsavhengigheter
-				</Text>
+				<>
+					<Text fontSize="xs" fontWeight="700">
+						Funksjonsavhengigheter
+					</Text>
+					<Text
+						fontSize="xx-small"
+						fontWeight="700"
+						color={"gray.500"}
+						mb="4px"
+					>
+						(Legcay, du kan se to lister og dobbelt opp mens vi migrerer)
+					</Text>
+				</>
 			)}
 			<List
 				display="flex"
@@ -56,9 +70,11 @@ export function FunctionCardSelectedView({
 				))}
 			</List>
 			<SchemaButton my="16px" functionId={functionId} />
+			{/* Keep this for backwards compatibility with old metadata */}
+			{/* TODO: remove when backend is migrated */}
 			{schemaMetadata.map((item) => (
 				<RegelrettLink
-					key={item.key}
+					key={`legacy-${item.key}-${item.value}`}
 					metadata={{
 						key: item.key,
 						contextId: item.value,

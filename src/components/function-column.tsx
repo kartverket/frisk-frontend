@@ -78,7 +78,7 @@ export function FunctionColumn({ functionId }: FunctionFolderProps) {
 
 		const metadata = [];
 
-		for (const md of config.metadata) {
+		for (const md of config.metadata ?? []) {
 			if (md.type === "select" && md.selectMode === "multi") {
 				const formElement = form.elements.namedItem(
 					md.key,
@@ -193,7 +193,7 @@ export function FunctionColumn({ functionId }: FunctionFolderProps) {
 									/>
 								</FormControl>
 
-								{config.metadata.map((meta) => (
+								{config.metadata?.map((meta) => (
 									<MetadataInput
 										key={meta.key}
 										metadata={meta}
