@@ -34,9 +34,19 @@ export function FunctionCardSelectedView({
 				<MetadataView key={meta.key} metadata={meta} functionId={functionId} />
 			))}
 			{dependencies.data && dependencies.data?.length > 0 && (
-				<Text fontSize="xs" fontWeight="700" mb="4px">
-					Funksjonsavhengigheter
-				</Text>
+				<>
+					<Text fontSize="xs" fontWeight="700">
+						Funksjonsavhengigheter
+					</Text>
+					<Text
+						fontSize="xx-small"
+						fontWeight="700"
+						color={"gray.500"}
+						mb="4px"
+					>
+						(Legcay, du kan se to lister og dobbelt opp mens vi migrerer)
+					</Text>
+				</>
 			)}
 			<List
 				display="flex"
