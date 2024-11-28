@@ -11,7 +11,6 @@ import { useFunction } from "@/hooks/use-function";
 import { Route } from "@/routes";
 import { DeleteFunctionModal } from "@/components/delete-function-modal.tsx";
 import { useIsMutating } from "@tanstack/react-query";
-import { DependenciesSelect } from "./metadata/dependencies-select";
 import { config } from "../../frisk.config";
 import {
 	MetadataInput,

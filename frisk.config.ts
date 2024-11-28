@@ -1,7 +1,6 @@
 import type { HTMLInputTypeAttribute } from "react";
 import {
 	getFunction,
-	getFunctionMetadata,
 	getFunctions,
 	getMyMicrosoftTeams,
 	getTeam,
@@ -45,7 +44,8 @@ export const config: FriskConfig = {
 		{
 			key: "dependencies",
 			type: "select",
-			label: "Velg andre funksjoner denne funksjonen er avhengig av",
+			label:
+				"Velg andre funksjoner denne funksjonen er avhengig av (holder på å migrere data, kan oppstå uønsket oppførsel rundt denne funksjonaliteten)",
 			getOptions: async () => {
 				const functions = await getFunctions();
 				return functions.map((func) => ({
