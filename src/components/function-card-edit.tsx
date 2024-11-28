@@ -61,11 +61,22 @@ export function FunctionCardEdit({ functionId }: { functionId: number }) {
 				| null;
 			if (!formElement?.value) continue;
 			if (md.type === "select" && md.selectMode === "multi") {
-				const values = JSON.parse(formElement.value) as MultiSelectOption[];
-				// delete existing metadata
+				const newMetadata = JSON.parse(
+					formElement.value,
+				) as MultiSelectOption[];
+
+				const metadataToAdd = newMetadata.filter(
+					(newMd) => !existingMetadata.some((m) => m.value === newMd.value),
+				);
+
+				const metadataToDelete = existingMetadata.filter(
+					(existingMd) =>
+						!newMetadata.some((m) => m.value === existingMd.value),
+				);
+
 				const deletePromises: Promise<unknown>[] = [];
 				if (metaDataKeyExists) {
-					for (const md of existingMetadata) {
+					for (const md of metadataToDelete) {
 						deletePromises.push(
 							removeMetadata.mutateAsync({
 								id: md.id,
@@ -75,14 +86,13 @@ export function FunctionCardEdit({ functionId }: { functionId: number }) {
 					}
 					await Promise.all(deletePromises);
 				}
-				// for each metadata -> add new metadata
 				const addPromises: Promise<unknown>[] = [];
-				for (const value of values) {
+				for (const newMd of metadataToAdd) {
 					addPromises.push(
 						addMetadata.mutateAsync({
 							functionId,
 							key: md.key,
-							value: value.value,
+							value: newMd.value,
 						}),
 					);
 				}
