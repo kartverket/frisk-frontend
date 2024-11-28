@@ -10,6 +10,7 @@ import {
 	type DragEndEvent,
 } from "@dnd-kit/core";
 import type { useFunction } from "@/hooks/use-function";
+import { config } from "../../frisk.config";
 
 type FunctionColumnViewProps = {
 	path: string;
@@ -53,10 +54,10 @@ export function FunctionColumnView({ path }: FunctionColumnViewProps) {
 	return (
 		<Flex flexDirection="column" paddingY="38" paddingX="100" marginBottom="76">
 			<Text fontSize="2xl" fontWeight="700" marginBottom="3">
-				Funksjonsregisteret
+				{config.title}
 			</Text>
 			<Text fontSize="xs" marginBottom="38">
-				Smell opp noen bra funksjoner og få den oversikten du fortjener
+				{config.description}
 			</Text>
 			<DndContext onDragEnd={handleDragEnd} sensors={sensors}>
 				<Flex>

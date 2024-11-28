@@ -18,7 +18,7 @@ export const config: FriskConfig = {
 				const team = await getTeam(input.value);
 				return team.displayName;
 			},
-			selectMode: "multi",
+			selectMode: "single",
 			showOn: "createAndUpdate",
 			isRequired: true,
 			placeholder: "Velg team",
@@ -37,10 +37,25 @@ export const config: FriskConfig = {
 			},
 		},
 	],
+	logo: {
+		imageSource: "/logo.svg",
+	},
+	title: "Funksjonsregisteret",
+	description:
+		"Smell opp noen bra funksjoner og få den oversikten du fortjener",
+	rootNodeName: "Kartverket",
+	columnName: "Funksjon",
+	addButtonName: "Legg til funksjon",
 };
 
 type FriskConfig = {
 	metadata: Metadata[];
+	logo: Logo;
+	title: string;
+	description: string;
+	rootNodeName: string;
+	columnName: string;
+	addButtonName: string;
 };
 
 type GeneralMetadataContent = {
@@ -76,4 +91,9 @@ export type InputMetadata = GeneralMetadata & {
 
 type Metadata = SelectMetadata | InputMetadata;
 
-type SelectOption = { value: string; name: string };
+export type SelectOption = { value: string; name: string };
+
+type Logo = {
+	imageSource: string;
+	logoLink?: string;
+};
