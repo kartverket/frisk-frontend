@@ -44,8 +44,7 @@ export const config: FriskConfig = {
 		{
 			key: "dependencies",
 			type: "select",
-			label:
-				"Velg andre funksjoner denne funksjonen er avhengig av (Ved overgang til en ny datastruktur kan det være du ser dobbelt opp av avhengigheter. Dette løses automatisk om litt)",
+			label: "Velg andre funksjoner denne funksjonen er avhengig av",
 			getOptions: async () => {
 				const functions = await getFunctions();
 				return functions.map((func) => ({
