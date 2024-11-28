@@ -22,11 +22,14 @@ export function MetadataView({ metadata, functionId }: Props) {
 				queryKey: [functionId, metadata.key, m.value, "getDisplayValue"],
 				queryFn: async () => {
 					return (
-						metadata.getDisplayValue?.(m) ?? {
+						metadata.getDisplayValue?.(m) ??
+						({
 							displayValue: m.value,
 							value: m.value,
-							displayType: metadata.type,
-						}
+							display: undefined,
+						} satisfies Awaited<
+							ReturnType<NonNullable<Metadata["getDisplayValue"]>>
+						>)
 					);
 				},
 			})) ?? [],
@@ -41,17 +44,16 @@ export function MetadataView({ metadata, functionId }: Props) {
 			{displayValues.map((dv, i) => {
 				const isDisplayValueLoading = dv.isLoading;
 				const displayValue = dv.data?.displayValue;
-				const metadataType = dv.data?.displayType ?? metadata.type;
+				const metadataDisplayType = dv.data?.display?.type;
+				const metadataType = metadata.type;
 				const metaDataValue = dv.data?.value ?? metadataToDisplay?.[i]?.value;
 				const isLoading = isCurrentMetadataLoading || isDisplayValueLoading;
 				const isNoMetadata = !currentMetadata && !isCurrentMetadataLoading;
 
 				if (isNoMetadata) return null;
 
-				switch (metadataType) {
+				switch (metadataDisplayType) {
 					case "text":
-					case "number":
-					case "select":
 						return (
 							<TextView
 								key={metaDataValue}
@@ -65,11 +67,40 @@ export function MetadataView({ metadata, functionId }: Props) {
 								key={metaDataValue}
 								url={metaDataValue}
 								displayValue={displayValue}
+								isExternal={dv.data?.display?.isExternal ?? true}
 								isLoading={isLoading}
 							/>
 						);
+
+					case undefined:
+						switch (metadataType) {
+							case "select":
+							case "number":
+							case "text":
+								return (
+									<TextView
+										key={metaDataValue}
+										displayValue={displayValue}
+										isLoading={isLoading}
+									/>
+								);
+							case "url":
+								return (
+									<LinkView
+										key={metaDataValue}
+										url={metaDataValue}
+										displayValue={displayValue}
+										isExternal={metadata.isExternal}
+										isLoading={isLoading}
+									/>
+								);
+							default:
+								metadataType satisfies never;
+								console.error("Unsupported data type");
+								return null;
+						}
 					default:
-						metadataType satisfies never;
+						metadataDisplayType satisfies never;
 						console.error("Unsupported data type");
 						return null;
 				}
@@ -94,10 +125,11 @@ function TextView({ displayValue, isLoading }: TextViewProps) {
 type LinkViewProps = {
 	url: string | undefined;
 	displayValue: string | undefined;
+	isExternal: boolean;
 	isLoading: boolean;
 };
 
-function LinkView({ url, displayValue, isLoading }: LinkViewProps) {
+function LinkView({ url, displayValue, isExternal, isLoading }: LinkViewProps) {
 	return (
 		<Skeleton isLoaded={!isLoading} fitContent>
 			<Link
@@ -105,7 +137,7 @@ function LinkView({ url, displayValue, isLoading }: LinkViewProps) {
 				fontWeight="700"
 				colorScheme="blue"
 				width="fit-content"
-				isExternal
+				isExternal={isExternal}
 				href={url}
 				onClick={(e) => e.stopPropagation()}
 				marginBottom="10px"

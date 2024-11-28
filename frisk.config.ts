@@ -28,6 +28,7 @@ export const config: FriskConfig = {
 		{
 			key: "backstage-url",
 			type: "url",
+			isExternal: true,
 			label: "Lenke til utviklerportalen",
 			showOn: "createAndUpdate",
 			isRequired: false,
@@ -55,7 +56,10 @@ export const config: FriskConfig = {
 				return {
 					displayValue: tableName.replaceAll("+", " "),
 					value: url,
-					displayType: "url",
+					display: {
+						type: "url",
+						isExternal: false,
+					},
 				};
 			},
 		},
@@ -85,7 +89,14 @@ type GeneralMetadataContent = {
 	getDisplayValue?: (input: { key: string; value: string }) => Promise<{
 		displayValue: string;
 		value?: string;
-		displayType?: "text" | "url";
+		display?:
+			| {
+					type: "text";
+			  }
+			| {
+					type: "url";
+					isExternal: boolean;
+			  };
 	}>;
 };
 
@@ -108,10 +119,18 @@ export type SelectMetadata = GeneralMetadata & {
 	placeholder: string;
 };
 
-export type InputMetadata = GeneralMetadata & {
-	type: Extract<HTMLInputTypeAttribute, "number" | "text" | "url">;
-	placeholder: string;
-};
+export type InputMetadata = GeneralMetadata &
+	(
+		| {
+				type: Extract<HTMLInputTypeAttribute, "number" | "text">;
+				placeholder: string;
+		  }
+		| {
+				type: "url";
+				placeholder: string;
+				isExternal: boolean;
+		  }
+	);
 
 export type Metadata = SelectMetadata | InputMetadata;
 
