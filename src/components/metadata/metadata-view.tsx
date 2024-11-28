@@ -21,16 +21,7 @@ export function MetadataView({ metadata, functionId }: Props) {
 			metadataToDisplay?.map((m) => ({
 				queryKey: [functionId, metadata.key, m.value, "getDisplayValue"],
 				queryFn: async () => {
-					return (
-						metadata.getDisplayValue?.(m) ??
-						({
-							displayValue: m.value,
-							value: m.value,
-							displayOptions: undefined,
-						} satisfies Awaited<
-							ReturnType<NonNullable<Metadata["getDisplayValue"]>>
-						>)
-					);
+					return metadata.getDisplayValue?.(m);
 				},
 			})) ?? [],
 	});
@@ -43,7 +34,8 @@ export function MetadataView({ metadata, functionId }: Props) {
 		<>
 			{displayValues.map((dv, i) => {
 				const isDisplayValueLoading = dv.isLoading;
-				const displayValue = dv.data?.displayValue;
+				const displayValue =
+					dv.data?.displayValue ?? metadataToDisplay?.[i]?.value;
 				const metadataDisplayType = dv.data?.displayOptions?.type;
 				const metadataType = metadata.type;
 				const metaDataValue = dv.data?.value ?? metadataToDisplay?.[i]?.value;

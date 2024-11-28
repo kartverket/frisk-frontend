@@ -21,7 +21,7 @@ import { useState } from "react";
 
 type MetadataInputProps = {
 	metadata: Metadata;
-	parentFunctionId: number;
+	parentFunctionId: number | undefined;
 	functionId: number | undefined;
 };
 
@@ -63,7 +63,7 @@ export function MetadataInput({
 type SelectInputProps = {
 	metadata: SelectMetadata;
 	functionId: number | undefined;
-	parentFunctionId: number;
+	parentFunctionId: number | undefined;
 };
 
 function SelectInput({
@@ -240,7 +240,8 @@ function MultiSelect({
 				size="sm"
 				value={
 					currentMetadataValues ??
-					(metadata.inheritFromParent ? parentMetadataValues : undefined)
+					(metadata.inheritFromParent ? parentMetadataValues : undefined) ??
+					[]
 				}
 				isMulti
 				debounceTime={100}
@@ -269,7 +270,8 @@ function MultiSelect({
 				name={metadata.key}
 				value={JSON.stringify(
 					currentMetadataValues ??
-						(metadata.inheritFromParent ? parentMetadataValues : undefined),
+						(metadata.inheritFromParent ? parentMetadataValues : undefined) ??
+						[],
 				)}
 			/>
 		</>
@@ -279,7 +281,7 @@ function MultiSelect({
 type InputProps = {
 	metadata: InputMetadata;
 	functionId: number | undefined;
-	parentFunctionId: number;
+	parentFunctionId: number | undefined;
 };
 
 function InputField({ metadata, functionId, parentFunctionId }: InputProps) {

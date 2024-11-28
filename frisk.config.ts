@@ -1,5 +1,10 @@
 import type { HTMLInputTypeAttribute } from "react";
-import { getMyMicrosoftTeams, getTeam } from "@/services/backend";
+import {
+	getFunction,
+	getFunctions,
+	getMyMicrosoftTeams,
+	getTeam,
+} from "@/services/backend";
 import { getregelrettFrontendUrl } from "@/config";
 
 export const config: FriskConfig = {
@@ -63,11 +68,48 @@ export const config: FriskConfig = {
 				};
 			},
 		},
+		{
+			key: "dependencies",
+			type: "select",
+			label: "Velg andre funksjoner denne funksjonen er avhengig av",
+			getOptions: async () => {
+				const functions = await getFunctions();
+				return functions.map((func) => ({
+					name: func.name,
+					value: String(func.id),
+				}));
+			},
+			getDisplayValue: async (input) => {
+				const functionId = Number.parseInt(input.value);
+				const func = await getFunction(functionId);
+				return { displayValue: func.name };
+			},
+			selectMode: "multi",
+			showOn: "createAndUpdate",
+			isRequired: false,
+			placeholder: "Søk etter funksjoner",
+			inheritFromParent: false,
+		},
 	],
+	logo: {
+		imageSource: "/logo.svg",
+	},
+	title: "Funksjonsregisteret",
+	description:
+		"Smell opp noen bra funksjoner og få den oversikten du fortjener",
+	rootNodeName: "Kartverket",
+	columnName: "Funksjon",
+	addButtonName: "Legg til funksjon",
 };
 
 type FriskConfig = {
 	metadata?: Metadata[];
+	logo: Logo;
+	title: string;
+	description: string;
+	rootNodeName: string;
+	columnName: string;
+	addButtonName: string;
 };
 
 type GeneralMetadataContent = {
@@ -135,3 +177,8 @@ export type InputMetadata = GeneralMetadata &
 export type Metadata = SelectMetadata | InputMetadata;
 
 export type SelectOption = { value: string; name: string };
+
+type Logo = {
+	imageSource: string;
+	logoLink?: string;
+};
