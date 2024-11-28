@@ -108,56 +108,6 @@ export async function deleteFunction(id: number) {
 	});
 }
 
-export async function createDependency(functionDependency: FunctionDependency) {
-	const response = await fetchFromBackend(
-		`/functions/${functionDependency.functionId}/dependencies`,
-		{
-			method: "POST",
-			headers: {
-				"Content-Type": "application/json",
-			},
-			body: JSON.stringify(functionDependency),
-		},
-	);
-
-	const json = await response.json();
-	return FunctionDependency.parse(json);
-}
-
-export async function deleteDependency({
-	functionId,
-	dependencyFunctionId,
-}: FunctionDependency) {
-	await fetchFromBackend(
-		`/functions/${functionId}/dependencies/${dependencyFunctionId}`,
-		{
-			method: "DELETE",
-		},
-	);
-}
-
-export async function getDependencies(functionId: number) {
-	const response = await fetchFromBackend(
-		`/functions/${functionId}/dependencies`,
-		{
-			method: "GET",
-		},
-	);
-	const json = await response.json();
-	return array(number().int()).parse(json);
-}
-
-export async function getDependents(functionId: number) {
-	const response = await fetchFromBackend(
-		`/functions/${functionId}/dependents`,
-		{
-			method: "GET",
-		},
-	);
-	const json = await response.json();
-	return array(number().int()).parse(json);
-}
-
 export async function getMetadataKeys(search?: string) {
 	const response = await fetchFromBackend(
 		`/metadata/keys${search ? `?search=${search}` : ""}`,
@@ -246,12 +196,6 @@ export type BackendFunctionWithMetadataCreate = {
 	function: BackendFunctionCreate;
 	metadata: Omit<FunctionMetadataCreate, "functionId">[];
 };
-
-const FunctionDependency = object({
-	functionId: number().int(),
-	dependencyFunctionId: number().int(),
-});
-export type FunctionDependency = z.infer<typeof FunctionDependency>;
 
 const FunctionMetadata = object({
 	id: number().int(),
