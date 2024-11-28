@@ -5,14 +5,15 @@ import { useFunction } from "@/hooks/use-function";
 import { EditAndSelectButtons } from "./edit-and-select-buttons";
 import { config } from "../../frisk.config";
 import { MetadataView } from "./metadata/metadata-view";
+import { useMetadata } from "@/hooks/use-metadata";
 
 export function FunctionCardSelectedView({
 	functionId,
 }: { functionId: number }) {
-	const { func, metadata, dependencies } = useFunction(functionId, {
-		includeMetadata: true,
+	const { func, dependencies } = useFunction(functionId, {
 		includeDependencies: true,
 	});
+	const { metadata } = useMetadata(functionId);
 
 	// TODO: remove when backend is migrated
 	const schemaMetadata =

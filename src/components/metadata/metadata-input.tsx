@@ -71,9 +71,11 @@ function SelectInput({
 	functionId,
 	parentFunctionId,
 }: SelectInputProps) {
-	const parentMetadata = useMetadata(parentFunctionId);
+	const { metadata: parentMetadata } = useMetadata(parentFunctionId);
 
-	const { data: currentMetadata } = useMetadata(functionId);
+	const {
+		metadata: { data: currentMetadata },
+	} = useMetadata(functionId);
 
 	const metadataToDisplay = currentMetadata?.filter(
 		(m) => metadata.key === m.key,
@@ -275,8 +277,8 @@ type InputProps = {
 };
 
 function InputField({ metadata, functionId, parentFunctionId }: InputProps) {
-	const currentMetadata = useMetadata(functionId);
-	const parentMetadata = useMetadata(parentFunctionId);
+	const { metadata: currentMetadata } = useMetadata(functionId);
+	const { metadata: parentMetadata } = useMetadata(parentFunctionId);
 
 	const currentMetadataValue = currentMetadata.data?.find(
 		(m) => metadata.key === m.key,

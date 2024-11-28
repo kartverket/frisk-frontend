@@ -9,8 +9,9 @@ type Props = {
 };
 
 export function MetadataView({ metadata, functionId }: Props) {
-	const { data: currentMetadata, isPending: isCurrentMetadataLoading } =
-		useMetadata(functionId);
+	const {
+		metadata: { data: currentMetadata, isPending: isCurrentMetadataLoading },
+	} = useMetadata(functionId);
 
 	const metadataToDisplay = currentMetadata?.filter(
 		(m) => metadata.key === m.key,

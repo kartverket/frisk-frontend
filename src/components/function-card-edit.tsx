@@ -16,18 +16,12 @@ import {
 	MetadataInput,
 	type MultiSelectOption,
 } from "./metadata/metadata-input";
+import { useMetadata } from "@/hooks/use-metadata";
 
 export function FunctionCardEdit({ functionId }: { functionId: number }) {
-	const {
-		func,
-		updateFunction,
-		metadata,
-		updateMetadataValue,
-		addMetadata,
-		removeMetadata,
-	} = useFunction(functionId, {
-		includeMetadata: true,
-	});
+	const { func, updateFunction } = useFunction(functionId);
+	const { metadata, addMetadata, removeMetadata, updateMetadataValue } =
+		useMetadata(functionId);
 	const navigate = Route.useNavigate();
 	const search = Route.useSearch();
 	const { isOpen, onOpen, onClose } = useDisclosure();
