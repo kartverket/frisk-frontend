@@ -59,14 +59,6 @@ export function FunctionColumnView({ path }: FunctionColumnViewProps) {
 			<Text fontSize="xs" marginBottom="38">
 				Smell opp noen bra funksjoner og få den oversikten du fortjener
 			</Text>
-			{/* <Grid
-				id="GRID"
-				// templateColumns={`repeat(${selectedFunctionIds.length}, auto)`}
-				templateRows={`repeat(${path[0].length}, auto)`}
-				templateAreas="&quot;header&quot;
-                  &quot;nav &quot;
-                  &quot;footer&quot;"
-			> */}
 			<DndContext onDragEnd={handleDragEnd} sensors={sensors}>
 				<Flex>
 					{selectedFunctionIds?.map((id) => (
@@ -74,7 +66,6 @@ export function FunctionColumnView({ path }: FunctionColumnViewProps) {
 					))}
 				</Flex>
 			</DndContext>
-			{/* </Grid> */}
 		</Flex>
 	);
 }

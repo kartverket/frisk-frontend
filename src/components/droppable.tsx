@@ -1,5 +1,5 @@
 import { useDndMonitor, useDroppable } from "@dnd-kit/core";
-import { Box } from "@kvib/react";
+import { Box, Grid } from "@kvib/react";
 import { useState, type ReactNode } from "react";
 import { useFunction } from "@/hooks/use-function";
 
@@ -37,7 +37,11 @@ export function Droppable({ id, children }: DroppableProps) {
 		<Box
 			key={"hei"}
 			ref={setNodeRef}
-			backgroundColor={isOver ? "blue.100" : "white"}
+			padding={"8px"}
+			backgroundColor={isOver ? "blue.100" : "gray.200"}
+			borderRadius="md"
+			border="1px"
+			height={id === 1 ? "100%" : undefined}
 		>
 			{children}
 		</Box>

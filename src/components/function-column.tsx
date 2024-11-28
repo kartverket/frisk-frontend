@@ -4,6 +4,7 @@ import {
 	Box,
 	Button,
 	Flex,
+	Grid,
 	GridItem,
 	List,
 	ListItem,
@@ -11,12 +12,11 @@ import {
 	Text,
 } from "@kvib/react";
 import { FunctionCard } from "./function-card";
-import { useRef, useState } from "react";
+import { useState } from "react";
 import { Draggable } from "./draggable";
 import { Droppable } from "./droppable";
 import { useFunctions } from "@/hooks/use-functions";
 import { AddFunctionForm } from "./add-function-form";
-import { number, set } from "zod";
 
 type FunctionFolderProps = {
 	functionIds: number[];
@@ -35,6 +35,9 @@ function getChildrenFromPath(pathArray: string[], x: number): string[] {
 	return ja;
 }
 
+const FUNCTION_HEIGHT = 58;
+const SELECTED_FUNCTION_HEIGHT = 136;
+
 export function FunctionColumn({ functionIds }: FunctionFolderProps) {
 	const { path } = Route.useSearch();
 
@@ -49,8 +52,31 @@ export function FunctionColumn({ functionIds }: FunctionFolderProps) {
 
 	const [selectedForm, setSelectedForm] = useState<number | null>(null);
 
+	const getParentPosition = (parentId: number, childId: string) => {
+		// Sjekk foreldre-nivået basert på `functionIds`
+		console.log("!!parent", parentId);
+
+		const parent = document.getElementById(parentId.toString());
+		const child = document.getElementById(childId);
+		if (parent && child) {
+			console.log("AVSTAND", parent.getBoundingClientRect().top);
+			return parent.getBoundingClientRect().top - 312;
+		}
+		return 0;
+		//const parentIndex = currentLevel - 1;
+		// if (parentIndex >= 0) {
+		// 	console.log("parent", selectedFunctionIds);
+		// 	console.log("parent", selectedFunctionIds[parentIndex].indexOf(parentId));
+
+		// 	return selectedFunctionIds[parentIndex].indexOf(parentId) * 60;
+		// 	// Finner posisjon for forelder hvis tilstede
+		// 	// return functionIds.indexOf(childId) * 400; // Juster 60 for ønsket høyde
+		// }
+		// return 0; // Ingen foreldre, start på 0
+	};
+
 	return (
-		<Flex flexDirection="column" width="380px">
+		<Flex flexDirection="column" width="380px" height={"100%"}>
 			<Box
 				bgColor="gray.200"
 				border="1px"
@@ -64,73 +90,104 @@ export function FunctionColumn({ functionIds }: FunctionFolderProps) {
 					Funksjon nivå {currentLevel + 1}
 				</Text>
 			</Box>
+
 			<Box
 				border="1px"
-				p="20px"
 				borderColor="gray.400"
-				minH="100%"
+				minH="800px"
 				backgroundColor={"white"}
+				height="100%"
+				position="relative"
 			>
+				{/* <Grid> */}
 				{children?.map((childre, i) => (
-					<Skeleton key={"hei"} isLoaded={!childre.isLoading} minH={60}>
-						{childre.isSuccess ? (
-							<List
-								display="flex"
-								flexDirection="column"
-								gap={2}
-								spacing="100"
-								marginBottom="3"
-							>
-								{/* TODO: fikse sånn at du ikke må dobbelt loope */}
+					// <GridItem
+					// 	key={"hei"}
+					// 	marginTop={
+					// 		currentLevel > 0
+					// 			? currentLevel * 10
+					// 			: // selectedFunctionIds[currentLevel].indexOf(functionIds[i]) *
+					// 				// 	10
+					// 				0
+					// 	}
+					// >
 
-								<Droppable id={functionIds[i]}>
-									<h1>{functions?.[i].data?.name}</h1>
-									{childre.data?.map((child) => (
-										<ListItem
-											key={child.id + child.name + child.parentId + child.path}
-											marginBottom={getChildrenFromPath(path, child.id).length}
-										>
-											{/* <GridItem
-												bg="red.400"
-												id="Grid_ITEM"
-												h="100%"
-												w="100%"
-												rowSpan={getChildrenFromPath(path, child.id).length}
-											> */}
-											<Draggable functionId={child.id}>
-												<FunctionCard
-													functionId={child.id}
-													selected={selectedFunctionIds.some((idList) =>
-														idList.includes(child.id),
-													)}
-												/>
-											</Draggable>
-											{/* </GridItem> */}
-										</ListItem>
-									))}
-									<Button
-										leftIcon="add"
-										variant="tertiary"
-										colorScheme="blue"
-										onClick={() => {
-											setSelectedForm(functionIds[i]);
-										}}
+					<Box
+						key={"hei"}
+						// position={"relative"}
+						// marginTop={
+						// 	currentLevel > 0
+						// 		? `${currentLevel * FUNCTION_HEIGHT}px`
+						// 		: // selectedFunctionIds[currentLevel].indexOf(functionIds[i]) *
+						// 			// 	10
+						// 			0
+						// }
+						id={`${functions?.[i].data?.id}_group`}
+						position="absolute"
+						display={"flex"}
+						flexDirection={"column"}
+						width={"100%"}
+						padding={"20px 2px 20px 2px"}
+						top={`${getParentPosition(functions?.[i].data?.id ?? 0, `${functions?.[i].data?.id}_group`)}px`} // Bruk foreldres posisjon
+					>
+						<Skeleton key={"hei"} isLoaded={!childre.isLoading} minH={60}>
+							<h1>{functions?.[i].data?.name}</h1>
+							{childre.isSuccess ? (
+								<Droppable key="." id={functionIds[i]}>
+									<List
+										display="flex"
+										flexDirection="column"
+										// justifyContent={"space-between"}
+										// height={functionIds[i] === 1 ? "100%" : undefined}
+										gap={2}
+										marginBottom="2"
 									>
-										Legg til funksjon
-									</Button>
+										{childre.data?.map((child) => (
+											<ListItem
+												marginBottom={
+													getChildrenFromPath(path, child.id).length
+												}
+												key={
+													child.id + child.name + child.parentId + child.path
+												}
+											>
+												<Draggable functionId={child.id}>
+													<FunctionCard
+														functionId={child.id}
+														selected={selectedFunctionIds.some((idList) =>
+															idList.includes(child.id),
+														)}
+													/>
+												</Draggable>
+											</ListItem>
+										))}
+										<Button
+											leftIcon="add"
+											variant="tertiary"
+											colorScheme="blue"
+											onClick={() => {
+												setSelectedForm(functionIds[i]);
+											}}
+										>
+											Legg til funksjon
+										</Button>
+									</List>
 								</Droppable>
-							</List>
-						) : childre.isError ? (
-							<Text>Det skjedde en feil</Text>
-						) : null}
-						{selectedForm === functionIds[i] && (
-							<AddFunctionForm
-								functionId={functionIds[i]}
-								setSelectedForm={setSelectedForm}
-							/>
-						)}
-					</Skeleton>
+							) : childre.isError ? (
+								<Text key={""}>Det skjedde en feil</Text>
+							) : null}
+							{selectedForm === functionIds[i] && (
+								<AddFunctionForm
+									functionId={functionIds[i]}
+									setSelectedForm={setSelectedForm}
+								/>
+							)}
+						</Skeleton>
+					</Box>
+
+					// </GridItem>
 				))}
+				{/* </Grid> */}
 			</Box>
 		</Flex>
 	);
