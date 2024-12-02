@@ -1,7 +1,16 @@
 import { useMetadata } from "@/hooks/use-metadata";
-import { Box, Link, Skeleton, Text } from "@kvib/react";
+import {
+	Box,
+	Flex,
+	IconButton,
+	Link,
+	Skeleton,
+	Text,
+	useDisclosure,
+} from "@kvib/react";
 import { useQueries } from "@tanstack/react-query";
 import type { Metadata } from "../../../frisk.config";
+import { DeleteMetadataModal } from "../delete-metadata-modal";
 
 type Props = {
 	metadata: Metadata;
@@ -45,6 +54,7 @@ export function MetadataView({ metadata, functionId }: Props) {
 				const metadataDisplayType = dv.data?.displayOptions?.type;
 				const metadataType = metadata.type;
 				const metaDataValue = dv.data?.value ?? metadataToDisplay?.[i]?.value;
+				const metadataId = metadataToDisplay?.[i]?.id;
 				const isLoading = isCurrentMetadataLoading || isDisplayValueLoading;
 				const isNoMetadata = !currentMetadata && !isCurrentMetadataLoading;
 
@@ -66,6 +76,9 @@ export function MetadataView({ metadata, functionId }: Props) {
 								url={metaDataValue}
 								displayValue={displayValue}
 								isExternal={dv.data?.displayOptions?.isExternal ?? true}
+								isDeletable={dv.data?.displayOptions?.isDeletable ?? false}
+								metadataId={metadataId}
+								functionId={functionId}
 								isLoading={isLoading}
 							/>
 						);
@@ -98,6 +111,9 @@ export function MetadataView({ metadata, functionId }: Props) {
 										url={metaDataValue}
 										displayValue={displayValue}
 										isExternal={metadata.isExternal}
+										isDeletable={false}
+										metadataId={metadataId}
+										functionId={functionId}
 										isLoading={isLoading}
 									/>
 								);
@@ -133,23 +149,57 @@ type LinkViewProps = {
 	url: string | undefined;
 	displayValue: string | undefined;
 	isExternal: boolean;
+	isDeletable: boolean;
+	metadataId: number | undefined;
+	functionId: number | undefined;
 	isLoading: boolean;
 };
 
-function LinkView({ url, displayValue, isExternal, isLoading }: LinkViewProps) {
+function LinkView({
+	url,
+	displayValue,
+	isExternal,
+	isDeletable,
+	metadataId,
+	functionId,
+	isLoading,
+}: LinkViewProps) {
+	const { isOpen, onOpen, onClose } = useDisclosure();
 	return (
 		<Skeleton isLoaded={!isLoading} fitContent>
-			<Link
-				fontSize="sm"
-				fontWeight="700"
-				colorScheme="blue"
-				width="fit-content"
-				isExternal={isExternal}
-				href={url}
-				onClick={(e) => e.stopPropagation()}
-			>
-				{displayValue ?? "<Ingen lenke>"}
-			</Link>
+			<Flex alignItems="center">
+				<Link
+					fontSize="sm"
+					fontWeight="700"
+					colorScheme="blue"
+					width="fit-content"
+					isExternal={isExternal}
+					href={url}
+					onClick={(e) => e.stopPropagation()}
+				>
+					{displayValue ?? "<Ingen lenke>"}
+				</Link>
+				{isDeletable && (
+					<IconButton
+						aria-label="delete"
+						icon="delete"
+						variant="tertiary"
+						size="sm"
+						color="black"
+						onClick={onOpen}
+					/>
+				)}
+				{functionId && metadataId && (
+					<DeleteMetadataModal
+						onOpen={onOpen}
+						onClose={onClose}
+						isOpen={isOpen}
+						functionId={functionId}
+						metadataId={metadataId}
+						displayValue={displayValue}
+					/>
+				)}
+			</Flex>
 		</Skeleton>
 	);
 }
