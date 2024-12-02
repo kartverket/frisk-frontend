@@ -1,4 +1,5 @@
 import { useFunction } from "@/hooks/use-function";
+import { useMetadata } from "@/hooks/use-metadata";
 import { getIdFromPath } from "@/lib/utils";
 import { Route } from "@/routes";
 import { useEffect } from "react";
@@ -7,7 +8,8 @@ export function CreateAndRedirectEffect() {
 	const navigate = Route.useNavigate();
 	const { path, newMetadataKey, newMetadataValue, redirect } =
 		Route.useSearch();
-	const { func, addMetadata } = useFunction(getIdFromPath(path) ?? 1);
+	const { func } = useFunction(getIdFromPath(path) ?? 1);
+	const { addMetadata } = useMetadata(getIdFromPath(path) ?? 1);
 
 	useEffect(() => {
 		if (
