@@ -4,7 +4,9 @@ import { Card, Flex, IconButton, Skeleton, Text } from "@kvib/react";
 import { FunctionCardEdit } from "./function-card-edit";
 import { FunctionCardSelectedView } from "./function-card-selected-view";
 import { EditAndSelectButtons } from "./edit-and-select-buttons";
-import { getIdsFromPath } from "@/lib/utils";
+
+const CHILDREN_FUNCTION_HEIGHT = 70;
+const SELECTED_FUNCTION_HEIGHT = 150;
 
 export function FunctionCard({
 	functionId,
@@ -21,36 +23,14 @@ export function FunctionCard({
 		return path.some((p) => p.includes(child.id.toString()));
 	});
 
-	const selectedFunctionIds = getIdsFromPath(path);
-
-	const lastGrandChild = 0;
-
-	const getParentPosition = () => {
-		const pathArrayIndex = path.indexOf(
-			path.find((pathString) => pathString.includes(functionId.toString())) ??
-				"0",
-		);
-
-		if (pathArrayIndex > 0) {
-			const lastChild = path[pathArrayIndex - 1].slice(-1);
-			const parent = document.getElementById(lastChild);
-			if (parent) {
-				return parent.getBoundingClientRect().bottom;
-			}
-		}
-
-		return 0;
-	};
-
 	return (
 		<Card
 			id={functionId.toString()}
-			// marginTop={`${getParentPosition()}px`}
 			marginBottom={
 				selected
 					? `${
-							(children.data?.length ?? 0) * 70 +
-							(selectedChildren?.length ?? 0) * 150
+							(children.data?.length ?? 0) * CHILDREN_FUNCTION_HEIGHT +
+							(selectedChildren?.length ?? 0) * SELECTED_FUNCTION_HEIGHT
 						}px`
 					: 0
 			}

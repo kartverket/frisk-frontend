@@ -1,7 +1,7 @@
 import { Flex, Text } from "@kvib/react";
 import { FunctionColumn } from "./function-column";
 import { getIdsFromPath } from "@/lib/utils";
-import { Grid, GridItem } from "@kvib/react";
+
 import {
 	DndContext,
 	MouseSensor,
@@ -60,7 +60,7 @@ export function FunctionColumnView({ path }: FunctionColumnViewProps) {
 				Smell opp noen bra funksjoner og få den oversikten du fortjener
 			</Text>
 			<DndContext onDragEnd={handleDragEnd} sensors={sensors}>
-				<Flex>
+				<Flex alignItems="stretch">
 					{selectedFunctionIds?.map((id) => (
 						<FunctionColumn key={id[0]} functionIds={id} />
 					))}

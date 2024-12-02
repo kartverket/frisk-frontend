@@ -1,16 +1,6 @@
 import { getIdsFromPath } from "@/lib/utils";
 import { Route } from "@/routes";
-import {
-	Box,
-	Button,
-	Flex,
-	Grid,
-	GridItem,
-	List,
-	ListItem,
-	Skeleton,
-	Text,
-} from "@kvib/react";
+import { Box, Button, Flex, List, ListItem, Skeleton, Text } from "@kvib/react";
 import { FunctionCard } from "./function-card";
 import { useState } from "react";
 import { Draggable } from "./draggable";
@@ -22,21 +12,8 @@ type FunctionFolderProps = {
 	functionIds: number[];
 };
 
-function getChildrenFromPath(pathArray: string[], x: number): string[] {
-	console.log("JAAA", pathArray);
-	console.log("JAAA", x);
-
-	const ja = pathArray.filter((path) => {
-		const etterX = path.split(`${x}.`);
-		return etterX.length > 1 && etterX[1].split(".")[0];
-	});
-
-	console.log("JAAA", ja);
-	return ja;
-}
-
-const FUNCTION_HEIGHT = 58;
-const SELECTED_FUNCTION_HEIGHT = 136;
+const CHILDREN_FUNCTION_HEIGHT = 155;
+const FUNCTION_VIEW_OFFSET = 312;
 
 export function FunctionColumn({ functionIds }: FunctionFolderProps) {
 	const { path } = Route.useSearch();
@@ -52,31 +29,29 @@ export function FunctionColumn({ functionIds }: FunctionFolderProps) {
 
 	const [selectedForm, setSelectedForm] = useState<number | null>(null);
 
-	const getParentPosition = (parentId: number, childId: string) => {
-		// Sjekk foreldre-nivået basert på `functionIds`
-		console.log("!!parent", parentId);
-
+	const getParentPosition = (parentId: number) => {
 		const parent = document.getElementById(parentId.toString());
-		const child = document.getElementById(childId);
-		if (parent && child) {
-			console.log("AVSTAND", parent.getBoundingClientRect().top);
-			return parent.getBoundingClientRect().top - 312;
-		}
-		return 0;
-		//const parentIndex = currentLevel - 1;
-		// if (parentIndex >= 0) {
-		// 	console.log("parent", selectedFunctionIds);
-		// 	console.log("parent", selectedFunctionIds[parentIndex].indexOf(parentId));
 
-		// 	return selectedFunctionIds[parentIndex].indexOf(parentId) * 60;
-		// 	// Finner posisjon for forelder hvis tilstede
-		// 	// return functionIds.indexOf(childId) * 400; // Juster 60 for ønsket høyde
-		// }
-		// return 0; // Ingen foreldre, start på 0
+		if (!parent) return 0;
+
+		const scrollTop = window.scrollY || document.documentElement.scrollTop;
+		return (
+			parent.getBoundingClientRect().top - FUNCTION_VIEW_OFFSET + scrollTop
+		);
 	};
 
+	const getTotalChildren = () =>
+		children.reduce((total, childrenData) => {
+			const numberOfChildren = childrenData.data?.length ?? 0;
+			const numberOfSelectedChildren =
+				childrenData.data?.filter((child) =>
+					path.some((p) => p.includes(child.id.toString())),
+				).length ?? 0;
+			return total + numberOfChildren + numberOfSelectedChildren;
+		}, 0);
+
 	return (
-		<Flex flexDirection="column" width="380px" height={"100%"}>
+		<Flex flexDirection="column" width="380px">
 			<Box
 				bgColor="gray.200"
 				border="1px"
@@ -94,59 +69,33 @@ export function FunctionColumn({ functionIds }: FunctionFolderProps) {
 			<Box
 				border="1px"
 				borderColor="gray.400"
-				minH="800px"
 				backgroundColor={"white"}
-				height="100%"
 				position="relative"
+				minH="100%"
+				h={`${getTotalChildren() * CHILDREN_FUNCTION_HEIGHT}px`}
 			>
-				{/* <Grid> */}
 				{children?.map((childre, i) => (
-					// <GridItem
-					// 	key={"hei"}
-					// 	marginTop={
-					// 		currentLevel > 0
-					// 			? currentLevel * 10
-					// 			: // selectedFunctionIds[currentLevel].indexOf(functionIds[i]) *
-					// 				// 	10
-					// 				0
-					// 	}
-					// >
-
 					<Box
-						key={"hei"}
-						// position={"relative"}
-						// marginTop={
-						// 	currentLevel > 0
-						// 		? `${currentLevel * FUNCTION_HEIGHT}px`
-						// 		: // selectedFunctionIds[currentLevel].indexOf(functionIds[i]) *
-						// 			// 	10
-						// 			0
-						// }
-						id={`${functions?.[i].data?.id}_group`}
+						key={functionIds[i]}
 						position="absolute"
 						display={"flex"}
 						flexDirection={"column"}
 						width={"100%"}
 						padding={"20px 2px 20px 2px"}
-						top={`${getParentPosition(functions?.[i].data?.id ?? 0, `${functions?.[i].data?.id}_group`)}px`} // Bruk foreldres posisjon
+						top={`${getParentPosition(functions?.[i].data?.id ?? 0)}px`}
 					>
-						<Skeleton key={"hei"} isLoaded={!childre.isLoading} minH={60}>
+						<Skeleton isLoaded={!childre.isLoading} minH={60}>
 							<h1>{functions?.[i].data?.name}</h1>
 							{childre.isSuccess ? (
-								<Droppable key="." id={functionIds[i]}>
+								<Droppable id={functionIds[i]}>
 									<List
 										display="flex"
 										flexDirection="column"
-										// justifyContent={"space-between"}
-										// height={functionIds[i] === 1 ? "100%" : undefined}
 										gap={2}
 										marginBottom="2"
 									>
 										{childre.data?.map((child) => (
 											<ListItem
-												marginBottom={
-													getChildrenFromPath(path, child.id).length
-												}
 												key={
 													child.id + child.name + child.parentId + child.path
 												}
@@ -184,10 +133,7 @@ export function FunctionColumn({ functionIds }: FunctionFolderProps) {
 							)}
 						</Skeleton>
 					</Box>
-
-					// </GridItem>
 				))}
-				{/* </Grid> */}
 			</Box>
 		</Flex>
 	);
