@@ -3,25 +3,19 @@ import {
 	type BackendFunction,
 	createDependency,
 	createFunction,
-	createFunctionMetadata,
 	deleteDependency,
 	deleteFunction,
-	deleteFunctionMetadata,
-	type FunctionMetadata,
 	getChildren,
 	getDependencies,
 	getDependents,
 	getFunction,
-	getFunctionMetadata,
 	putFunction,
-	patchMetadataValue,
 } from "@/services/backend";
 
 type UseFunctionOpts = {
 	includeChildren?: boolean;
 	includeDependencies?: boolean;
 	includeDependents?: boolean;
-	includeMetadata?: boolean;
 };
 
 export function useFunction(functionId: number, opts?: UseFunctionOpts) {
@@ -91,15 +85,6 @@ export function useFunction(functionId: number, opts?: UseFunctionOpts) {
 			return dependents;
 		},
 		enabled: opts?.includeDependents === true,
-	});
-
-	const metadata = useQuery({
-		queryKey: ["functions", functionId, "metadata"],
-		queryFn: async () => {
-			const functionMetadata = await getFunctionMetadata(functionId);
-			return functionMetadata;
-		},
-		enabled: opts?.includeMetadata === true,
 	});
 
 	const addFunction = useMutation({
@@ -496,137 +481,6 @@ export function useFunction(functionId: number, opts?: UseFunctionOpts) {
 		},
 	});
 
-	const addMetadata = useMutation({
-		mutationFn: createFunctionMetadata,
-		onMutate: async (_newMetadata) => {
-			await queryClient.cancelQueries({
-				queryKey: ["functions", _newMetadata.functionId, "metadata"],
-			});
-
-			const previousMetadata = queryClient.getQueryData<FunctionMetadata[]>([
-				"functions",
-				functionId,
-				"metadata",
-			]);
-
-			const randomNegativeNumber = -Math.floor(Math.random() * 1000);
-			const newMetadata: FunctionMetadata = {
-				id: randomNegativeNumber,
-				functionId,
-				key: _newMetadata.key,
-				value: _newMetadata.value,
-			};
-
-			if (previousMetadata) {
-				queryClient.setQueryData<FunctionMetadata[]>(
-					["functions", _newMetadata.functionId, "metadata"],
-					[...previousMetadata, newMetadata],
-				);
-			} else {
-				queryClient.setQueryData<FunctionMetadata[]>(
-					["functions", _newMetadata.functionId, "metadata"],
-					[newMetadata],
-				);
-			}
-
-			return { previousMetadata };
-		},
-		onError: (_, vars, context) => {
-			queryClient.setQueryData<FunctionMetadata[]>(
-				["functions", vars.functionId, "metadata"],
-				context?.previousMetadata,
-			);
-		},
-		onSettled: (_, __, newMetadata) => {
-			queryClient.invalidateQueries({
-				queryKey: ["functions", newMetadata.functionId, "metadata"],
-			});
-		},
-	});
-
-	const removeMetadata = useMutation({
-		mutationFn: (args: { id: number; functionId: number }) =>
-			deleteFunctionMetadata(args.id),
-		onMutate: async (deletedMetadata) => {
-			await queryClient.cancelQueries({
-				queryKey: ["functions", deletedMetadata.functionId, "metadata"],
-			});
-
-			const previousMetadata = queryClient.getQueryData<FunctionMetadata[]>([
-				"functions",
-				deletedMetadata.functionId,
-				"metadata",
-			]);
-
-			if (previousMetadata) {
-				queryClient.setQueryData<FunctionMetadata[]>(
-					["functions", deletedMetadata.functionId, "metadata"],
-					previousMetadata.filter(
-						(metadata) => metadata.id !== deletedMetadata.id,
-					),
-				);
-			} else {
-				queryClient.setQueryData<FunctionMetadata[]>(
-					["functions", deletedMetadata.functionId, "metadata"],
-					[],
-				);
-			}
-
-			return { previousMetadata };
-		},
-		onError: (_, deletedMetadata, context) => {
-			queryClient.setQueryData<FunctionMetadata[]>(
-				["functions", deletedMetadata.functionId, "metadata"],
-				context?.previousMetadata,
-			);
-		},
-		onSettled: (_, __, deletedMetadata) => {
-			queryClient.invalidateQueries({
-				queryKey: ["functions", deletedMetadata.functionId, "metadata"],
-			});
-		},
-	});
-
-	const updateMetadataValue = useMutation({
-		mutationFn: patchMetadataValue,
-		onMutate: async (updatedMetadata) => {
-			await queryClient.cancelQueries({
-				queryKey: ["functions", functionId, "metadata"],
-			});
-
-			const previousMetadata = queryClient.getQueryData<FunctionMetadata[]>([
-				"functions",
-				functionId,
-				"metadata",
-			]);
-
-			if (previousMetadata) {
-				const updatedMetadataList = previousMetadata.map((metadata) =>
-					metadata.id === updatedMetadata.id
-						? { ...metadata, value: updatedMetadata.value }
-						: metadata,
-				);
-
-				queryClient.setQueryData<FunctionMetadata[]>(
-					["functions", functionId, "metadata"],
-					updatedMetadataList,
-				);
-			}
-			return { previousMetadata };
-		},
-		onError: (_, __, context) => {
-			queryClient.setQueryData<FunctionMetadata[]>(
-				["functions", functionId, "metadata"],
-				context?.previousMetadata,
-			);
-		},
-		onSettled: (_updatedMetadataValue) => {
-			queryClient.invalidateQueries({
-				queryKey: ["functions", functionId, "metadata"],
-			});
-		},
-	});
-
 	return {
 		func,
 		children,
@@ -637,9 +491,5 @@ export function useFunction(functionId: number, opts?: UseFunctionOpts) {
 		addDependency,
 		removeDependency,
 		dependents,
-		metadata,
-		addMetadata,
-		removeMetadata,
-		updateMetadataValue,
 	};
 }

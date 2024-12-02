@@ -1,5 +1,6 @@
 import { getregelrettFrontendUrl } from "@/config";
 import { useFunction } from "@/hooks/use-function";
+import { useMetadata } from "@/hooks/use-metadata";
 import { Button } from "@kvib/react";
 import type { ButtonProps } from "@kvib/react";
 
@@ -7,7 +8,8 @@ export function SchemaButton({
 	functionId,
 	...rest
 }: ButtonProps & { functionId: number }) {
-	const { func, metadata } = useFunction(functionId);
+	const { func } = useFunction(functionId);
+	const { metadata } = useMetadata(functionId);
 	return (
 		<Button
 			variant="primary"

@@ -12,17 +12,18 @@ import {
 } from "@kvib/react";
 import { Metadata } from "./metadata/metadata";
 import { getregelrettFrontendUrl } from "@/config";
+import { useMetadata } from "@/hooks/use-metadata";
 
 type FunctionInfoViewProps = {
 	functionId: number;
 };
 
 export function FunctionInfoView({ functionId }: FunctionInfoViewProps) {
-	const { func, dependencies, dependents, metadata } = useFunction(functionId, {
+	const { func, dependencies, dependents } = useFunction(functionId, {
 		includeDependencies: true,
 		includeDependents: true,
-		includeMetadata: true,
 	});
+	const { metadata } = useMetadata(functionId);
 
 	return (
 		<Skeleton isLoaded={!!func.data} fitContent>
