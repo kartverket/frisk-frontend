@@ -40,7 +40,7 @@ export function FunctionColumn({ functionIds }: FunctionFolderProps) {
 		);
 	};
 
-	const getTotalChildren = () =>
+	const computeColumnHeight = () =>
 		children.reduce((total, childrenData) => {
 			const numberOfChildren = childrenData.data?.length ?? 0;
 			const numberOfSelectedChildren =
@@ -76,7 +76,7 @@ export function FunctionColumn({ functionIds }: FunctionFolderProps) {
 				backgroundColor={"white"}
 				position="relative"
 				minH="100%"
-				h={`${getTotalChildren()}px`}
+				h={`${computeColumnHeight()}px`}
 			>
 				{children?.map((childre, i) => (
 					<Skeleton
