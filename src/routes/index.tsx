@@ -1,9 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { FunctionColumnView } from "../components/function-column-view";
-import { Breadcrumbs } from "@/components/breadcrumbs";
 import { number, object, string, array } from "zod";
 import { fallback, zodSearchValidator } from "@tanstack/router-zod-adapter";
-import { useFunction } from "@/hooks/use-function";
 import { useEffect } from "react";
 import { Main } from "@/components/main";
 import { CreateAndRedirectEffect } from "@/effects/create-and-redirect-effect";
@@ -20,6 +18,7 @@ const functionSearchSchema = object({
 		),
 		["1"],
 	),
+	functionId: number().optional(),
 	edit: number().optional(),
 	newMetadataKey: string().optional(),
 	newMetadataValue: string().optional(),
@@ -43,8 +42,6 @@ function Index() {
 
 	useEffect(() => {
 		functions.map((func, i) => {
-			// TODO: trenger man denne?
-
 			if (func.error) {
 				// if function id is invalid, navigate to parent until it is valid
 				const updatedPathArray = idArrays.map((id, index) =>

@@ -4,15 +4,16 @@ import { Box, Button, Flex, List, ListItem, Skeleton, Text } from "@kvib/react";
 import { FunctionCard } from "./function-card";
 import { useState } from "react";
 import { Draggable } from "./draggable";
+import { config } from "../../frisk.config";
 import { Droppable } from "./droppable";
 import { useFunctions } from "@/hooks/use-functions";
-import { AddFunctionForm } from "./add-function-form";
+import { CreateFunctionForm } from "./create-function-form";
 
 type FunctionFolderProps = {
 	functionIds: number[];
 };
-
-const CHILDREN_FUNCTION_HEIGHT = 155;
+const FUNCTION_HEIGHT = 90;
+const SELECTED_FUNCTION_HEIGHT = 400;
 const FUNCTION_VIEW_OFFSET = 312;
 
 export function FunctionColumn({ functionIds }: FunctionFolderProps) {
@@ -21,7 +22,6 @@ export function FunctionColumn({ functionIds }: FunctionFolderProps) {
 	const { functions, children } = useFunctions(functionIds, {
 		includeChildren: true,
 	});
-
 	const selectedFunctionIds = getIdsFromPath(path);
 	const currentLevel = selectedFunctionIds.findIndex(
 		(ids) => ids.join() === functionIds.join(),
@@ -47,7 +47,11 @@ export function FunctionColumn({ functionIds }: FunctionFolderProps) {
 				childrenData.data?.filter((child) =>
 					path.some((p) => p.includes(child.id.toString())),
 				).length ?? 0;
-			return total + numberOfChildren + numberOfSelectedChildren;
+			return (
+				total +
+				numberOfChildren * FUNCTION_HEIGHT +
+				numberOfSelectedChildren * SELECTED_FUNCTION_HEIGHT
+			);
 		}, 0);
 
 	return (
@@ -62,7 +66,7 @@ export function FunctionColumn({ functionIds }: FunctionFolderProps) {
 				minH="46px"
 			>
 				<Text size="lg" fontWeight="700">
-					Funksjon nivå {currentLevel + 1}
+					{config.columnName} nivå {currentLevel + 1}
 				</Text>
 			</Box>
 
@@ -72,21 +76,24 @@ export function FunctionColumn({ functionIds }: FunctionFolderProps) {
 				backgroundColor={"white"}
 				position="relative"
 				minH="100%"
-				h={`${getTotalChildren() * CHILDREN_FUNCTION_HEIGHT}px`}
+				h={`${getTotalChildren()}px`}
 			>
 				{children?.map((childre, i) => (
-					<Box
+					<Skeleton
 						key={functionIds[i]}
-						position="absolute"
-						display={"flex"}
-						flexDirection={"column"}
-						width={"100%"}
-						padding={"20px 2px 20px 2px"}
-						top={`${getParentPosition(functions?.[i].data?.id ?? 0)}px`}
+						isLoaded={!childre.isLoading}
+						minH={60}
 					>
-						<Skeleton isLoaded={!childre.isLoading} minH={60}>
-							<h1>{functions?.[i].data?.name}</h1>
-							{childre.isSuccess ? (
+						{childre.isSuccess ? (
+							<Box
+								position="absolute"
+								display={"flex"}
+								flexDirection={"column"}
+								width={"100%"}
+								padding={"20px 2px 20px 2px"}
+								top={`${getParentPosition(functions?.[i].data?.id ?? 0)}px`}
+							>
+								<h1>{functions?.[i].data?.name}</h1>
 								<Droppable id={functionIds[i]}>
 									<List
 										display="flex"
@@ -110,29 +117,29 @@ export function FunctionColumn({ functionIds }: FunctionFolderProps) {
 												</Draggable>
 											</ListItem>
 										))}
-										<Button
-											leftIcon="add"
-											variant="tertiary"
-											colorScheme="blue"
-											onClick={() => {
-												setSelectedForm(functionIds[i]);
-											}}
-										>
-											Legg til funksjon
-										</Button>
 									</List>
+									<Button
+										leftIcon="add"
+										variant="tertiary"
+										colorScheme="blue"
+										onClick={() => {
+											setSelectedForm(functionIds[i]);
+										}}
+									>
+										{config.addButtonName}
+									</Button>
 								</Droppable>
-							) : childre.isError ? (
-								<Text key={""}>Det skjedde en feil</Text>
-							) : null}
-							{selectedForm === functionIds[i] && (
-								<AddFunctionForm
-									functionId={functionIds[i]}
-									setSelectedForm={setSelectedForm}
-								/>
-							)}
-						</Skeleton>
-					</Box>
+								{selectedForm === functionIds[i] && (
+									<CreateFunctionForm
+										functionId={functionIds[i]}
+										setSelectedForm={setSelectedForm}
+									/>
+								)}
+							</Box>
+						) : childre.isError ? (
+							<Text>Det skjedde en feil</Text>
+						) : null}
+					</Skeleton>
 				))}
 			</Box>
 		</Flex>

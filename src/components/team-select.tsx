@@ -1,7 +1,7 @@
 import { useFunction } from "@/hooks/use-function";
 import { useTeam } from "@/hooks/use-team";
 import { useUser } from "@/hooks/use-user";
-import { Text, Skeleton, Select } from "@kvib/react";
+import { Text, Skeleton, Select, FormLabel, FormControl } from "@kvib/react";
 
 export function TeamSelect({
 	functionId,
@@ -12,16 +12,20 @@ export function TeamSelect({
 	const { team: currentTeam } = useTeam(currentTeamValue);
 
 	return (
-		<>
-			<Text fontSize="xs" fontWeight="700" mb="4px">
-				Ansvarlig team for denne funksjonen?*
-			</Text>
+		<FormControl isRequired>
+			<FormLabel
+				style={{
+					fontSize: "small",
+					fontWeight: "medium",
+				}}
+			>
+				Ansvarlig team for denne funksjonen?
+			</FormLabel>
 			<Skeleton isLoaded={!teams.isLoading} fitContent>
 				{teams.isSuccess ? (
 					<Select
 						id="team-value"
 						name="team-value"
-						mb="30px"
 						size="sm"
 						borderRadius="5px"
 						required
@@ -38,6 +42,6 @@ export function TeamSelect({
 					<Text>Det skjedde en feil</Text>
 				) : null}
 			</Skeleton>
-		</>
+		</FormControl>
 	);
 }

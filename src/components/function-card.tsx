@@ -5,7 +5,7 @@ import { FunctionCardEdit } from "./function-card-edit";
 import { FunctionCardSelectedView } from "./function-card-selected-view";
 import { EditAndSelectButtons } from "./edit-and-select-buttons";
 
-const CHILDREN_FUNCTION_HEIGHT = 70;
+const FUNCTION_HEIGHT = 56;
 const SELECTED_FUNCTION_HEIGHT = 150;
 
 export function FunctionCard({
@@ -29,16 +29,14 @@ export function FunctionCard({
 			marginBottom={
 				selected
 					? `${
-							(children.data?.length ?? 0) * CHILDREN_FUNCTION_HEIGHT +
+							(children.data?.length ?? 0) * FUNCTION_HEIGHT +
 							(selectedChildren?.length ?? 0) * SELECTED_FUNCTION_HEIGHT
 						}px`
 					: 0
 			}
 			borderColor="blue.500"
 			borderWidth={1}
-			onClick={(e) => {
-				e.preventDefault();
-
+			onClick={() => {
 				if (search.edit !== undefined) {
 					return;
 				}

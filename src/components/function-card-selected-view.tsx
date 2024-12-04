@@ -1,10 +1,10 @@
-import { Flex, Text, Skeleton, List, ListItem, Box } from "@kvib/react";
+import { Flex, Text, Skeleton, List, ListItem, Box, Stack } from "@kvib/react";
 import { SchemaButton } from "./schema-button";
 import { RegelrettLink } from "./metadata/regelrett-link";
 import { useFunction } from "@/hooks/use-function";
-import { useTeam } from "@/hooks/use-team";
-import { BackstageLink } from "./metadata/backstage-link";
 import { EditAndSelectButtons } from "./edit-and-select-buttons";
+import { config } from "../../frisk.config";
+import { MetadataView } from "./metadata/metadata-view";
 
 export function FunctionCardSelectedView({
 	functionId,
@@ -13,17 +13,11 @@ export function FunctionCardSelectedView({
 		includeMetadata: true,
 		includeDependencies: true,
 	});
-	const teamId = metadata.data?.find((m) => m.key === "team")?.value;
-	const { team } = useTeam(teamId);
 	const schemaMetadata =
 		metadata.data?.filter((m) => m.key.startsWith("rr-")) ?? [];
-	const backstageMetadata =
-		metadata.data?.filter((m) => m.key.startsWith("backstage-url")) ?? [];
-	const teamDisplayName = team.data?.displayName.replace(/.* - /, "");
-	const teamLoaded = !metadata.isLoading && !team.isLoading;
 
 	return (
-		<Flex flexDirection="column" paddingLeft="10px" w="100%">
+		<Stack paddingLeft="10px" w="100%">
 			<Flex alignItems="center" w="100%">
 				<Skeleton isLoaded={!func.isLoading} fitContent w="100%">
 					<Text fontWeight="bold" as="span" display="flex" w="100%">
@@ -32,11 +26,8 @@ export function FunctionCardSelectedView({
 				</Skeleton>
 				<EditAndSelectButtons functionId={functionId} selected />
 			</Flex>
-			<Skeleton isLoaded={teamLoaded} fitContent>
-				<Text>{teamDisplayName ?? "<Ingen team>"}</Text>
-			</Skeleton>
-			{backstageMetadata.map((item) => (
-				<BackstageLink url={item.value} key={item.key} />
+			{config.metadata.map((meta) => (
+				<MetadataView key={meta.key} metadata={meta} functionId={functionId} />
 			))}
 			{dependencies.data && dependencies.data?.length > 0 && (
 				<Text fontSize="xs" fontWeight="700" mb="4px">
@@ -74,6 +65,6 @@ export function FunctionCardSelectedView({
 					}}
 				/>
 			))}
-		</Flex>
+		</Stack>
 	);
 }
