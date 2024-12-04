@@ -5,8 +5,8 @@ import { FunctionCardEdit } from "./function-card-edit";
 import { FunctionCardSelectedView } from "./function-card-selected-view";
 import { EditAndSelectButtons } from "./edit-and-select-buttons";
 
-const FUNCTION_HEIGHT = 56;
-const SELECTED_FUNCTION_HEIGHT = 150;
+const FUNCTION_HEIGHT = 60;
+const SELECTED_FUNCTION_HEIGHT = 260;
 
 export function FunctionCard({
 	functionId,

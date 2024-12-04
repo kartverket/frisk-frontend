@@ -61,9 +61,9 @@ export function FunctionColumnView({ path }: FunctionColumnViewProps) {
 				{config.description}
 			</Text>
 			<DndContext onDragEnd={handleDragEnd} sensors={sensors}>
-				<Flex alignItems="stretch">
-					{selectedFunctionIds?.map((id) => (
-						<FunctionColumn key={id[0]} functionIds={id} />
+				<Flex>
+					{selectedFunctionIds?.map((ids) => (
+						<FunctionColumn key={ids[0]} functionIds={ids} />
 					))}
 				</Flex>
 			</DndContext>

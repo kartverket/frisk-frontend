@@ -16,7 +16,8 @@ const defaultConfig: IConfig = {
 		"https://login.microsoftonline.com/7531b79e-fd42-4826-bff2-131d82c7b557/v2.0",
 	redirect_uri:
 		import.meta.env.VITE_LOGIN_REDIRECT_URI ?? "http://localhost:5173",
-	backend_url: import.meta.env.VITE_BACKEND_URL ?? "http://0.0.0.0:8080",
+	backend_url:
+		import.meta.env.VITE_BACKEND_URL ?? "https://frisk-backend.fly.dev",
 	regelrett_frontend_url:
 		import.meta.env.VITE_REGLERRETT_FRONTEND_URL ??
 		"https://regelrett-frontend-1024826672490.europe-north1.run.app",

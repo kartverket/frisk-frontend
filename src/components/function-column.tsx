@@ -12,8 +12,8 @@ import { CreateFunctionForm } from "./create-function-form";
 type FunctionFolderProps = {
 	functionIds: number[];
 };
-const FUNCTION_HEIGHT = 90;
-const SELECTED_FUNCTION_HEIGHT = 400;
+const FUNCTION_HEIGHT = 150;
+const SELECTED_FUNCTION_HEIGHT = 200;
 const FUNCTION_VIEW_OFFSET = 312;
 
 export function FunctionColumn({ functionIds }: FunctionFolderProps) {

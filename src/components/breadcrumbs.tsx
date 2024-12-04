@@ -5,7 +5,7 @@ import { Link as TSRLink } from "@tanstack/react-router";
 import { config } from "../../frisk.config";
 
 type BreadcrumbsProps = {
-	path: string[];
+	path: string;
 };
 
 export function Breadcrumbs({ path }: BreadcrumbsProps) {

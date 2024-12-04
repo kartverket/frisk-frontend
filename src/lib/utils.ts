@@ -1,18 +1,3 @@
-// export function getIdsFromPath(urlPaths: string) {
-// 	const paths = urlPaths.split("-").map((path) => path.split(".").map(Number));
-
-// 	const maxLength = Math.max(...paths.map((path) => path.length));
-
-// 	return Array.from({ length: maxLength }, (_, i) =>
-// 		paths
-// 			.map((path) => path[i])
-// 			.filter(
-// 				(value, idx, self) =>
-// 					value !== undefined && self.indexOf(value) === idx,
-// 			),
-// 	);
-// }
-
 export function getIdsFromPath(paths: string[]) {
 	const nestedPaths = paths.map((path) => path.split(".").map(Number));
 
@@ -34,14 +19,6 @@ export function getIdsFromPath(paths: string[]) {
 			),
 	);
 }
-
-// TODO: fix
-
-export function getIdFromPath(path: string) {
-	return getIdsFromPath(path).at(-1);
-}
-
-// TODO: fix
 
 export function isURL(url: string) {
 	return URL.canParse(url);

@@ -22,7 +22,6 @@ type UseFunctionOpts = {
 	includeDependencies?: boolean;
 	includeDependents?: boolean;
 	includeMetadata?: boolean;
-	useFunctions?: boolean;
 };
 
 export function useFunction(functionId: number, opts?: UseFunctionOpts) {
@@ -384,7 +383,7 @@ export function useFunction(functionId: number, opts?: UseFunctionOpts) {
 				);
 			}
 
-			if (func?.data) {
+			if (func.data) {
 				if (previousDependents) {
 					queryClient.setQueryData<BackendFunction[]>(
 						["functions", _newDependency.dependencyFunctionId, "dependents"],
