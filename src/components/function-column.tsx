@@ -13,7 +13,7 @@ type FunctionFolderProps = {
 	functionIds: number[];
 };
 const FUNCTION_HEIGHT = 150;
-const SELECTED_FUNCTION_HEIGHT = 250;
+const SELECTED_FUNCTION_HEIGHT = 300;
 const FUNCTION_VIEW_OFFSET = 312;
 
 export function FunctionColumn({ functionIds }: FunctionFolderProps) {
