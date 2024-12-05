@@ -31,6 +31,24 @@ export const config: FriskConfig = {
 			inheritFromParent: true,
 		},
 		{
+			key: "kritikalitet",
+			type: "select",
+			title: "Kritikalitet",
+			label: "Kritikalitet",
+			inheritFromParent: false,
+			isRequired: false,
+			showOn: "createAndUpdate",
+			selectMode: "single",
+			getOptions: async () => {
+				return [
+					{ value: "Høy", name: "Høy" },
+					{ value: "Middels", name: "Middels" },
+					{ value: "Lav", name: "Lav" },
+				];
+			},
+			placeholder: "Velg kritikalitet",
+		},
+		{
 			key: "backstage-url",
 			type: "url",
 			isExternal: true,
