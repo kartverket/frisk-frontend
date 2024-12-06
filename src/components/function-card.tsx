@@ -6,38 +6,27 @@ import { FunctionCardSelectedView } from "./function-card-selected-view";
 import { EditAndSelectButtons } from "./edit-and-select-buttons";
 import { useEffect, useState } from "react";
 
-const FUNCTION_HEIGHT = 60;
-const SELECTED_FUNCTION_HEIGHT = 260;
-
 export function FunctionCard({
 	functionId,
 	selected,
 }: { functionId: number; selected: boolean }) {
-	const { func, children } = useFunction(functionId, {
-		includeChildren: true,
-	});
+	const { func } = useFunction(functionId);
 	const search = Route.useSearch();
 	const navigate = Route.useNavigate();
-	const { path } = Route.useSearch();
 
 	const [bottomMargin, setBottomMargin] = useState(0);
 
-	const selectedChildren = children.data?.filter((child) => {
-		return path.some((p) => p.includes(child.id.toString()));
-	});
-
-	const getParentDistance = () => {
-		const children = document.getElementById(`${functionId}-children`);
+	function getParentDistance() {
+		const childrenGroup = document.getElementById(`${functionId}-children`);
 		const self = document.getElementById(functionId.toString());
-		if (!children || !self) return;
+		if (!childrenGroup || !self) return 0;
 
-		const cHeight = children.getBoundingClientRect().height;
+		const cHeight = childrenGroup.getBoundingClientRect().height;
 		const sHeight = self.getBoundingClientRect().height;
-
-		setBottomMargin(cHeight > sHeight ? cHeight - sHeight : 2);
-	};
+		return cHeight > sHeight ? cHeight - sHeight : 2;
+	}
 	useEffect(() => {
-		getParentDistance();
+		setBottomMargin(getParentDistance());
 	});
 
 	return (
