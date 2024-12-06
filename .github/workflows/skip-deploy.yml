@@ -3,9 +3,22 @@ on:
   pull_request:
     branches:
       - main
+    paths:
+      - DockerfileForSkip
+      - src/**
+      - .github/workflows/skip-deploy.yml
+      - frisk-frontend/nginx/*
+      - index.html
+
   push:
     branches:
       - main
+    paths:
+      - DockerfileForSkip
+      - src/**
+      - .github/workflows/skip-deploy.yml
+      - frisk-frontend/nginx/*
+      - index.html
 
 env:
   REGISTRY: ghcr.io
@@ -155,7 +168,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: "Run Pharos"
-        uses: kartverket/pharos@v0.2.3
+        uses: kartverket/pharos@v0.2.4
         with:
           image_url: ${{ needs.build-prod.outputs.image_url }}
 
