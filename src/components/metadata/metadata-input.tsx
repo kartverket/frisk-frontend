@@ -294,7 +294,6 @@ function InputField({ metadata, functionId, parentFunctionId }: InputProps) {
 				{metadata.label}
 			</FormLabel>
 			<Input
-				autoFocus
 				type={metadata.type}
 				name={metadata.key}
 				defaultValue={
