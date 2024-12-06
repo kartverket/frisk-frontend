@@ -4,6 +4,7 @@ import { Card, Flex, IconButton, Skeleton, Text } from "@kvib/react";
 import { FunctionCardEdit } from "./function-card-edit";
 import { FunctionCardSelectedView } from "./function-card-selected-view";
 import { EditAndSelectButtons } from "./edit-and-select-buttons";
+import { useEffect, useState } from "react";
 
 const FUNCTION_HEIGHT = 60;
 const SELECTED_FUNCTION_HEIGHT = 260;
@@ -19,21 +20,30 @@ export function FunctionCard({
 	const navigate = Route.useNavigate();
 	const { path } = Route.useSearch();
 
+	const [bottomMargin, setBottomMargin] = useState(0);
+
 	const selectedChildren = children.data?.filter((child) => {
 		return path.some((p) => p.includes(child.id.toString()));
+	});
+
+	const getParentDistance = () => {
+		const children = document.getElementById(`${functionId}-children`);
+		const self = document.getElementById(functionId.toString());
+		if (!children || !self) return;
+
+		const cHeight = children.getBoundingClientRect().height;
+		const sHeight = self.getBoundingClientRect().height;
+
+		setBottomMargin(cHeight > sHeight ? cHeight - sHeight : 2);
+	};
+	useEffect(() => {
+		getParentDistance();
 	});
 
 	return (
 		<Card
 			id={functionId.toString()}
-			marginBottom={
-				selected
-					? `${
-							(children.data?.length ?? 0) * FUNCTION_HEIGHT +
-							(selectedChildren?.length ?? 0) * SELECTED_FUNCTION_HEIGHT
-						}px`
-					: 0
-			}
+			marginBottom={bottomMargin}
 			borderColor="blue.500"
 			borderWidth={1}
 			onClick={() => {

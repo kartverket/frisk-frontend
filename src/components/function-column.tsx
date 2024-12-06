@@ -2,7 +2,7 @@ import { getIdsFromPath } from "@/lib/utils";
 import { Route } from "@/routes";
 import { Box, Button, Flex, List, ListItem, Skeleton, Text } from "@kvib/react";
 import { FunctionCard } from "./function-card";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Draggable } from "./draggable";
 import { config } from "../../frisk.config";
 import { Droppable } from "./droppable";
@@ -17,6 +17,8 @@ const SELECTED_FUNCTION_HEIGHT = 300;
 const FUNCTION_VIEW_OFFSET = 312;
 
 export function FunctionColumn({ functionIds }: FunctionFolderProps) {
+	const [functionPositions, setFunctionPositions] = useState<number[]>([]);
+	const [cardPositions, setCardPositions] = useState<number[]>([]);
 	const { path } = Route.useSearch();
 
 	const { functions, children } = useFunctions(functionIds, {
@@ -28,17 +30,6 @@ export function FunctionColumn({ functionIds }: FunctionFolderProps) {
 	);
 
 	const [selectedForm, setSelectedForm] = useState<number | null>(null);
-
-	const getParentPosition = (parentId: number) => {
-		const parent = document.getElementById(parentId.toString());
-
-		if (!parent) return 0;
-
-		const scrollTop = window.scrollY || document.documentElement.scrollTop;
-		return (
-			parent.getBoundingClientRect().top - FUNCTION_VIEW_OFFSET + scrollTop
-		);
-	};
 
 	const computeColumnHeight = () =>
 		children.reduce((total, childrenData) => {
@@ -53,6 +44,26 @@ export function FunctionColumn({ functionIds }: FunctionFolderProps) {
 				numberOfSelectedChildren * SELECTED_FUNCTION_HEIGHT
 			);
 		}, 0);
+
+	useEffect(() => {
+		const getParentPosition = (parentId: number) => {
+			const parent = document.getElementById(parentId.toString());
+
+			if (!parent) return 0;
+
+			const scrollTop = window.scrollY || document.documentElement.scrollTop;
+			return (
+				parent.getBoundingClientRect().top - FUNCTION_VIEW_OFFSET + scrollTop
+			);
+		};
+
+		if (functions.every((func) => func.isSuccess)) {
+			const newPostions = functionIds.map((functionId) =>
+				getParentPosition(functionId),
+			);
+			setFunctionPositions(newPostions);
+		}
+	}, [functionIds, functions]);
 
 	return (
 		<Flex flexDirection="column" width="380px">
@@ -86,12 +97,13 @@ export function FunctionColumn({ functionIds }: FunctionFolderProps) {
 					>
 						{childre.isSuccess ? (
 							<Box
+								id={`${functionIds[i]}-children`}
 								position="absolute"
 								display={"flex"}
 								flexDirection={"column"}
 								width={"100%"}
 								padding={"20px 2px 20px 2px"}
-								top={`${getParentPosition(functions?.[i].data?.id ?? 0)}px`}
+								top={`${functionPositions[i]}px`} //state som opptares i use-effect. Få den til å oppdatere seg etter at parent er lastet inn.
 							>
 								<h1>{functions?.[i].data?.name}</h1>
 								<Droppable id={functionIds[i]}>
