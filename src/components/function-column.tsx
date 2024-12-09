@@ -45,7 +45,6 @@ export function FunctionColumn({ functionIds }: FunctionFolderProps) {
 			);
 		}, 0);
 
-	// biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
 	useEffect(() => {
 		const getParentPosition = (parentId: number) => {
 			const parent = document.getElementById(parentId.toString());
@@ -57,12 +56,13 @@ export function FunctionColumn({ functionIds }: FunctionFolderProps) {
 				parent.getBoundingClientRect().top - FUNCTION_VIEW_OFFSET + scrollTop
 			);
 		};
-
-		const newPostions = functionIds.map((functionId) =>
-			getParentPosition(functionId),
-		);
-		setFunctionPositions(newPostions);
-	}, [functions]);
+		if (functions) {
+			const newPostions = functionIds.map((functionId) =>
+				getParentPosition(functionId),
+			);
+			setFunctionPositions(newPostions);
+		}
+	}, [functions, functionIds]);
 
 	return (
 		<Flex flexDirection="column" width="380px">
