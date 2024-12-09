@@ -83,6 +83,7 @@ export const config: FriskConfig = {
 					displayOptions: {
 						type: "url",
 						isExternal: false,
+						isDeletable: true,
 					},
 				};
 			},
@@ -162,6 +163,7 @@ type GeneralMetadataContent = {
 			| {
 					type: "url";
 					isExternal: boolean;
+					isDeletable: boolean;
 			  };
 	}>;
 };
