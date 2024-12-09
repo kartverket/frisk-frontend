@@ -45,6 +45,18 @@ export function FunctionColumn({ functionIds }: FunctionFolderProps) {
 			);
 		}, 0);
 
+	function getColumnHeight() {
+		const column = document.getElementById(`${currentLevel}-children`);
+
+		if (!column) return 0;
+		console.log("JAAAA vi kom inn");
+		const children = column.querySelectorAll("[data-child]");
+		console.log("Høyde kolonne", children);
+		return Array.from(children).reduce((total, children) => {
+			return total + children.getBoundingClientRect().height;
+		}, 0);
+	}
+
 	useEffect(() => {
 		const getParentPosition = (parentId: number) => {
 			const parent = document.getElementById(parentId.toString());
@@ -56,13 +68,12 @@ export function FunctionColumn({ functionIds }: FunctionFolderProps) {
 				parent.getBoundingClientRect().top - FUNCTION_VIEW_OFFSET + scrollTop
 			);
 		};
-		if (functions) {
-			const newPostions = functionIds.map((functionId) =>
-				getParentPosition(functionId),
-			);
-			setFunctionPositions(newPostions);
-		}
-	}, [functions, functionIds]);
+
+		const newPostions = functionIds.map((functionId) =>
+			getParentPosition(functionId),
+		);
+		setFunctionPositions(newPostions);
+	}, [functionIds]);
 
 	return (
 		<Flex flexDirection="column" width="380px">
@@ -86,7 +97,8 @@ export function FunctionColumn({ functionIds }: FunctionFolderProps) {
 				backgroundColor={"white"}
 				position="relative"
 				minH="100%"
-				h={`${computeColumnHeight()}px`}
+				h={`${getColumnHeight() + 10}px`}
+				id={`${currentLevel}-children`}
 			>
 				{children?.map((childre, i) => (
 					<Skeleton
@@ -96,6 +108,7 @@ export function FunctionColumn({ functionIds }: FunctionFolderProps) {
 					>
 						{childre.isSuccess ? (
 							<Box
+								data-child
 								id={`${functionIds[i]}-children`}
 								position="absolute"
 								display={"flex"}
