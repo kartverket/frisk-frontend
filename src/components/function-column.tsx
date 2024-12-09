@@ -18,7 +18,7 @@ const FUNCTION_VIEW_OFFSET = 312;
 
 export function FunctionColumn({ functionIds }: FunctionFolderProps) {
 	const [functionPositions, setFunctionPositions] = useState<number[]>([]);
-	const [cardPositions, setCardPositions] = useState<number[]>([]);
+
 	const { path } = Route.useSearch();
 
 	const { functions, children } = useFunctions(functionIds, {
@@ -45,6 +45,7 @@ export function FunctionColumn({ functionIds }: FunctionFolderProps) {
 			);
 		}, 0);
 
+	// biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
 	useEffect(() => {
 		const getParentPosition = (parentId: number) => {
 			const parent = document.getElementById(parentId.toString());
@@ -57,13 +58,11 @@ export function FunctionColumn({ functionIds }: FunctionFolderProps) {
 			);
 		};
 
-		if (functions.every((func) => func.isSuccess)) {
-			const newPostions = functionIds.map((functionId) =>
-				getParentPosition(functionId),
-			);
-			setFunctionPositions(newPostions);
-		}
-	}, [functionIds, functions]);
+		const newPostions = functionIds.map((functionId) =>
+			getParentPosition(functionId),
+		);
+		setFunctionPositions(newPostions);
+	}, [functions]);
 
 	return (
 		<Flex flexDirection="column" width="380px">
