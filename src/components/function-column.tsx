@@ -2,19 +2,17 @@ import { getIdsFromPath } from "@/lib/utils";
 import { Route } from "@/routes";
 import { Box, Button, Flex, List, ListItem, Skeleton, Text } from "@kvib/react";
 import { FunctionCard } from "./function-card";
-import { useEffect, useLayoutEffect, useState } from "react";
+import { useLayoutEffect, useState } from "react";
 import { Draggable } from "./draggable";
 import { config } from "../../frisk.config";
 import { Droppable } from "./droppable";
 import { useFunctions } from "@/hooks/use-functions";
 import { CreateFunctionForm } from "./create-function-form";
-import { useIsFetching, useQueryClient } from "@tanstack/react-query";
+import { useIsFetching } from "@tanstack/react-query";
 
 type FunctionFolderProps = {
 	functionIds: number[];
 };
-const FUNCTION_HEIGHT = 150;
-const SELECTED_FUNCTION_HEIGHT = 300;
 const FUNCTION_VIEW_OFFSET = 312;
 
 export function FunctionColumn({ functionIds }: FunctionFolderProps) {
@@ -33,22 +31,6 @@ export function FunctionColumn({ functionIds }: FunctionFolderProps) {
 	const [selectedForm, setSelectedForm] = useState<number | null>(null);
 
 	const isFetching = useIsFetching();
-
-	console.log("jaaa", isFetching);
-
-	const computeColumnHeight = () =>
-		children.reduce((total, childrenData) => {
-			const numberOfChildren = childrenData.data?.length ?? 0;
-			const numberOfSelectedChildren =
-				childrenData.data?.filter((child) =>
-					path.some((p) => p.includes(child.id.toString())),
-				).length ?? 0;
-			return (
-				total +
-				numberOfChildren * FUNCTION_HEIGHT +
-				numberOfSelectedChildren * SELECTED_FUNCTION_HEIGHT
-			);
-		}, 0);
 
 	function getColumnHeight() {
 		const column = document.getElementById(`${currentLevel}-children`);
