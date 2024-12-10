@@ -2,12 +2,13 @@ import { getIdsFromPath } from "@/lib/utils";
 import { Route } from "@/routes";
 import { Box, Button, Flex, List, ListItem, Skeleton, Text } from "@kvib/react";
 import { FunctionCard } from "./function-card";
-import { useEffect, useState } from "react";
+import { useEffect, useLayoutEffect, useState } from "react";
 import { Draggable } from "./draggable";
 import { config } from "../../frisk.config";
 import { Droppable } from "./droppable";
 import { useFunctions } from "@/hooks/use-functions";
 import { CreateFunctionForm } from "./create-function-form";
+import { useIsFetching, useQueryClient } from "@tanstack/react-query";
 
 type FunctionFolderProps = {
 	functionIds: number[];
@@ -31,6 +32,10 @@ export function FunctionColumn({ functionIds }: FunctionFolderProps) {
 
 	const [selectedForm, setSelectedForm] = useState<number | null>(null);
 
+	const isFetching = useIsFetching();
+
+	console.log("jaaa", isFetching);
+
 	const computeColumnHeight = () =>
 		children.reduce((total, childrenData) => {
 			const numberOfChildren = childrenData.data?.length ?? 0;
@@ -49,15 +54,15 @@ export function FunctionColumn({ functionIds }: FunctionFolderProps) {
 		const column = document.getElementById(`${currentLevel}-children`);
 
 		if (!column) return 0;
-		console.log("JAAAA vi kom inn");
 		const children = column.querySelectorAll("[data-child]");
-		console.log("Høyde kolonne", children);
+
 		return Array.from(children).reduce((total, children) => {
 			return total + children.getBoundingClientRect().height;
 		}, 0);
 	}
 
-	useEffect(() => {
+	// biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
+	useLayoutEffect(() => {
 		const getParentPosition = (parentId: number) => {
 			const parent = document.getElementById(parentId.toString());
 
@@ -69,11 +74,10 @@ export function FunctionColumn({ functionIds }: FunctionFolderProps) {
 			);
 		};
 
-		const newPostions = functionIds.map((functionId) =>
-			getParentPosition(functionId),
-		);
-		setFunctionPositions(newPostions);
-	}, [functionIds]);
+		const newPositions = functionIds.map((func) => getParentPosition(func));
+
+		setFunctionPositions(newPositions);
+	}, [functionIds, isFetching]);
 
 	return (
 		<Flex flexDirection="column" width="380px">
@@ -115,7 +119,7 @@ export function FunctionColumn({ functionIds }: FunctionFolderProps) {
 								flexDirection={"column"}
 								width={"100%"}
 								padding={"20px 2px 20px 2px"}
-								top={`${functionPositions[i]}px`} //state som opptares i use-effect. Få den til å oppdatere seg etter at parent er lastet inn.
+								top={`${functionPositions[i]}px`}
 							>
 								<h1>{functions?.[i].data?.name}</h1>
 								<Droppable id={functionIds[i]}>
