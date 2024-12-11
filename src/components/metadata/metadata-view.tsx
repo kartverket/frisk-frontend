@@ -76,7 +76,9 @@ export function MetadataView({ metadata, functionId }: Props) {
 								url={metaDataValue}
 								displayValue={displayValue}
 								isExternal={dv.data?.displayOptions?.isExternal ?? true}
-								isDeletable={dv.data?.displayOptions?.isDeletable ?? false}
+								isDeletable={
+									metadata.showOn === "readOnly" && metadata.isDeletable
+								}
 								metadataId={metadataId}
 								functionId={functionId}
 								isLoading={isLoading}
@@ -111,7 +113,9 @@ export function MetadataView({ metadata, functionId }: Props) {
 										url={metaDataValue}
 										displayValue={displayValue}
 										isExternal={metadata.isExternal}
-										isDeletable={false}
+										isDeletable={
+											metadata.showOn === "readOnly" && metadata.isDeletable
+										}
 										metadataId={metadataId}
 										functionId={functionId}
 										isLoading={isLoading}
