@@ -9,8 +9,6 @@ import {
 	Stack,
 } from "@kvib/react";
 
-import { DependenciesSelect } from "./metadata/dependencies-select";
-
 import type { MultiSelectOption } from "./metadata/metadata-input";
 import { MetadataInput } from "./metadata/metadata-input";
 import { config } from "../../frisk.config";
@@ -24,9 +22,7 @@ export function CreateFunctionForm({
 	functionId,
 	setSelectedForm,
 }: CreateFunctionFormProps) {
-	const { addFunction, addDependency, dependencies } = useFunction(functionId, {
-		includeDependencies: true,
-	});
+	const { addFunction } = useFunction(functionId, {});
 
 	async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
 		e.preventDefault();
@@ -35,13 +31,9 @@ export function CreateFunctionForm({
 			"name",
 		) as HTMLInputElement | null;
 
-		const dependenciesElement = form.elements.namedItem(
-			"dependencies",
-		) as HTMLSelectElement;
-
 		const metadata = [];
 
-		for (const md of config.metadata) {
+		for (const md of config.metadata ?? []) {
 			if (md.type === "select" && md.selectMode === "multi") {
 				const formElement = form.elements.namedItem(
 					md.key,
@@ -65,7 +57,7 @@ export function CreateFunctionForm({
 
 		if (!nameElement) return;
 
-		const newFunction = await addFunction.mutateAsync({
+		await addFunction.mutateAsync({
 			function: {
 				name: nameElement.value,
 				description: null,
@@ -74,35 +66,14 @@ export function CreateFunctionForm({
 			metadata: metadata,
 		});
 
-		const dependenciesSelected: number[] = JSON.parse(
-			dependenciesElement.value,
-		) as number[];
-
-		const dependenciesToCreate = dependenciesSelected.filter(
-			(dependency) =>
-				!dependencies.data?.map((dep) => dep.id).includes(dependency),
-		);
-
-		const promises: Promise<unknown>[] = [];
-		for (const dependency of dependenciesToCreate) {
-			promises.push(
-				addDependency.mutateAsync({
-					functionId: newFunction.id,
-					dependencyFunctionId: dependency,
-				}),
-			);
-		}
-		await Promise.all(promises);
-		setSelectedForm(null);
-
 		// clear form
 		form.reset();
+		setSelectedForm(null);
 	}
 
 	return (
 		<form onSubmit={handleSubmit}>
 			<Stack
-				bgColor={"white"}
 				border="1px"
 				borderRadius="8px"
 				borderColor="blue.500"
@@ -130,7 +101,7 @@ export function CreateFunctionForm({
 					/>
 				</FormControl>
 
-				{config.metadata.map((meta) => (
+				{config.metadata?.map((meta) => (
 					<MetadataInput
 						key={meta.key}
 						metadata={meta}
@@ -138,7 +109,6 @@ export function CreateFunctionForm({
 						functionId={undefined}
 					/>
 				))}
-				<DependenciesSelect />
 				<Flex gap="10px">
 					<Button
 						aria-label="delete"

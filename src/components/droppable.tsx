@@ -1,5 +1,5 @@
 import { useDndMonitor, useDroppable } from "@dnd-kit/core";
-import { Box, Grid } from "@kvib/react";
+import { Box } from "@kvib/react";
 import { useState, type ReactNode } from "react";
 import { useFunction } from "@/hooks/use-function";
 
@@ -33,6 +33,7 @@ export function Droppable({ id, children }: DroppableProps) {
 			setDisabled(false);
 		},
 	});
+
 	return (
 		<Box
 			ref={setNodeRef}

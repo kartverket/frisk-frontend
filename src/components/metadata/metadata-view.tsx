@@ -1,59 +1,119 @@
 import { useMetadata } from "@/hooks/use-metadata";
-import { Link, Skeleton, Text } from "@kvib/react";
-import { useQuery } from "@tanstack/react-query";
-import type { config } from "frisk.config";
+import { Box, Link, Skeleton, Text } from "@kvib/react";
+import { useQueries } from "@tanstack/react-query";
+import type { Metadata } from "../../../frisk.config";
 
 type Props = {
-	metadata: (typeof config.metadata)[number];
+	metadata: Metadata;
 	functionId: number | undefined;
 };
 
 export function MetadataView({ metadata, functionId }: Props) {
-	const { data: currentMetadata, isPending: isCurrentMetadataLoading } =
-		useMetadata(functionId);
+	const {
+		metadata: { data: currentMetadata, isPending: isCurrentMetadataLoading },
+	} = useMetadata(functionId);
 
-	const metadataToDisplay = currentMetadata?.find(
+	const metadataToDisplay = currentMetadata?.filter(
 		(m) => metadata.key === m.key,
 	);
 
-	const { data: displayValue, isPending: isDisplayValueLoading } = useQuery({
-		queryKey: [metadata, "getDisplayValue"],
-		queryFn: () => {
-			if (metadata.getDisplayValue)
-				// biome-ignore lint/style/noNonNullAssertion: <explanation>
-				return metadata.getDisplayValue(metadataToDisplay!);
-			// biome-ignore lint/style/noNonNullAssertion: <explanation>
-			return metadataToDisplay!.value;
-		},
-		enabled: !!metadataToDisplay,
+	const displayValues = useQueries({
+		queries:
+			metadataToDisplay?.map((m) => ({
+				queryKey: [functionId, metadata.key, m.value, "getDisplayValue"],
+				queryFn: async () => {
+					return metadata.getDisplayValue?.(m);
+				},
+			})) ?? [],
 	});
 
-	const metadataType = metadata.type;
-	if (!metadataToDisplay && !isCurrentMetadataLoading) return null;
-
-	switch (metadataType) {
-		case "text":
-		case "number":
-		case "select":
-			return (
-				<TextView
-					displayValue={displayValue}
-					isLoading={isCurrentMetadataLoading && isDisplayValueLoading}
-				/>
-			);
-		case "url":
-			return (
-				<LinkView
-					url={metadataToDisplay?.value}
-					displayValue={displayValue}
-					isLoading={isCurrentMetadataLoading && isDisplayValueLoading}
-				/>
-			);
-		default:
-			metadataType satisfies never;
-			console.error("Unsupported data type");
-			return null;
+	if (displayValues.length === 0 && !isCurrentMetadataLoading) {
+		return null;
 	}
+
+	return (
+		<Box my={1}>
+			{metadata.title ? (
+				<Text fontSize="xs" fontWeight="700">
+					{metadata.title}:
+				</Text>
+			) : null}
+			{displayValues.map((dv, i) => {
+				const isDisplayValueLoading = dv.isLoading;
+				const displayValue =
+					dv.data?.displayValue ?? metadataToDisplay?.[i]?.value;
+				const metadataDisplayType = dv.data?.displayOptions?.type;
+				const metadataType = metadata.type;
+				const metaDataValue = dv.data?.value ?? metadataToDisplay?.[i]?.value;
+				const isLoading = isCurrentMetadataLoading || isDisplayValueLoading;
+				const isNoMetadata = !currentMetadata && !isCurrentMetadataLoading;
+
+				if (isNoMetadata) return null;
+
+				switch (metadataDisplayType) {
+					case "text":
+						return (
+							<TextView
+								key={metaDataValue}
+								displayValue={displayValue}
+								isLoading={isLoading}
+							/>
+						);
+					case "url":
+						return (
+							<LinkView
+								key={metaDataValue}
+								url={metaDataValue}
+								displayValue={displayValue}
+								isExternal={dv.data?.displayOptions?.isExternal ?? true}
+								isLoading={isLoading}
+							/>
+						);
+
+					case "pill":
+						return (
+							<PillView
+								key={metaDataValue}
+								displayValue={displayValue}
+								isLoading={isLoading}
+							/>
+						);
+
+					case undefined:
+						switch (metadataType) {
+							case "select":
+							case "number":
+							case "text":
+								return (
+									<TextView
+										key={metaDataValue}
+										displayValue={displayValue}
+										isLoading={isLoading}
+									/>
+								);
+							case "url":
+								return (
+									<LinkView
+										key={metaDataValue}
+										url={metaDataValue}
+										displayValue={displayValue}
+										isExternal={metadata.isExternal}
+										isLoading={isLoading}
+									/>
+								);
+							default:
+								metadataType satisfies never;
+								console.error("Unsupported data type");
+								return null;
+						}
+					default:
+						metadataDisplayType satisfies never;
+						console.error("Unsupported data type");
+						return null;
+				}
+			})}
+		</Box>
+	);
 }
 
 type TextViewProps = {
@@ -64,7 +124,7 @@ type TextViewProps = {
 function TextView({ displayValue, isLoading }: TextViewProps) {
 	return (
 		<Skeleton isLoaded={!isLoading} fitContent>
-			<Text>{displayValue}</Text>
+			<Text>{displayValue ?? "<Ingen tekst>"}</Text>
 		</Skeleton>
 	);
 }
@@ -72,10 +132,11 @@ function TextView({ displayValue, isLoading }: TextViewProps) {
 type LinkViewProps = {
 	url: string | undefined;
 	displayValue: string | undefined;
+	isExternal: boolean;
 	isLoading: boolean;
 };
 
-function LinkView({ url, displayValue, isLoading }: LinkViewProps) {
+function LinkView({ url, displayValue, isExternal, isLoading }: LinkViewProps) {
 	return (
 		<Skeleton isLoaded={!isLoading} fitContent>
 			<Link
@@ -83,13 +144,36 @@ function LinkView({ url, displayValue, isLoading }: LinkViewProps) {
 				fontWeight="700"
 				colorScheme="blue"
 				width="fit-content"
-				isExternal
+				isExternal={isExternal}
 				href={url}
 				onClick={(e) => e.stopPropagation()}
-				marginBottom="10px"
 			>
-				{displayValue}
+				{displayValue ?? "<Ingen lenke>"}
 			</Link>
+		</Skeleton>
+	);
+}
+
+type PillViewProps = {
+	displayValue: string | undefined;
+	isLoading: boolean;
+};
+
+function PillView({ displayValue, isLoading }: PillViewProps) {
+	return (
+		<Skeleton isLoaded={!isLoading} fitContent>
+			<Box
+				bg="#BAD7F8"
+				paddingRight={1}
+				paddingLeft={1}
+				borderRadius="md"
+				w="fit-content"
+				my={1}
+			>
+				<Text fontSize="xs" fontWeight="500">
+					{displayValue ?? "<Ingen verdi>"}
+				</Text>
+			</Box>
 		</Skeleton>
 	);
 }

@@ -1,6 +1,6 @@
 import type {
-	config,
 	InputMetadata,
+	Metadata,
 	SelectMetadata,
 	SelectOption,
 } from "../../../frisk.config";
@@ -20,8 +20,8 @@ import type { UseQueryResult } from "@tanstack/react-query";
 import { useState } from "react";
 
 type MetadataInputProps = {
-	metadata: (typeof config.metadata)[number];
-	parentFunctionId: number;
+	metadata: Metadata;
+	parentFunctionId: number | undefined;
 	functionId: number | undefined;
 };
 
@@ -30,8 +30,11 @@ export function MetadataInput({
 	functionId,
 	parentFunctionId,
 }: MetadataInputProps) {
-	const metadataType = metadata.type;
-	switch (metadataType) {
+	if (metadata.showOn === "readOnly") return null;
+	if (metadata.showOn === "update" && functionId === undefined) return null;
+
+	const metadataInputType = metadata.type;
+	switch (metadataInputType) {
 		case "select":
 			return (
 				<SelectInput
@@ -51,7 +54,7 @@ export function MetadataInput({
 				/>
 			);
 		default:
-			metadataType satisfies never;
+			metadataInputType satisfies never;
 			console.error("Unsupported data type");
 			return null;
 	}
@@ -60,7 +63,7 @@ export function MetadataInput({
 type SelectInputProps = {
 	metadata: SelectMetadata;
 	functionId: number | undefined;
-	parentFunctionId: number;
+	parentFunctionId: number | undefined;
 };
 
 function SelectInput({
@@ -68,9 +71,9 @@ function SelectInput({
 	functionId,
 	parentFunctionId,
 }: SelectInputProps) {
-	const parentMetadata = useMetadata(parentFunctionId);
-
-	const { data: currentMetadata } = useMetadata(functionId);
+	const {
+		metadata: { data: currentMetadata },
+	} = useMetadata(functionId);
 
 	const metadataToDisplay = currentMetadata?.filter(
 		(m) => metadata.key === m.key,
@@ -85,50 +88,48 @@ function SelectInput({
 			metadataToDisplay?.map((m) => ({
 				queryKey: [functionId, metadata.key, m.value, "getDisplayValue"],
 				queryFn: async () => {
-					return metadata.getDisplayValue?.(m) ?? m.value;
+					return metadata.getDisplayValue?.(m);
 				},
 			})) ?? [],
 	});
 
-	const [currentMetadataValues, setCurrentMetadataValues] = useState<
+	const currentMetadataValues = metadataToDisplay?.map((m, i) => ({
+		value: m.value,
+		label: displayValues[i].data?.displayValue ?? m.value,
+	}));
+
+	const [newMetadataValues, setCurrentMetadataValues] = useState<
 		MultiSelectOption[] | undefined
-	>(
-		currentMetadata
-			?.filter((m) => metadata.key === m.key)
-			?.map((m, i) => ({
-				value: m.value,
-				label: displayValues[i].data ?? m.value,
-			})),
-	);
+	>();
+
+	const { metadata: parentMetadata } = useMetadata(parentFunctionId);
 
 	const parentMetadataToDisplay = parentMetadata.data?.filter(
 		(m) => metadata.key === m.key,
 	);
 
-	const parentDisplayValues = useQueries({
-		queries:
-			parentMetadata.data?.map((m) => ({
-				queryKey: [functionId, metadata.key, m.value, "getDisplayValue"],
-				queryFn: async () => {
-					return metadata.getDisplayValue?.(m) ?? m.value;
-				},
-			})) ?? [],
-	});
-
 	const parentMetadataValue = parentMetadata.data?.find(
 		(m) => metadata.key === m.key,
 	)?.value;
 
-	const parentMetadataValues: MultiSelectOption[] =
-		parentMetadataToDisplay
-			?.filter((m) => metadata.key === m.key)
-			?.map((m, i) => ({
-				value: m.value,
-				label: parentDisplayValues[i].data ?? m.value,
-			})) ?? [];
+	const parentDisplayValues = useQueries({
+		queries:
+			parentMetadataToDisplay?.map((m) => ({
+				queryKey: [parentFunctionId, metadata.key, m.value, "getDisplayValue"],
+				queryFn: async () => {
+					return metadata.getDisplayValue?.(m);
+				},
+			})) ?? [],
+	});
+
+	const parentMetadataValues: MultiSelectOption[] | undefined =
+		parentMetadataToDisplay?.map((m, i) => ({
+			value: m.value,
+			label: parentDisplayValues[i].data?.displayValue ?? m.value,
+		})) ?? [];
 
 	const options = useQuery({
-		queryKey: [metadata, "getOptions"],
+		queryKey: [metadata.key, "getOptions"],
 		queryFn: metadata.getOptions,
 	});
 
@@ -155,7 +156,7 @@ function SelectInput({
 						<MultiSelect
 							options={options}
 							metadata={metadata}
-							currentMetadataValues={currentMetadataValues}
+							currentMetadataValues={newMetadataValues ?? currentMetadataValues}
 							parentMetadataValues={parentMetadataValues}
 							setCurrentMetadataValues={setCurrentMetadataValues}
 						/>
@@ -221,14 +222,16 @@ function MultiSelect({
 	parentMetadataValues,
 	setCurrentMetadataValues,
 }: MultiSelectProps) {
+	const value =
+		currentMetadataValues ??
+		(metadata.inheritFromParent ? parentMetadataValues : undefined) ??
+		[];
+
 	return (
 		<>
 			<SearchAsync
 				size="sm"
-				value={
-					currentMetadataValues ??
-					(metadata.inheritFromParent ? parentMetadataValues : undefined)
-				}
+				value={value}
 				isMulti
 				debounceTime={100}
 				defaultOptions
@@ -251,14 +254,7 @@ function MultiSelect({
 				}}
 				placeholder="Søk"
 			/>
-			<Input
-				type="hidden"
-				name={metadata.key}
-				value={JSON.stringify(
-					currentMetadataValues ??
-						(metadata.inheritFromParent ? parentMetadataValues : undefined),
-				)}
-			/>
+			<Input type="hidden" name={metadata.key} value={JSON.stringify(value)} />
 		</>
 	);
 }
@@ -266,12 +262,12 @@ function MultiSelect({
 type InputProps = {
 	metadata: InputMetadata;
 	functionId: number | undefined;
-	parentFunctionId: number;
+	parentFunctionId: number | undefined;
 };
 
 function InputField({ metadata, functionId, parentFunctionId }: InputProps) {
-	const currentMetadata = useMetadata(functionId);
-	const parentMetadata = useMetadata(parentFunctionId);
+	const { metadata: currentMetadata } = useMetadata(functionId);
+	const { metadata: parentMetadata } = useMetadata(parentFunctionId);
 
 	const currentMetadataValue = currentMetadata.data?.find(
 		(m) => metadata.key === m.key,
@@ -287,7 +283,6 @@ function InputField({ metadata, functionId, parentFunctionId }: InputProps) {
 				{metadata.label}
 			</FormLabel>
 			<Input
-				autoFocus
 				type={metadata.type}
 				name={metadata.key}
 				defaultValue={

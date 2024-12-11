@@ -60,7 +60,6 @@ function Index() {
 	return (
 		<Main>
 			{/* <Breadcrumbs path={path} /> */}
-			{/* <FunctionView functionId={id} /> */}
 			<FunctionColumnView path={path} />
 			<CreateAndRedirectEffect />
 		</Main>

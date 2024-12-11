@@ -10,35 +10,22 @@ import {
 import { useFunction } from "@/hooks/use-function";
 import { Route } from "@/routes";
 import { DeleteFunctionModal } from "@/components/delete-function-modal.tsx";
-import { TeamSelect } from "./team-select";
 import { useIsMutating } from "@tanstack/react-query";
-import { BackstageInput } from "./metadata/backstage-input";
-import { DependenciesSelect } from "./metadata/dependencies-select";
+import { config } from "../../frisk.config";
+import {
+	MetadataInput,
+	type MultiSelectOption,
+} from "./metadata/metadata-input";
+import { useMetadata } from "@/hooks/use-metadata";
 
 export function FunctionCardEdit({ functionId }: { functionId: number }) {
-	const {
-		func,
-		updateFunction,
-		metadata,
-		updateMetadataValue,
-		addMetadata,
-		removeMetadata,
-		dependencies,
-		addDependency,
-		removeDependency,
-	} = useFunction(functionId, {
-		includeDependencies: true,
-		includeMetadata: true,
-	});
+	const { func, updateFunction } = useFunction(functionId);
+	const { metadata, addMetadata, removeMetadata, updateMetadataValue } =
+		useMetadata(functionId);
 	const navigate = Route.useNavigate();
 	const search = Route.useSearch();
 	const { isOpen, onOpen, onClose } = useDisclosure();
 	const isMutating = useIsMutating();
-
-	const currentTeamId = metadata.data?.find((m) => m.key === "team");
-	const currentBackstageId = metadata.data?.find(
-		(m) => m.key === "backstage-url",
-	);
 
 	async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
 		e.preventDefault();
@@ -46,28 +33,83 @@ export function FunctionCardEdit({ functionId }: { functionId: number }) {
 		const nameElement = form.elements.namedItem(
 			"name",
 		) as HTMLInputElement | null;
-		const teamElement = form.elements.namedItem(
-			"team-value",
-		) as HTMLInputElement;
-		const backstageUrlElement = form.elements.namedItem(
-			"backstage-url",
-		) as HTMLInputElement;
-		const dependenciesElement = form.elements.namedItem(
-			"dependencies",
-		) as HTMLSelectElement;
-		if (!nameElement || !teamElement) return;
-		const metadata = [
-			{
-				key: "team",
-				value: teamElement.value,
-			},
-		];
+		if (!nameElement) return;
 
-		backstageUrlElement?.value &&
-			metadata.push({
-				key: "backstage-url",
-				value: backstageUrlElement.value,
-			});
+		for (const md of config.metadata ?? []) {
+			const existingMetadata =
+				metadata.data?.filter((m) => m.key === md.key) || [];
+			const metaDataKeyExists: boolean =
+				existingMetadata && existingMetadata.length > 0;
+			const formElement = form.elements.namedItem(md.key) as
+				| HTMLInputElement
+				| HTMLSelectElement
+				| null;
+			if (!formElement?.value) continue;
+			if (md.type === "select" && md.selectMode === "multi") {
+				const newMetadata = JSON.parse(
+					formElement.value,
+				) as MultiSelectOption[];
+
+				const metadataToAdd = newMetadata.filter(
+					(newMd) => !existingMetadata.some((m) => m.value === newMd.value),
+				);
+
+				const metadataToDelete = existingMetadata.filter(
+					(existingMd) =>
+						!newMetadata.some((m) => m.value === existingMd.value),
+				);
+
+				const promises: Promise<unknown>[] = [];
+				if (metaDataKeyExists) {
+					for (const md of metadataToDelete) {
+						promises.push(
+							removeMetadata.mutateAsync({
+								id: md.id,
+								functionId,
+							}),
+						);
+					}
+				}
+				for (const newMd of metadataToAdd) {
+					promises.push(
+						addMetadata.mutateAsync({
+							functionId,
+							key: md.key,
+							value: newMd.value,
+						}),
+					);
+				}
+				await Promise.all(promises);
+			} else {
+				const existingMd = existingMetadata[0];
+				// if metadatakey not exists: addMetadata
+				if (!metaDataKeyExists) {
+					await addMetadata.mutateAsync({
+						functionId,
+						key: md.key,
+						value: formElement.value,
+					});
+				}
+				// if form key exists in metadata and new value: updatemetadatavalue
+				if (metaDataKeyExists) {
+					if (existingMd.value !== formElement.value) {
+						existingMd.id &&
+							(await updateMetadataValue.mutateAsync({
+								id: existingMd.id,
+								value: formElement.value,
+							}));
+					}
+				}
+				// if input field is set to empty: delete
+				if (formElement.value.trim() === "" && metaDataKeyExists) {
+					existingMd.id &&
+						(await removeMetadata.mutateAsync({
+							id: existingMd.id,
+							functionId,
+						}));
+				}
+			}
+		}
 
 		if (
 			nameElement.value &&
@@ -78,67 +120,6 @@ export function FunctionCardEdit({ functionId }: { functionId: number }) {
 				...func.data,
 				name: nameElement.value,
 			});
-		}
-
-		if (currentTeamId?.id && teamElement.value) {
-			await updateMetadataValue.mutateAsync({
-				id: currentTeamId.id,
-				value: teamElement.value,
-			});
-		}
-
-		if (backstageUrlElement.value) {
-			if (currentBackstageId?.id) {
-				await updateMetadataValue.mutateAsync({
-					id: currentBackstageId.id,
-					value: backstageUrlElement.value,
-				});
-			} else {
-				await addMetadata.mutateAsync({
-					functionId,
-					key: "backstage-url",
-					value: backstageUrlElement.value,
-				});
-			}
-		} else if (currentBackstageId?.id) {
-			await removeMetadata.mutateAsync({
-				id: currentBackstageId.id,
-				functionId,
-			});
-		}
-		if (dependenciesElement.value) {
-			const dependenciesSelected: number[] = JSON.parse(
-				dependenciesElement.value,
-			) as number[];
-
-			const dependenciesToCreate = dependenciesSelected.filter(
-				(dependency) =>
-					!dependencies.data?.map((dep) => dep.id).includes(dependency),
-			);
-			const dependenciesToDelete =
-				dependencies.data?.filter(
-					(dependency) =>
-						!dependenciesSelected.map((dep) => dep).includes(dependency.id),
-				) ?? [];
-
-			const promises: Promise<unknown>[] = [];
-			for (const dependency of dependenciesToDelete) {
-				promises.push(
-					removeDependency.mutateAsync({
-						functionId,
-						dependencyFunctionId: dependency.id,
-					}),
-				);
-			}
-			for (const dependency of dependenciesToCreate) {
-				promises.push(
-					addDependency.mutateAsync({
-						functionId: functionId,
-						dependencyFunctionId: dependency,
-					}),
-				);
-			}
-			await Promise.all(promises);
 		}
 
 		navigate({ search: { ...search, edit: undefined } });
@@ -167,9 +148,14 @@ export function FunctionCardEdit({ functionId }: { functionId: number }) {
 							borderRadius="5px"
 						/>
 					</FormControl>
-					<TeamSelect functionId={functionId} />
-					<BackstageInput defaultValue={currentBackstageId?.value} />
-					<DependenciesSelect existingDependencies={dependencies} />
+					{config.metadata?.map((meta) => (
+						<MetadataInput
+							key={meta.key}
+							metadata={meta}
+							parentFunctionId={undefined}
+							functionId={functionId}
+						/>
+					))}
 					<Flex gap="10px">
 						<Button
 							aria-label="decline"
