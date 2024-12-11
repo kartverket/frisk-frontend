@@ -33,7 +33,7 @@ export function FunctionColumn({ functionIds }: FunctionFolderProps) {
 	const isFetching = useIsFetching();
 
 	function getColumnHeight() {
-		const column = document.getElementById(`${currentLevel}-children`);
+		const column = document.getElementById(`${currentLevel}-column`);
 
 		if (!column) return 0;
 		const children = column.querySelectorAll("[data-child]");
@@ -83,8 +83,8 @@ export function FunctionColumn({ functionIds }: FunctionFolderProps) {
 				backgroundColor={"white"}
 				position="relative"
 				minH="100%"
-				h={`${getColumnHeight() + 10}px`}
-				id={`${currentLevel}-children`}
+				h={`${getColumnHeight()}px`}
+				id={`${currentLevel}-column`}
 			>
 				{children?.map((childre, i) => (
 					<Skeleton
@@ -97,11 +97,10 @@ export function FunctionColumn({ functionIds }: FunctionFolderProps) {
 								data-child
 								id={`${functionIds[i]}-children`}
 								position="absolute"
-								display={"flex"}
-								flexDirection={"column"}
-								width={"100%"}
 								padding={"20px 2px 20px 2px"}
 								top={`${functionPositions[i]}px`}
+								left={0}
+								right={0}
 							>
 								<h1>{functions?.[i].data?.name}</h1>
 								<Droppable id={functionIds[i]}>

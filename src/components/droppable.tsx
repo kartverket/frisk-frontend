@@ -40,7 +40,6 @@ export function Droppable({ id, children }: DroppableProps) {
 			backgroundColor={isOver ? "blue.100" : "gray.200"}
 			borderRadius="md"
 			border="1px"
-			height={id === 1 ? "100%" : undefined}
 			marginBottom={2}
 		>
 			{children}
