@@ -6,6 +6,8 @@ Dette repoet inneholder frontend-koden til FRISK, som står for FunksjonsRegistr
 
 Hver funksjon er lenket til en _forelder-funksjon_ og består av et navn og egendefinerte metadata som kan bli konfiguert til å passe et spesifikt bruksområde. En detaljert beskrivelse av oppsettet til konfigurasjonsfilen `frisk.config.js` finnes i seksjonen [Konfigurasjon](#konfigurer-funksjonshierarkiet).
 
+< Eksempelbilde av et demo-funksjonshierarki >
+
 ## Sett opp frisk-frontend lokalt
 
 ### Steg 1
@@ -33,3 +35,7 @@ Kjør lokalt
 `bun run dev`
 
 ## Konfigurer funksjonshierarkiet
+
+### Generell
+
+### Metadata på funksjoner
