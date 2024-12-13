@@ -1,9 +1,23 @@
-export function getIdsFromPath(path: string) {
-	return path.split(".").map((part) => Number.parseInt(part));
-}
+export function getIdsFromPath(paths: string[]) {
+	const nestedPaths = paths.map((path) => path.split(".").map(Number));
 
-export function getIdFromPath(path: string) {
-	return getIdsFromPath(path).at(-1);
+	let max = 0;
+	let indexOfLongestPath = -1;
+	nestedPaths.forEach((pathArray, i) => {
+		if (pathArray.length > max) {
+			max = pathArray.length;
+			indexOfLongestPath = i;
+		}
+	});
+
+	return nestedPaths[indexOfLongestPath].map((pathArray, i) =>
+		nestedPaths
+			.map((functionId: number[]) => functionId[i])
+			.filter(
+				(value, idx, self) =>
+					value !== undefined && self.indexOf(value) === idx,
+			),
+	);
 }
 
 export function isURL(url: string) {

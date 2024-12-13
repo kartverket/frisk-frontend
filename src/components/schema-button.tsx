@@ -23,6 +23,7 @@ export function SchemaButton({
 
 				const searchParamsRedirectURL = new URLSearchParams({
 					path: `"${func.data.path}"`,
+					functionId: functionId.toString(),
 					newMetadataKey: "rr-skjema",
 					newMetadataValue:
 						"{contextId}:splitTarget:{tableName}:splitTarget:{contextName}",

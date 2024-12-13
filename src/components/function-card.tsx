@@ -4,6 +4,7 @@ import { Card, Flex, IconButton, Skeleton, Text } from "@kvib/react";
 import { FunctionCardEdit } from "./function-card-edit";
 import { FunctionCardSelectedView } from "./function-card-selected-view";
 import { EditAndSelectButtons } from "./edit-and-select-buttons";
+import { useEffect, useState } from "react";
 
 export function FunctionCard({
 	functionId,
@@ -13,15 +14,45 @@ export function FunctionCard({
 	const search = Route.useSearch();
 	const navigate = Route.useNavigate();
 
+	const [bottomMargin, setBottomMargin] = useState(0);
+
+	function getParentDistance() {
+		const childrenGroup = document.getElementById(`${functionId}-children`);
+		const self = document.getElementById(functionId.toString());
+		if (!childrenGroup || !self) return 0;
+
+		const cHeight = childrenGroup.getBoundingClientRect().height;
+		const sHeight = self.getBoundingClientRect().height;
+		return cHeight > sHeight ? cHeight - sHeight : 2;
+	}
+	useEffect(() => {
+		setBottomMargin(getParentDistance());
+	});
+
 	return (
 		<Card
+			id={functionId.toString()}
+			marginBottom={bottomMargin}
 			borderColor="blue.500"
 			borderWidth={1}
 			onClick={() => {
 				if (search.edit !== undefined) {
 					return;
 				}
-				navigate({ search: { path: func.data?.path } });
+				navigate({
+					search: {
+						path: [
+							...search.path.filter(
+								(path) =>
+									!func?.data?.path.includes(path) &&
+									!path.includes(`${func?.data?.path}`),
+							),
+							`${func?.data?.path}`,
+						],
+
+						edit: search.edit,
+					},
+				});
 			}}
 		>
 			<Flex

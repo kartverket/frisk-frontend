@@ -1,15 +1,16 @@
 import { useFunction } from "@/hooks/use-function";
 import { useMetadata } from "@/hooks/use-metadata";
-import { getIdFromPath } from "@/lib/utils";
+
 import { Route } from "@/routes";
 import { useEffect } from "react";
 
 export function CreateAndRedirectEffect() {
 	const navigate = Route.useNavigate();
-	const { path, newMetadataKey, newMetadataValue, redirect } =
+	const { path, functionId, newMetadataKey, newMetadataValue, redirect } =
 		Route.useSearch();
-	const { func } = useFunction(getIdFromPath(path) ?? 1);
-	const { addMetadata } = useMetadata(getIdFromPath(path) ?? 1);
+
+	const { func } = useFunction(functionId ?? 1);
+	const { addMetadata } = useMetadata(functionId ?? 1);
 
 	useEffect(() => {
 		if (
@@ -28,7 +29,7 @@ export function CreateAndRedirectEffect() {
 					if (redirect) {
 						window.location.href = redirect;
 					} else {
-						navigate({ search: { path: func.data.path } });
+						navigate({ search: { path: path } });
 					}
 				});
 		}
@@ -37,6 +38,7 @@ export function CreateAndRedirectEffect() {
 		newMetadataKey,
 		newMetadataValue,
 		func.data,
+		path,
 		addMetadata,
 		navigate,
 	]);
