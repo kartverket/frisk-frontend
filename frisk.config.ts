@@ -12,6 +12,7 @@ export const config: FriskConfig = {
 		{
 			key: "team",
 			type: "select",
+			title: "Team",
 			label: "Ansvarlig team for denne funksjonen?",
 			getOptions: async () => {
 				const teams = await getMyMicrosoftTeams();
@@ -51,6 +52,7 @@ export const config: FriskConfig = {
 		{
 			key: "backstage-url",
 			type: "url",
+			title: "Lenke til utviklerportalen",
 			isExternal: true,
 			label: "Lenke til utviklerportalen",
 			showOn: "createAndUpdate",
