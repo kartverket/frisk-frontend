@@ -54,7 +54,7 @@ I config-objektet kan man kofigurere følgende generelle innstillinger:
 
 - `columnName`: Navn på kolonnene i funksjonshierarkiet.
 
-- `addButtonName`: Holder på å bli fjernet.
+- `addButtonName`: Navet på knappen for å opprette en ny funksjon.
 
 ### Metadata på funksjoner
 
