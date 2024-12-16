@@ -1,6 +1,7 @@
 import { Flex, Text } from "@kvib/react";
 import { FunctionColumn } from "./function-column";
 import { getIdsFromPath } from "@/lib/utils";
+
 import {
 	DndContext,
 	MouseSensor,
@@ -13,7 +14,7 @@ import type { useFunction } from "@/hooks/use-function";
 import { config } from "../../frisk.config";
 
 type FunctionColumnViewProps = {
-	path: string;
+	path: string[];
 };
 
 export function FunctionColumnView({ path }: FunctionColumnViewProps) {
@@ -61,8 +62,8 @@ export function FunctionColumnView({ path }: FunctionColumnViewProps) {
 			</Text>
 			<DndContext onDragEnd={handleDragEnd} sensors={sensors}>
 				<Flex>
-					{selectedFunctionIds?.map((id) => (
-						<FunctionColumn key={id} functionId={id} />
+					{selectedFunctionIds?.map((ids) => (
+						<FunctionColumn key={ids[0]} functionIds={ids} />
 					))}
 				</Flex>
 			</DndContext>
