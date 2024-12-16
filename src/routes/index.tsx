@@ -59,7 +59,6 @@ function Index() {
 
 	return (
 		<Main>
-			{/* <Breadcrumbs path={path} /> */}
 			<FunctionColumnView path={path} />
 			<CreateAndRedirectEffect />
 		</Main>
