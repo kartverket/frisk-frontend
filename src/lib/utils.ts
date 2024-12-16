@@ -10,7 +10,7 @@ export function getIdsFromPath(paths: string[]) {
 		}
 	});
 
-	return nestedPaths[indexOfLongestPath].map((pathArray, i) =>
+	return nestedPaths[indexOfLongestPath].map((_, i) =>
 		nestedPaths
 			.map((functionId: number[]) => functionId[i])
 			.filter(
