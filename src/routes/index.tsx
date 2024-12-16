@@ -44,7 +44,7 @@ function Index() {
 		functions.map((func, i) => {
 			if (func.error) {
 				// if function id is invalid, navigate to parent until it is valid
-				const updatedPathArray = idArrays.map((id, index) =>
+				const updatedPathArray = idArrays.map((_, index) =>
 					i === index ? idArrays[i].join(".") : path[i],
 				);
 				navigate({
