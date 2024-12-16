@@ -72,6 +72,7 @@ export const config: FriskConfig = {
 			isRequired: false,
 			placeholder: "Sett inn skjema",
 			inheritFromParent: false,
+			isDeletable: true,
 			getDisplayValue: async (input) => {
 				const [contextId, tableName, __] = input.value.split(":splitTarget:");
 				const searchParams = new URLSearchParams({
@@ -175,10 +176,19 @@ type GeneralRequiredMetadata = GeneralMetadataContent & {
 
 type GeneralOptionalMetadata = GeneralMetadataContent & {
 	isRequired: false;
-	showOn: "update" | "createAndUpdate" | "readOnly";
+	showOn: "update" | "createAndUpdate";
 };
 
-type GeneralMetadata = GeneralRequiredMetadata | GeneralOptionalMetadata;
+type ReadOnlyMetadata = GeneralMetadataContent & {
+	isRequired: false;
+	showOn: "readOnly";
+	isDeletable: boolean;
+};
+
+type GeneralMetadata =
+	| GeneralRequiredMetadata
+	| GeneralOptionalMetadata
+	| ReadOnlyMetadata;
 
 export type SelectMetadata = GeneralMetadata & {
 	getOptions: () => Promise<SelectOption[]>;
