@@ -161,6 +161,16 @@ export async function patchMetadataValue({
 	});
 }
 
+export async function getFunctionsCSVDump() {
+	const response = await fetchFromBackend("/dump", {
+		method: "GET",
+		headers: {
+			"Content-Type": "text/csv",
+		},
+	});
+	return await response.text();
+}
+
 type MetadataValueUpdate = { id: number; value: string };
 
 export async function getMyMicrosoftTeams() {
