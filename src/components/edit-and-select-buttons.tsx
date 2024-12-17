@@ -13,7 +13,7 @@ export function EditAndSelectButtons({
 		includeChildren: true,
 	});
 	return (
-		<Flex gap="8px">
+		<Flex gap="2px">
 			<IconButton
 				type="button"
 				colorScheme="gray"
@@ -33,9 +33,9 @@ export function EditAndSelectButtons({
 				borderRadius="5px"
 				alignItems="center"
 				bgColor={selected ? "blue.500" : "white"}
-				p="5px"
+				p="2px"
 				pl="10px"
-				gap="8px"
+				gap="4px"
 			>
 				<Text
 					fontSize="xs"
