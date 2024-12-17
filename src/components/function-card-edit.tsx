@@ -6,6 +6,8 @@ import {
 	FormLabel,
 	FormControl,
 	Stack,
+	IconButton,
+	Tooltip,
 } from "@kvib/react";
 import { useFunction } from "@/hooks/use-function";
 import { Route } from "@/routes";
@@ -156,7 +158,7 @@ export function FunctionCardEdit({ functionId }: { functionId: number }) {
 							functionId={functionId}
 						/>
 					))}
-					<Flex gap="10px">
+					<Flex gap="10px" justifyContent="space-between" alignItems="center">
 						<Button
 							aria-label="decline"
 							variant="secondary"
@@ -181,18 +183,18 @@ export function FunctionCardEdit({ functionId }: { functionId: number }) {
 						>
 							Lagre
 						</Button>
-						<Button
-							aria-label="delete"
-							variant="tertiary"
-							leftIcon="delete"
-							size="sm"
-							colorScheme="blue"
-							ml="auto"
-							onClick={onOpen}
-							isLoading={isMutating > 0}
-						>
-							Slett funksjon
-						</Button>
+						<Tooltip label="Slett funksjon" placement="top">
+							<IconButton
+								aria-label="delete"
+								variant="tertiary"
+								icon="delete"
+								size="md"
+								colorScheme="red"
+								ml="auto"
+								onClick={onOpen}
+								isLoading={isMutating > 0}
+							/>
+						</Tooltip>
 					</Flex>
 				</Stack>
 			</form>

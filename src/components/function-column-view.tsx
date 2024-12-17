@@ -53,7 +53,7 @@ export function FunctionColumnView({ path }: FunctionColumnViewProps) {
 	}
 
 	return (
-		<Flex flexDirection="column" paddingY="38" paddingX="100" marginBottom="76">
+		<Flex flexDirection="column" paddingY="38" paddingX="75" marginBottom="76">
 			<Text fontSize="2xl" fontWeight="700" marginBottom="3">
 				{config.title}
 			</Text>
