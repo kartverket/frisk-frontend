@@ -2,7 +2,7 @@
 
 Velkommen til FRISK Frontend!
 
-Dette repoet inneholder frontend-koden til FRISK, som står for FunksjonsRegistreret i Statens Kartvert. Det er en applikasjon for å bygge opp og redigere et vilkårlig hierarki av _funksjoner_.
+Dette repoet inneholder frontend-koden til FRISK, som står for FunksjonsRegistreret i Statens Kartverk. Det er en applikasjon for å bygge opp og redigere et vilkårlig hierarki av _funksjoner_.
 
 Hver funksjon er lenket til en _forelder-funksjon_ og består av et navn og egendefinerte metadata som kan bli konfiguert til å passe et spesifikt bruksområde. En detaljert beskrivelse av oppsettet til konfigurasjonsfilen `frisk.config.js` finnes i seksjonen [Konfigurasjon](#konfigurer-funksjonshierarkiet).
 
@@ -44,7 +44,7 @@ I config-objektet kan man kofigurere følgende generelle innstillinger:
 
 - `logo`: Logo som skal vises på toppen av siden. Spesifiseres gjennom et følgende objekt:
 
-  - `{imageSource: string;}`, der `imageSource` er en pathen til logoen som skal vises.
+  - `{imageSource: string;}`, der `imageSource` er pathen til logoen som skal vises.
 
 - `title`: Tittel på siden.
 
@@ -54,7 +54,7 @@ I config-objektet kan man kofigurere følgende generelle innstillinger:
 
 - `columnName`: Navn på kolonnene i funksjonshierarkiet.
 
-- `addButtonName`: Navet på knappen for å opprette en ny funksjon.
+- `addButtonName`: Navnet på knappen for å opprette en ny funksjon.
 
 ### Metadata på funksjoner
 
