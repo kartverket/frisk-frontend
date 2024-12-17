@@ -47,7 +47,9 @@ export function FunctionCard({
 									!func?.data?.path.includes(path) &&
 									!path.includes(`${func?.data?.path}`),
 							),
-							`${func?.data?.path}`,
+							...(search.path.includes(`${func?.data?.path}`)
+								? [func?.data?.path.slice(0, func?.data?.path.lastIndexOf("."))]
+								: [`${func?.data?.path}`]),
 						],
 
 						edit: search.edit,
