@@ -110,7 +110,7 @@ export function FunctionColumnView({ path }: FunctionColumnViewProps) {
 				rightIcon="download"
 				alignSelf="flex-start"
 			>
-				Eksporter skjemautfyllinger
+				Eksporter funksjonsregisteret
 			</Button>
 			<DndContext onDragEnd={handleDragEnd} sensors={sensors}>
 				<Flex>
