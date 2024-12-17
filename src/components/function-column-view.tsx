@@ -108,6 +108,7 @@ export function FunctionColumnView({ path }: FunctionColumnViewProps) {
 				colorScheme="blue"
 				onClick={() => handleExportCSV()}
 				rightIcon="download"
+				alignSelf="flex-start"
 			>
 				Eksporter skjemautfyllinger
 			</Button>
