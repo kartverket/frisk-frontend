@@ -63,6 +63,8 @@ export function FunctionCard({
 				borderRadius="inherit"
 				alignItems="center"
 				p="2"
+				minWidth={0}
+				flex-wrap="wrap"
 			>
 				{search.edit === functionId ? (
 					<FunctionCardEdit functionId={functionId} />
@@ -77,13 +79,13 @@ export function FunctionCard({
 							aria-label="drag"
 							icon="drag_indicator"
 						/>
-						<Skeleton isLoaded={!func.isLoading} fitContent w="100%">
+						<Skeleton isLoaded={!func.isLoading} flex="1" minWidth={0}>
 							<Text
 								fontWeight="bold"
 								as="span"
 								display="flex"
 								w="100%"
-								paddingLeft="10px"
+								overflow="hidden"
 							>
 								{func.data?.name ?? "<Det skjedde en feil>"}
 							</Text>
