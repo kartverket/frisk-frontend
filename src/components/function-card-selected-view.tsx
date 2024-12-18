@@ -12,9 +12,15 @@ export function FunctionCardSelectedView({
 
 	return (
 		<Stack paddingLeft="10px" w="100%">
-			<Flex alignItems="center" w="100%">
-				<Skeleton isLoaded={!func.isLoading} fitContent w="100%">
-					<Text fontWeight="bold" as="span" display="flex" w="100%">
+			<Flex alignItems="center" w="100%" flex-wrap="wrap">
+				<Skeleton isLoaded={!func.isLoading} flex={1} minWidth={0}>
+					<Text
+						fontWeight="bold"
+						as="span"
+						display="flex"
+						w="100%"
+						overflow="hidden"
+					>
 						{func.data?.name ?? "<Det skjedde en feil>"}
 					</Text>
 				</Skeleton>
