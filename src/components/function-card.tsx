@@ -31,10 +31,9 @@ export function FunctionCard({
 		setBottomMargin(getParentDistance());
 	});
 
-	let hasAccess = true;
-	if (config.enableEntra) {
-		hasAccess = useHasFunctionAccess(functionId);
-	}
+	const hasAccess = config.enableEntra
+		? useHasFunctionAccess(functionId)
+		: true;
 
 	return (
 		<Card

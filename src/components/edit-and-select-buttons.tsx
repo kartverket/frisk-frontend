@@ -15,10 +15,9 @@ export function EditAndSelectButtons({
 		includeChildren: true,
 	});
 
-	let hasAccess = true;
-	if (config.enableEntra) {
-		hasAccess = useHasFunctionAccess(functionId);
-	}
+	const hasAccess = config.enableEntra
+		? useHasFunctionAccess(functionId)
+		: true;
 
 	return (
 		<Flex gap="2px">
