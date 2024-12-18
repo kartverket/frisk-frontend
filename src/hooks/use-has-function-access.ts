@@ -9,5 +9,5 @@ export function useHasFunctionAccess(functionId: number) {
 		(metadata) => metadata.key === "team",
 	);
 
-	return teams.data?.some((team) => team.id === teamMetadata?.value);
+	return teams.data?.some((team) => team.id === teamMetadata?.value) ?? false;
 }

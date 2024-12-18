@@ -2,6 +2,7 @@ import { Flex, IconButton, Text, Icon, useTheme } from "@kvib/react";
 import { Route } from "@/routes";
 import { useFunction } from "@/hooks/use-function";
 import { useHasFunctionAccess } from "@/hooks/use-has-function-access";
+import { config } from "../../frisk.config";
 
 export function EditAndSelectButtons({
 	functionId,
@@ -14,8 +15,10 @@ export function EditAndSelectButtons({
 		includeChildren: true,
 	});
 
-	const hasAccess = useHasFunctionAccess(functionId);
-	console.log(hasAccess);
+	let hasAccess = true;
+	if (config.enableEntra) {
+		hasAccess = useHasFunctionAccess(functionId);
+	}
 
 	return (
 		<Flex gap="2px">
