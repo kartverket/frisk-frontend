@@ -5,6 +5,8 @@ import { FunctionCardEdit } from "./function-card-edit";
 import { FunctionCardSelectedView } from "./function-card-selected-view";
 import { EditAndSelectButtons } from "./edit-and-select-buttons";
 import { useEffect, useState } from "react";
+import { config } from "../../frisk.config";
+import { useHasFunctionAccess } from "@/hooks/use-has-function-access";
 
 export function FunctionCard({
 	functionId,
@@ -28,6 +30,11 @@ export function FunctionCard({
 	useEffect(() => {
 		setBottomMargin(getParentDistance());
 	});
+
+	let hasAccess = true;
+	if (config.enableEntra) {
+		hasAccess = useHasFunctionAccess(functionId);
+	}
 
 	return (
 		<Card
@@ -66,7 +73,7 @@ export function FunctionCard({
 				minWidth={0}
 				flex-wrap="wrap"
 			>
-				{search.edit === functionId ? (
+				{search.edit === functionId && hasAccess ? (
 					<FunctionCardEdit functionId={functionId} />
 				) : selected ? (
 					<FunctionCardSelectedView functionId={functionId} />
