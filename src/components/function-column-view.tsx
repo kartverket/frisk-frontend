@@ -1,4 +1,4 @@
-import { Button, Flex, IconButton, Text, useToast } from "@kvib/react";
+import { Button, Flex, Text, useToast } from "@kvib/react";
 import { FunctionColumn } from "./function-column";
 import { getIdsFromPath } from "@/lib/utils";
 
