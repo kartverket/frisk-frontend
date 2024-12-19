@@ -20,7 +20,7 @@ export function FunctionColumn({ functionIds }: FunctionFolderProps) {
 
 	const { path } = Route.useSearch();
 
-	const { functions, children } = useFunctions(functionIds, {
+	const { children } = useFunctions(functionIds, {
 		includeChildren: true,
 	});
 	const selectedFunctionIds = getIdsFromPath(path);
