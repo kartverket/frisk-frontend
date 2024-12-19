@@ -102,7 +102,6 @@ export function FunctionColumn({ functionIds }: FunctionFolderProps) {
 								left={0}
 								right={0}
 							>
-								<h1>{functions?.[i].data?.name}</h1>
 								<Droppable id={functionIds[i]}>
 									<List
 										display="flex"
