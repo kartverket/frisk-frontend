@@ -14,7 +14,7 @@ export function SchemaButton({
 		<Button
 			variant="primary"
 			colorScheme="blue"
-			size="xs"
+			size="sm"
 			width="fit-content"
 			{...rest}
 			onClick={() => {

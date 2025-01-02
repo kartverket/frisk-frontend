@@ -43,7 +43,7 @@ export function MetadataView({ metadata, functionId }: Props) {
 	return (
 		<Box my={1}>
 			{metadata.title ? (
-				<Text fontSize="xs" fontWeight="700">
+				<Text fontSize="sm" fontWeight="700">
 					{metadata.title}:
 				</Text>
 			) : null}
@@ -144,7 +144,7 @@ type TextViewProps = {
 function TextView({ displayValue, isLoading }: TextViewProps) {
 	return (
 		<Skeleton isLoaded={!isLoading} fitContent>
-			<Text>{displayValue ?? "<Ingen tekst>"}</Text>
+			<Text fontSize="sm">{displayValue ?? "<Ingen tekst>"}</Text>
 		</Skeleton>
 	);
 }
@@ -174,7 +174,6 @@ function LinkView({
 			<Flex alignItems="center">
 				<Link
 					fontSize="sm"
-					fontWeight="700"
 					colorScheme="blue"
 					width="fit-content"
 					isExternal={isExternal}
@@ -224,7 +223,7 @@ function PillView({ displayValue, isLoading }: PillViewProps) {
 				w="fit-content"
 				my={1}
 			>
-				<Text fontSize="xs" fontWeight="500">
+				<Text fontSize="sm" fontWeight="500">
 					{displayValue ?? "<Ingen verdi>"}
 				</Text>
 			</Box>
