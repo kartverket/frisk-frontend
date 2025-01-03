@@ -6,9 +6,14 @@ import type { ReactNode } from "react";
 type DraggableProps = {
 	functionId: number;
 	children: ReactNode;
+	isDraggable?: boolean;
 };
 
-export function Draggable({ functionId, children }: DraggableProps) {
+export function Draggable({
+	functionId,
+	children,
+	isDraggable = true,
+}: DraggableProps) {
 	const { edit } = Route.useSearch();
 	const { func, updateFunction } = useFunction(functionId);
 
@@ -18,7 +23,7 @@ export function Draggable({ functionId, children }: DraggableProps) {
 			func: func.data,
 			update: updateFunction,
 		},
-		disabled: edit === functionId,
+		disabled: edit === functionId || !isDraggable,
 	});
 
 	const dragableStyle = transform

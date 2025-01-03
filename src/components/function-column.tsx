@@ -9,6 +9,7 @@ import { Droppable } from "./droppable";
 import { useFunctions } from "@/hooks/use-functions";
 import { CreateFunctionForm } from "./create-function-form";
 import { useIsFetching } from "@tanstack/react-query";
+import { useHasFunctionAccess } from "@/hooks/use-has-function-access";
 
 type FunctionFolderProps = {
 	functionIds: number[];
@@ -110,20 +111,11 @@ export function FunctionColumn({ functionIds }: FunctionFolderProps) {
 										marginBottom="2"
 									>
 										{childre.data?.map((child) => (
-											<ListItem
-												key={
-													child.id + child.name + child.parentId + child.path
-												}
-											>
-												<Draggable functionId={child.id}>
-													<FunctionCard
-														functionId={child.id}
-														selected={selectedFunctionIds.some((idList) =>
-															idList.includes(child.id),
-														)}
-													/>
-												</Draggable>
-											</ListItem>
+											<FunctionListItem
+												key={child.id}
+												childId={child.id}
+												selectedFunctionIds={selectedFunctionIds}
+											/>
 										))}
 									</List>
 									<Button
@@ -151,5 +143,29 @@ export function FunctionColumn({ functionIds }: FunctionFolderProps) {
 				))}
 			</Box>
 		</Flex>
+	);
+}
+
+function FunctionListItem({
+	childId,
+	selectedFunctionIds,
+}: {
+	childId: number;
+	selectedFunctionIds: number[][];
+}) {
+	const hasAccess = useHasFunctionAccess(childId);
+	const isDraggable = config.enableEntra && hasAccess;
+
+	return (
+		<ListItem key={childId}>
+			<Draggable functionId={childId} isDraggable={isDraggable}>
+				<FunctionCard
+					functionId={childId}
+					selected={selectedFunctionIds.some((idList) =>
+						idList.includes(childId),
+					)}
+				/>
+			</Draggable>
+		</ListItem>
 	);
 }
