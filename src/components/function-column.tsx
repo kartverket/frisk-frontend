@@ -154,11 +154,11 @@ function FunctionListItem({
 	selectedFunctionIds: number[][];
 }) {
 	const hasAccess = useHasFunctionAccess(childId);
-	const isDraggable = config.enableEntra && hasAccess;
+	const isDraggable = config.enableEntra ? hasAccess : true;
 
 	return (
 		<ListItem key={childId}>
-			<Draggable functionId={childId} isDraggable={isDraggable}>
+			<Draggable functionId={childId} hasAccess={isDraggable}>
 				<FunctionCard
 					functionId={childId}
 					selected={selectedFunctionIds.some((idList) =>
