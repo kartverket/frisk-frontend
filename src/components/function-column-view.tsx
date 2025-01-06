@@ -5,7 +5,7 @@ import { getIdsFromPath } from "@/lib/utils";
 import {
 	DndContext,
 	DragOverlay,
-	DragStartEvent,
+	type DragStartEvent,
 	MouseSensor,
 	TouchSensor,
 	useSensor,
@@ -14,7 +14,6 @@ import {
 } from "@dnd-kit/core";
 import type { useFunction } from "@/hooks/use-function";
 import { config } from "../../frisk.config";
-import { createPortal } from "react-dom";
 import { useState } from "react";
 import { FunctionCard } from "./function-card";
 
@@ -81,15 +80,12 @@ export function FunctionColumnView({ path }: FunctionColumnViewProps) {
 						<FunctionColumn key={ids[0]} functionIds={ids} />
 					))}
 				</Flex>
-				{/* {createPortal( */}
+
 				<DragOverlay>
 					{activeId ? (
 						<FunctionCard functionId={activeId} selected={false} />
 					) : null}
 				</DragOverlay>
-
-				{/* document.body,
-				)} */}
 			</DndContext>
 		</Flex>
 	);
