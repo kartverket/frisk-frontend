@@ -12,18 +12,25 @@ export function Draggable({ functionId, children }: DraggableProps) {
 	const { edit } = Route.useSearch();
 	const { func, updateFunction } = useFunction(functionId);
 
-	const { attributes, listeners, setNodeRef, transform } = useDraggable({
-		id: functionId,
-		data: {
-			func: func.data,
-			update: updateFunction,
-		},
-		disabled: edit === functionId,
-	});
+	const { isDragging, attributes, listeners, setNodeRef, transform } =
+		useDraggable({
+			id: functionId,
+			data: {
+				func: func.data,
+				update: updateFunction,
+			},
+			disabled: edit === functionId,
+		});
 
-	const dragableStyle = transform
+	// const dragableStyle = transform
+	// 	? {
+	// 			transform: `translate3d(${transform.x}px, ${transform.y}px, 0)`,
+	// 		}
+	// 	: undefined;
+
+	const dragableStyle = isDragging
 		? {
-				transform: `translate3d(${transform.x}px, ${transform.y}px, 0)`,
+				opacity: "50%",
 			}
 		: undefined;
 	return (

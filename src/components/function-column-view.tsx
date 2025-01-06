@@ -4,6 +4,8 @@ import { getIdsFromPath } from "@/lib/utils";
 
 import {
 	DndContext,
+	DragOverlay,
+	DragStartEvent,
 	MouseSensor,
 	TouchSensor,
 	useSensor,
@@ -12,12 +14,16 @@ import {
 } from "@dnd-kit/core";
 import type { useFunction } from "@/hooks/use-function";
 import { config } from "../../frisk.config";
+import { createPortal } from "react-dom";
+import { useState } from "react";
+import { FunctionCard } from "./function-card";
 
 type FunctionColumnViewProps = {
 	path: string[];
 };
 
 export function FunctionColumnView({ path }: FunctionColumnViewProps) {
+	const [activeId, setActiveId] = useState<number | null>(null);
 	const selectedFunctionIds = getIdsFromPath(path);
 
 	const sensors = useSensors(
@@ -50,6 +56,11 @@ export function FunctionColumnView({ path }: FunctionColumnViewProps) {
 				parentId: Number(over.id),
 			});
 		}
+		setActiveId(null);
+	}
+
+	function handleDragStart(event: DragStartEvent) {
+		setActiveId(Number(event.active.id));
 	}
 
 	return (
@@ -60,12 +71,25 @@ export function FunctionColumnView({ path }: FunctionColumnViewProps) {
 			<Text fontSize="xs" marginBottom="38">
 				{config.description}
 			</Text>
-			<DndContext onDragEnd={handleDragEnd} sensors={sensors}>
+			<DndContext
+				onDragStart={handleDragStart}
+				onDragEnd={handleDragEnd}
+				sensors={sensors}
+			>
 				<Flex>
 					{selectedFunctionIds?.map((ids) => (
 						<FunctionColumn key={ids[0]} functionIds={ids} />
 					))}
 				</Flex>
+				{/* {createPortal( */}
+				<DragOverlay>
+					{activeId ? (
+						<FunctionCard functionId={activeId} selected={false} />
+					) : null}
+				</DragOverlay>
+
+				{/* document.body,
+				)} */}
 			</DndContext>
 		</Flex>
 	);
