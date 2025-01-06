@@ -123,6 +123,7 @@ export const config: FriskConfig = {
 	rootNodeName: "Kartverket",
 	columnName: "Funksjon",
 	addButtonName: "Legg til funksjon",
+	enableEntra: true,
 };
 
 type FriskConfig = {
@@ -133,6 +134,7 @@ type FriskConfig = {
 	rootNodeName: string;
 	columnName: string;
 	addButtonName: string;
+	enableEntra?: boolean;
 };
 
 type GeneralMetadataContent = {

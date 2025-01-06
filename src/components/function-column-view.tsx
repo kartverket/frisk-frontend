@@ -1,4 +1,4 @@
-import { Flex, Text } from "@kvib/react";
+import { Button, Flex, Text, useToast } from "@kvib/react";
 import { FunctionColumn } from "./function-column";
 import { getIdsFromPath } from "@/lib/utils";
 
@@ -14,6 +14,7 @@ import {
 } from "@dnd-kit/core";
 import type { useFunction } from "@/hooks/use-function";
 import { config } from "../../frisk.config";
+import { getFunctionsCSVDump } from "@/services/backend";
 import { useState } from "react";
 import { FunctionCard } from "./function-card";
 
@@ -39,6 +40,12 @@ export function FunctionColumnView({ path }: FunctionColumnViewProps) {
 		}),
 	);
 
+	const toast = useToast();
+
+	function handleDragStart(event: DragStartEvent) {
+		setActiveId(Number(event.active.id));
+	}
+
 	async function handleDragEnd(event: DragEndEvent) {
 		const { active, over } = event;
 		if (
@@ -55,21 +62,65 @@ export function FunctionColumnView({ path }: FunctionColumnViewProps) {
 				parentId: Number(over.id),
 			});
 		}
-		setActiveId(null);
 	}
 
-	function handleDragStart(event: DragStartEvent) {
-		setActiveId(Number(event.active.id));
-	}
+	const handleExportCSV = async () => {
+		try {
+			const csvData = await getFunctionsCSVDump();
+
+			if (!csvData) {
+				throw new Error("No data received for CSV");
+			}
+
+			const blob = new Blob([csvData], {
+				type: "text/csv;charset=utf-8;",
+			});
+			const url = URL.createObjectURL(blob);
+			const link = document.createElement("a");
+			link.href = url;
+			link.setAttribute("download", "funkreg_data.csv");
+
+			document.body.appendChild(link);
+			link.click();
+
+			document.body.removeChild(link);
+
+			URL.revokeObjectURL(url);
+		} catch (error) {
+			console.error("Error downloading CSV:", error);
+			const toastId = "export-csv-error";
+			if (!toast.isActive(toastId)) {
+				toast({
+					id: toastId,
+					title: "Å nei!",
+					description:
+						"Det kan være du ikke har tilgang til denne funksjonaliteten:",
+					status: "error",
+					duration: 5000,
+					isClosable: true,
+				});
+			}
+		}
+	};
 
 	return (
-		<Flex flexDirection="column" paddingY="38" paddingX="100" marginBottom="76">
+		<Flex flexDirection="column" paddingY="38" paddingX="75" marginBottom="76">
 			<Text fontSize="2xl" fontWeight="700" marginBottom="3">
 				{config.title}
 			</Text>
 			<Text fontSize="xs" marginBottom="38">
 				{config.description}
 			</Text>
+			<Button
+				padding="0"
+				variant="tertiary"
+				colorScheme="blue"
+				onClick={() => handleExportCSV()}
+				rightIcon="download"
+				alignSelf="flex-start"
+			>
+				Eksporter funksjonsregisteret
+			</Button>
 			<DndContext
 				onDragStart={handleDragStart}
 				onDragEnd={handleDragEnd}

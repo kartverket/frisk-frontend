@@ -20,7 +20,7 @@ export function FunctionColumn({ functionIds }: FunctionFolderProps) {
 
 	const { path } = Route.useSearch();
 
-	const { functions, children } = useFunctions(functionIds, {
+	const { children } = useFunctions(functionIds, {
 		includeChildren: true,
 	});
 	const selectedFunctionIds = getIdsFromPath(path);
@@ -102,7 +102,6 @@ export function FunctionColumn({ functionIds }: FunctionFolderProps) {
 								left={0}
 								right={0}
 							>
-								<h1>{functions?.[i].data?.name}</h1>
 								<Droppable id={functionIds[i]}>
 									<List
 										display="flex"
