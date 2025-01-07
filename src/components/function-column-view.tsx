@@ -15,6 +15,7 @@ import {
 import type { useFunction } from "@/hooks/use-function";
 import { config } from "../../frisk.config";
 import { getFunctionsCSVDump } from "@/services/backend";
+import { SearchField } from "./search-field";
 import { useState } from "react";
 import { FunctionCard } from "./function-card";
 
@@ -121,6 +122,7 @@ export function FunctionColumnView({ path }: FunctionColumnViewProps) {
 			>
 				Eksporter funksjonsregisteret
 			</Button>
+			<SearchField />
 			<DndContext
 				onDragStart={handleDragStart}
 				onDragEnd={handleDragEnd}
