@@ -13,6 +13,7 @@ import {
 import type { useFunction } from "@/hooks/use-function";
 import { config } from "../../frisk.config";
 import { getFunctionsCSVDump } from "@/services/backend";
+import { SearchField } from "./search-field";
 
 type FunctionColumnViewProps = {
 	path: string[];
@@ -112,6 +113,7 @@ export function FunctionColumnView({ path }: FunctionColumnViewProps) {
 			>
 				Eksporter funksjonsregisteret
 			</Button>
+			<SearchField />
 			<DndContext onDragEnd={handleDragEnd} sensors={sensors}>
 				<Flex>
 					{selectedFunctionIds?.map((ids) => (
