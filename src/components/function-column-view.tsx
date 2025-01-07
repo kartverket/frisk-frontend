@@ -4,6 +4,8 @@ import { getIdsFromPath } from "@/lib/utils";
 
 import {
 	DndContext,
+	DragOverlay,
+	type DragStartEvent,
 	MouseSensor,
 	TouchSensor,
 	useSensor,
@@ -14,12 +16,15 @@ import type { useFunction } from "@/hooks/use-function";
 import { config } from "../../frisk.config";
 import { getFunctionsCSVDump } from "@/services/backend";
 import { SearchField } from "./search-field";
+import { useState } from "react";
+import { FunctionCard } from "./function-card";
 
 type FunctionColumnViewProps = {
 	path: string[];
 };
 
 export function FunctionColumnView({ path }: FunctionColumnViewProps) {
+	const [activeId, setActiveId] = useState<number | null>(null);
 	const selectedFunctionIds = getIdsFromPath(path);
 
 	const sensors = useSensors(
@@ -37,6 +42,10 @@ export function FunctionColumnView({ path }: FunctionColumnViewProps) {
 	);
 
 	const toast = useToast();
+
+	function handleDragStart(event: DragStartEvent) {
+		setActiveId(Number(event.active.id));
+	}
 
 	async function handleDragEnd(event: DragEndEvent) {
 		const { active, over } = event;
@@ -114,12 +123,22 @@ export function FunctionColumnView({ path }: FunctionColumnViewProps) {
 				Eksporter funksjonsregisteret
 			</Button>
 			<SearchField />
-			<DndContext onDragEnd={handleDragEnd} sensors={sensors}>
+			<DndContext
+				onDragStart={handleDragStart}
+				onDragEnd={handleDragEnd}
+				sensors={sensors}
+			>
 				<Flex>
 					{selectedFunctionIds?.map((ids) => (
 						<FunctionColumn key={ids[0]} functionIds={ids} />
 					))}
 				</Flex>
+
+				<DragOverlay>
+					{activeId ? (
+						<FunctionCard functionId={activeId} selected={false} />
+					) : null}
+				</DragOverlay>
 			</DndContext>
 		</Flex>
 	);
