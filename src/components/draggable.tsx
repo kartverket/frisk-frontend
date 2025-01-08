@@ -6,24 +6,29 @@ import type { ReactNode } from "react";
 type DraggableProps = {
 	functionId: number;
 	children: ReactNode;
+	hasAccess?: boolean;
 };
 
-export function Draggable({ functionId, children }: DraggableProps) {
+export function Draggable({
+	functionId,
+	children,
+	hasAccess = true,
+}: DraggableProps) {
 	const { edit } = Route.useSearch();
 	const { func, updateFunction } = useFunction(functionId);
 
-	const { attributes, listeners, setNodeRef, transform } = useDraggable({
+	const { isDragging, attributes, listeners, setNodeRef } = useDraggable({
 		id: functionId,
 		data: {
 			func: func.data,
 			update: updateFunction,
 		},
-		disabled: edit === functionId,
+		disabled: edit === functionId || !hasAccess,
 	});
 
-	const dragableStyle = transform
+	const dragableStyle = isDragging
 		? {
-				transform: `translate3d(${transform.x}px, ${transform.y}px, 0)`,
+				opacity: "50%",
 			}
 		: undefined;
 	return (
