@@ -6,6 +6,9 @@ import {
 	getTeam,
 } from "@/services/backend";
 import { getregelrettFrontendUrl } from "@/config";
+import { Button } from "@kvib/react";
+import type { useFunction } from "@/hooks/use-function";
+import type { useMetadata } from "@/hooks/use-metadata";
 
 export const config: FriskConfig = {
 	metadata: [
@@ -114,6 +117,7 @@ export const config: FriskConfig = {
 			inheritFromParent: false,
 		},
 	],
+
 	logo: {
 		imageSource: "/logo.svg",
 	},
@@ -124,6 +128,7 @@ export const config: FriskConfig = {
 	columnName: "Funksjon",
 	addButtonName: "Legg til funksjon",
 	enableEntra: true,
+	functionCardComponents: [SchemaButton],
 };
 
 type FriskConfig = {
@@ -135,6 +140,7 @@ type FriskConfig = {
 	columnName: string;
 	addButtonName: string;
 	enableEntra?: boolean;
+	functionCardComponents: React.FC<FunctionCardComponentProps>[];
 };
 
 type GeneralMetadataContent = {
@@ -220,3 +226,48 @@ type Logo = {
 	imageSource: string;
 	logoLink?: string;
 };
+
+type FunctionCardComponentProps = {
+	func: ReturnType<typeof useFunction>["func"];
+	metadata: ReturnType<typeof useMetadata>["metadata"];
+};
+
+function SchemaButton({ func, metadata }: FunctionCardComponentProps) {
+	return (
+		<Button
+			variant="primary"
+			colorScheme="blue"
+			size="sm"
+			width="fit-content"
+			my="16px"
+			onClick={(e) => {
+				e.preventDefault();
+				if (!func.data) return;
+				const teamId = metadata.data?.find((obj) => obj.key === "team")?.value;
+
+				const searchParamsRedirectURL = new URLSearchParams({
+					path: `"${func.data.path}"`,
+					functionId: func.data.id.toString(),
+					newMetadataKey: "rr-skjema",
+					newMetadataValue:
+						"{contextId}:splitTarget:{tableName}:splitTarget:{contextName}",
+					redirect: `"${location.origin}"`,
+				});
+				const redirectURL = `${location.origin}?${searchParamsRedirectURL.toString()}`;
+
+				const searchParams = new URLSearchParams({
+					name: func.data?.name,
+					...(teamId && { teamId }),
+					redirect: redirectURL,
+					locked: "true",
+					redirectBackUrl: window.location.href,
+					redirectBackTitle: "Funksjonsregisteret",
+				});
+				const path = `${getregelrettFrontendUrl()}/ny?${searchParams.toString()}`;
+				window.location.href = path;
+			}}
+		>
+			Opprett sikkerhetsskjema
+		</Button>
+	);
+}
