@@ -3,10 +3,10 @@ import {
 	getFunction,
 	getFunctions,
 	getMyMicrosoftTeams,
-	getSchemasFromRegelrett,
 	getTeam,
 } from "@/services/backend";
 import { getregelrettFrontendUrl } from "@/config";
+import { object, string, array } from "zod";
 import { Button } from "@kvib/react";
 import type { useFunction } from "@/hooks/use-function";
 import type { useMetadata } from "@/hooks/use-metadata";
@@ -303,3 +303,26 @@ function SchemaButton({ func, metadata }: FunctionCardComponentProps) {
 		</Button>
 	);
 }
+
+const REGELRETT_BACKEND_URL =
+	process.env.NODE_ENV === "development" ||
+	process.env.NODE_ENV === "production"
+		? "http://regelrett.bekk.no:8080"
+		: process.env.NODE_ENV === "skip"
+			? "http://regelrett-backend.regelrett-main:8080"
+			: "http://localhost:8080";
+
+async function getSchemasFromRegelrett() {
+	const response = await fetch(`${REGELRETT_BACKEND_URL}/schemas`);
+	if (!response.ok) {
+		throw new Error(`Backend error: ${response.status} ${response.statusText}`);
+	}
+
+	const json = await response.json();
+	return array(RegelrettSchema).parse(json);
+}
+
+const RegelrettSchema = object({
+	id: string(),
+	name: string(),
+});

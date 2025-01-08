@@ -1,11 +1,9 @@
 import { array, number, object, string, type z } from "zod";
 import { msalInstance, scopes } from "./msal";
 import { InteractionRequiredAuthError } from "@azure/msal-browser";
-import { getBackendUrl, getRegelrettBackendUrl } from "@/config";
+import { getBackendUrl } from "@/config";
 
 const BACKEND_URL = getBackendUrl() ?? "http://localhost:8080";
-const REGELRETT_BACKEND_URL =
-	getRegelrettBackendUrl() ?? "http://localhost:8080";
 
 async function getTokens() {
 	const accounts = msalInstance.getAllAccounts();
@@ -191,16 +189,6 @@ export async function getTeam(id: string) {
 	return MicrosoftTeam.parse(json);
 }
 
-export async function getSchemasFromRegelrett() {
-	const response = await fetch(`${REGELRETT_BACKEND_URL}/schemas`);
-	if (!response.ok) {
-		throw new Error(`Backend error: ${response.status} ${response.statusText}`);
-	}
-
-	const json = await response.json();
-	return array(RegelrettSchema).parse(json);
-}
-
 const BackendFunction = object({
 	id: number().int(),
 	name: string(),
@@ -233,12 +221,5 @@ const MicrosoftTeam = object({
 	displayName: string(),
 });
 export type MicrosoftTeam = z.infer<typeof MicrosoftTeam>;
-
-const RegelrettSchema = object({
-	id: string(),
-	name: string(),
-});
-
-export type RegelrettSchema = z.infer<typeof RegelrettSchema>;
 
 type Path = `/${string}`;
