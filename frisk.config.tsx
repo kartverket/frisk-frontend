@@ -3,12 +3,15 @@ import {
 	getFunction,
 	getFunctions,
 	getMyMicrosoftTeams,
+	getSchemasFromRegelrett,
 	getTeam,
 } from "@/services/backend";
 import { getregelrettFrontendUrl } from "@/config";
 import { Button } from "@kvib/react";
 import type { useFunction } from "@/hooks/use-function";
 import type { useMetadata } from "@/hooks/use-metadata";
+
+const schemas = await getSchemasFromRegelrett();
 
 export const config: FriskConfig = {
 	metadata: [
@@ -93,6 +96,35 @@ export const config: FriskConfig = {
 				};
 			},
 		},
+		...schemas.map(
+			(schema): InputMetadata => ({
+				key: schema.id,
+				type: "text",
+				title: schema.name,
+				label: "Regelrett skjema",
+				showOn: "readOnly",
+				isRequired: false,
+				placeholder: "Sett inn skjema",
+				inheritFromParent: false,
+				isDeletable: true,
+				getDisplayValue: async (input) => {
+					const contextId = input.value;
+					const searchParams = new URLSearchParams({
+						redirectBackUrl: window.location.href,
+						redirectBackTitle: "Funksjonsregisteret",
+					});
+					const url = `${getregelrettFrontendUrl()}/context/${contextId}?${searchParams.toString()}`;
+					return {
+						displayValue: schema.name,
+						value: url,
+						displayOptions: {
+							type: "url",
+							isExternal: false,
+						},
+					};
+				},
+			}),
+		),
 		{
 			key: "dependencies",
 			type: "select",

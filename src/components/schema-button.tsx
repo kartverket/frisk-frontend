@@ -24,9 +24,8 @@ export function SchemaButton({
 				const searchParamsRedirectURL = new URLSearchParams({
 					path: `"${func.data.path}"`,
 					functionId: functionId.toString(),
-					newMetadataKey: "rr-skjema",
-					newMetadataValue:
-						"{contextId}:splitTarget:{tableName}:splitTarget:{contextName}",
+					newMetadataKey: "{tableId}",
+					newMetadataValue: "{contextId}",
 					redirect: `"${location.origin}"`,
 				});
 				const redirectURL = `${location.origin}?${searchParamsRedirectURL.toString()}`;
