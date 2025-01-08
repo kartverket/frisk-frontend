@@ -114,6 +114,14 @@ export const config: FriskConfig = {
 			inheritFromParent: false,
 		},
 	],
+	functionCardComponents: {
+		id: "schemaButton",
+		type: "SchemaButton",
+		props: (input) => ({
+			my: "16px",
+			functionId: input,
+		}),
+	},
 	logo: {
 		imageSource: "/logo.svg",
 	},
@@ -125,9 +133,17 @@ export const config: FriskConfig = {
 	addButtonName: "Legg til funksjon",
 	enableEntra: true,
 };
+type staticFunctionComponent = {
+	id: string;
+	type: string;
+	// biome-ignore lint/suspicious/noExplicitAny: <explanation>
+	props: (input: any) => Record<string, any>;
+	children?: staticFunctionComponent[];
+};
 
 type FriskConfig = {
 	metadata?: Metadata[];
+	functionCardComponents: staticFunctionComponent;
 	logo: Logo;
 	title: string;
 	description: string;

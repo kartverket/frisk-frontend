@@ -47,3 +47,7 @@ export function SchemaButton({
 		</Button>
 	);
 }
+
+export const componentsMap: Record<string, React.FC<any>> = {
+	SchemaButton,
+};
