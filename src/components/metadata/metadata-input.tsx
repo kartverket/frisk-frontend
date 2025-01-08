@@ -23,12 +23,18 @@ type MetadataInputProps = {
 	metadata: Metadata;
 	parentFunctionId: number | undefined;
 	functionId: number | undefined;
+	onChange?: (value: string | string[]) => void;
+	value?: string | MultiSelectOption[];
+	hideLabel?: boolean;
 };
 
 export function MetadataInput({
 	metadata,
 	functionId,
 	parentFunctionId,
+	onChange,
+	value,
+	hideLabel,
 }: MetadataInputProps) {
 	if (metadata.showOn === "readOnly") return null;
 	if (metadata.showOn === "update" && functionId === undefined) return null;
@@ -41,6 +47,9 @@ export function MetadataInput({
 					metadata={metadata}
 					functionId={functionId}
 					parentFunctionId={parentFunctionId}
+					onChange={onChange}
+					value={value}
+					hideLabel={hideLabel}
 				/>
 			);
 		case "text":
@@ -51,6 +60,9 @@ export function MetadataInput({
 					metadata={metadata}
 					functionId={functionId}
 					parentFunctionId={parentFunctionId}
+					onChange={onChange}
+					value={value as string}
+					hideLabel={hideLabel}
 				/>
 			);
 		default:
@@ -64,12 +76,18 @@ type SelectInputProps = {
 	metadata: SelectMetadata;
 	functionId: number | undefined;
 	parentFunctionId: number | undefined;
+	onChange?: (value: string | string[]) => void;
+	value?: string | MultiSelectOption[];
+	hideLabel?: boolean;
 };
 
 function SelectInput({
 	metadata,
 	functionId,
 	parentFunctionId,
+	onChange,
+	value,
+	hideLabel,
 }: SelectInputProps) {
 	const {
 		metadata: { data: currentMetadata },
@@ -135,14 +153,16 @@ function SelectInput({
 
 	return (
 		<FormControl isRequired={metadata.isRequired}>
-			<FormLabel
-				style={{
-					fontSize: "small",
-					fontWeight: "medium",
-				}}
-			>
-				{metadata.label}
-			</FormLabel>
+			{!hideLabel && (
+				<FormLabel
+					style={{
+						fontSize: "small",
+						fontWeight: "medium",
+					}}
+				>
+					{metadata.label}
+				</FormLabel>
+			)}
 			<Skeleton isLoaded={!options.isLoading} fitContent>
 				{options.isSuccess ? (
 					metadata.selectMode === "single" ? (
@@ -151,6 +171,8 @@ function SelectInput({
 							metadata={metadata}
 							currentMetadataValue={currentMetadataValue}
 							parentMetadataValue={parentMetadataValue}
+							onChange={onChange}
+							value={value as string}
 						/>
 					) : (
 						<MultiSelect
@@ -159,6 +181,8 @@ function SelectInput({
 							currentMetadataValues={newMetadataValues ?? currentMetadataValues}
 							parentMetadataValues={parentMetadataValues}
 							setCurrentMetadataValues={setCurrentMetadataValues}
+							onChange={onChange}
+							value={value as MultiSelectOption[]}
 						/>
 					)
 				) : options.isError ? (
@@ -174,6 +198,8 @@ type SingleSelectProps = {
 	options: UseQueryResult<SelectOption[]>;
 	currentMetadataValue: string | undefined;
 	parentMetadataValue: string | undefined;
+	onChange?: (value: string | string[]) => void;
+	value?: string;
 };
 
 function SingleSelect({
@@ -181,6 +207,8 @@ function SingleSelect({
 	options,
 	currentMetadataValue,
 	parentMetadataValue,
+	onChange,
+	value,
 }: SingleSelectProps) {
 	return (
 		<Select
@@ -192,6 +220,10 @@ function SingleSelect({
 				currentMetadataValue ??
 				(metadata.inheritFromParent ? parentMetadataValue : undefined)
 			}
+			onChange={(e) => {
+				onChange?.(e.target.value);
+			}}
+			value={value}
 		>
 			{options.data?.map((option) => (
 				<option key={option.value} value={option.value}>
@@ -213,6 +245,8 @@ type MultiSelectProps = {
 	currentMetadataValues: MultiSelectOption[] | undefined;
 	parentMetadataValues: MultiSelectOption[] | undefined;
 	setCurrentMetadataValues: (values: MultiSelectOption[]) => void;
+	onChange?: (value: string[]) => void;
+	value?: MultiSelectOption[];
 };
 
 function MultiSelect({
@@ -221,6 +255,8 @@ function MultiSelect({
 	currentMetadataValues,
 	parentMetadataValues,
 	setCurrentMetadataValues,
+	onChange,
+	value: overrideValue,
 }: MultiSelectProps) {
 	const value =
 		currentMetadataValues ??
@@ -231,7 +267,7 @@ function MultiSelect({
 		<>
 			<SearchAsync
 				size="sm"
-				value={value}
+				value={overrideValue ?? value}
 				isMulti
 				debounceTime={100}
 				defaultOptions
@@ -251,6 +287,8 @@ function MultiSelect({
 				onChange={(newValue) => {
 					// @ts-expect-error
 					setCurrentMetadataValues(newValue ?? []);
+					// @ts-expect-error
+					onChange?.(newValue ?? []);
 				}}
 				placeholder="Søk"
 			/>
@@ -263,9 +301,19 @@ type InputProps = {
 	metadata: InputMetadata;
 	functionId: number | undefined;
 	parentFunctionId: number | undefined;
+	onChange?: (value: string | string[]) => void;
+	value?: string;
+	hideLabel?: boolean;
 };
 
-function InputField({ metadata, functionId, parentFunctionId }: InputProps) {
+function InputField({
+	metadata,
+	functionId,
+	parentFunctionId,
+	onChange,
+	value,
+	hideLabel,
+}: InputProps) {
 	const { metadata: currentMetadata } = useMetadata(functionId);
 	const { metadata: parentMetadata } = useMetadata(parentFunctionId);
 
@@ -279,9 +327,11 @@ function InputField({ metadata, functionId, parentFunctionId }: InputProps) {
 
 	return (
 		<FormControl isRequired={metadata.isRequired}>
-			<FormLabel style={{ fontSize: "small", fontWeight: "medium" }}>
-				{metadata.label}
-			</FormLabel>
+			{!hideLabel && (
+				<FormLabel style={{ fontSize: "small", fontWeight: "medium" }}>
+					{metadata.label}
+				</FormLabel>
+			)}
 			<Input
 				type={metadata.type}
 				name={metadata.key}
@@ -289,9 +339,13 @@ function InputField({ metadata, functionId, parentFunctionId }: InputProps) {
 					currentMetadataValue ??
 					(metadata.inheritFromParent ? parentMetadataValue : undefined)
 				}
+				onChange={(e) => {
+					onChange?.(e.target.value);
+				}}
 				placeholder={metadata.placeholder}
 				size="sm"
 				borderRadius="5px"
+				value={value}
 			/>
 		</FormControl>
 	);

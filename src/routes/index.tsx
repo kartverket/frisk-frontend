@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { FunctionColumnView } from "../components/function-column-view";
-import { number, object, string, array } from "zod";
+import { number, object, string, array, unknown } from "zod";
 import { fallback, zodSearchValidator } from "@tanstack/router-zod-adapter";
 import { useEffect } from "react";
 import { Main } from "@/components/main";
@@ -23,6 +23,9 @@ const functionSearchSchema = object({
 	newMetadataKey: string().optional(),
 	newMetadataValue: string().optional(),
 	redirect: string().optional(),
+	filters: object({
+		metadata: array(object({ key: string(), value: unknown().optional() })),
+	}).optional(),
 });
 
 export const Route = createFileRoute("/")({
