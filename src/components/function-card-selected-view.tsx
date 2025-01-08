@@ -1,16 +1,15 @@
 import { Flex, Text, Skeleton, Stack } from "@kvib/react";
-import { componentsMap, SchemaButton } from "./schema-button";
 import { useFunction } from "@/hooks/use-function";
 import { EditAndSelectButtons } from "./edit-and-select-buttons";
 import { config } from "../../frisk.config";
 import { MetadataView } from "./metadata/metadata-view";
+import { useMetadata } from "@/hooks/use-metadata";
 
 export function FunctionCardSelectedView({
 	functionId,
 }: { functionId: number }) {
 	const { func } = useFunction(functionId);
-
-	const Component = componentsMap[config.functionCardComponents.type];
+	const { metadata } = useMetadata(functionId);
 
 	return (
 		<Stack paddingLeft="10px" w="100%">
@@ -31,9 +30,16 @@ export function FunctionCardSelectedView({
 			{config.metadata?.map((meta) => (
 				<MetadataView key={meta.key} metadata={meta} functionId={functionId} />
 			))}
-			<Component {...config.functionCardComponents.props(functionId)} />
 
-			{/* <SchemaButton my="16px" functionId={functionId} /> */}
+			{config.FunctionCardComponents.map((Component) => {
+				return (
+					<Component
+						key={Component.toString()}
+						func={func}
+						metadata={metadata}
+					/>
+				);
+			})}
 		</Stack>
 	);
 }
