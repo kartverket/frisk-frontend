@@ -307,9 +307,9 @@ function SchemaButton({ func, metadata }: FunctionCardComponentProps) {
 const REGELRETT_BACKEND_URL =
 	process.env.NODE_ENV === "development" ||
 	process.env.NODE_ENV === "production"
-		? "http://regelrett.bekk.no:8080"
+		? "https://regelrett-frontend-1024826672490.europe-north1.run.app/api"
 		: process.env.NODE_ENV === "skip"
-			? "http://regelrett-backend.regelrett-main:8080"
+			? "https://regelrett.atgcp1-prod.kartverket-intern.cloud/api"
 			: "http://localhost:8080";
 
 async function getSchemasFromRegelrett() {
