@@ -130,7 +130,7 @@ export const config: FriskConfig = {
 	columnName: "Funksjon",
 	addButtonName: "Legg til funksjon",
 	enableEntra: true,
-	FunctionCardComponents: [SchemaButton],
+	functionCardComponents: [SchemaButton],
 };
 
 type FriskConfig = {
@@ -142,7 +142,7 @@ type FriskConfig = {
 	columnName: string;
 	addButtonName: string;
 	enableEntra?: boolean;
-	FunctionCardComponents: React.FC<FunctionCardComponentProps>[];
+	functionCardComponents: React.FC<FunctionCardComponentProps>[];
 };
 
 type GeneralMetadataContent = {

@@ -31,7 +31,7 @@ export function FunctionCardSelectedView({
 				<MetadataView key={meta.key} metadata={meta} functionId={functionId} />
 			))}
 
-			{config.FunctionCardComponents.map((Component) => {
+			{config.functionCardComponents.map((Component) => {
 				return (
 					<Component
 						key={Component.toString()}
