@@ -1,7 +1,5 @@
-import type { HTMLInputTypeAttribute, ReactNode } from "react";
+import type { HTMLInputTypeAttribute } from "react";
 import {
-	BackendFunction,
-	FunctionMetadata,
 	getFunction,
 	getFunctions,
 	getMyMicrosoftTeams,
