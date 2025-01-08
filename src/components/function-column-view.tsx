@@ -261,7 +261,7 @@ export function FunctionColumnView({ path }: FunctionColumnViewProps) {
 																if (m.key === filterMeta.key) {
 																	return {
 																		key: filterMeta.key,
-																		value: value,
+																		value: value !== "" ? value : undefined,
 																	};
 																}
 																return m;
