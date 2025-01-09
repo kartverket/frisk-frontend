@@ -11,7 +11,7 @@ import {
 
 import type { MultiSelectOption } from "./metadata/metadata-input";
 import { MetadataInput } from "./metadata/metadata-input";
-import { config } from "../../frisk.config";
+import { Route } from "@/routes";
 
 type CreateFunctionFormProps = {
 	functionId: number;
@@ -22,6 +22,7 @@ export function CreateFunctionForm({
 	functionId,
 	setSelectedForm,
 }: CreateFunctionFormProps) {
+	const { config } = Route.useLoaderData();
 	const { addFunction } = useFunction(functionId, {});
 
 	async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {

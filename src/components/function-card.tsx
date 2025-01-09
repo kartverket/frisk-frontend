@@ -5,7 +5,6 @@ import { FunctionCardEdit } from "./function-card-edit";
 import { FunctionCardSelectedView } from "./function-card-selected-view";
 import { EditAndSelectButtons } from "./edit-and-select-buttons";
 import { useEffect, useState } from "react";
-import { config } from "../../frisk.config";
 import { useHasFunctionAccess } from "@/hooks/use-has-function-access";
 
 export function FunctionCard({
@@ -13,6 +12,7 @@ export function FunctionCard({
 	selected,
 	lowlighted,
 }: { functionId: number; selected: boolean; lowlighted: boolean }) {
+	const { config } = Route.useLoaderData();
 	const { func } = useFunction(functionId);
 	const search = Route.useSearch();
 	const navigate = Route.useNavigate();

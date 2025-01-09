@@ -4,7 +4,6 @@ import { Box, Button, Flex, List, ListItem, Skeleton, Text } from "@kvib/react";
 import { FunctionCard } from "./function-card";
 import { useLayoutEffect, useState } from "react";
 import { Draggable } from "./draggable";
-import { config } from "../../frisk.config";
 import { Droppable } from "./droppable";
 import { CreateFunctionForm } from "./create-function-form";
 import { useIsFetching } from "@tanstack/react-query";
@@ -20,6 +19,7 @@ type FunctionFolderProps = {
 const FUNCTION_VIEW_OFFSET = 312;
 
 export function FunctionColumn({ functionIds }: FunctionFolderProps) {
+	const { config } = Route.useLoaderData();
 	const [functionPositions, setFunctionPositions] = useState<number[]>([]);
 
 	const { path } = Route.useSearch();
@@ -101,6 +101,7 @@ function ChildrenGroup({
 	functionId,
 	functionPosition,
 }: { functionId: number; functionPosition: number }) {
+	const { config } = Route.useLoaderData();
 	const { path } = Route.useSearch();
 	const selectedFunctionIds = getIdsFromPath(path);
 
@@ -158,6 +159,7 @@ function ChildrenGroupItem({
 	func,
 	selected,
 }: { func: BackendFunction; selected: boolean }) {
+	const { config } = Route.useLoaderData();
 	const { metadata } = useMetadata(func.id);
 	const { filters } = Route.useSearch();
 	const hasAccess = useHasFunctionAccess(func.id);
