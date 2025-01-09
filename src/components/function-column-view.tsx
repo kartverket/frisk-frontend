@@ -184,7 +184,7 @@ export function FunctionColumnView({ path }: FunctionColumnViewProps) {
 						.map((m) => {
 							return (
 								<option key={m.key} value={m.key}>
-									{m.title ?? m.key}
+									{m.displayName ?? m.key}
 								</option>
 							);
 						})}
@@ -242,7 +242,7 @@ export function FunctionColumnView({ path }: FunctionColumnViewProps) {
 									.map((m) => {
 										return (
 											<option key={m.key} value={m.key}>
-												{m.title ?? m.key}
+												{m.displayName ?? m.key}
 											</option>
 										);
 									})}
