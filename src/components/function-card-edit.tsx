@@ -13,7 +13,6 @@ import { useFunction } from "@/hooks/use-function";
 import { Route } from "@/routes";
 import { DeleteFunctionModal } from "@/components/delete-function-modal.tsx";
 import { useIsMutating } from "@tanstack/react-query";
-import { config } from "../../frisk.config";
 import {
 	MetadataInput,
 	type MultiSelectOption,
@@ -21,6 +20,7 @@ import {
 import { useMetadata } from "@/hooks/use-metadata";
 
 export function FunctionCardEdit({ functionId }: { functionId: number }) {
+	const { config } = Route.useLoaderData();
 	const { func, updateFunction } = useFunction(functionId);
 	const { metadata, addMetadata, removeMetadata, updateMetadataValue } =
 		useMetadata(functionId);

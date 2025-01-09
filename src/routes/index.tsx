@@ -6,6 +6,8 @@ import { useEffect } from "react";
 import { Main } from "@/components/main";
 import { CreateAndRedirectEffect } from "@/effects/create-and-redirect-effect";
 import { useFunctions } from "@/hooks/use-functions";
+import { getConfig } from "../../frisk.config";
+import { Header } from "@/components/header";
 
 const functionSearchSchema = object({
 	path: fallback(
@@ -31,6 +33,9 @@ const functionSearchSchema = object({
 export const Route = createFileRoute("/")({
 	component: Index,
 	validateSearch: zodSearchValidator(functionSearchSchema),
+	loader: async () => {
+		return { config: await getConfig() };
+	},
 });
 
 function Index() {
@@ -61,9 +66,12 @@ function Index() {
 	}, [functions, path, navigate, idArrays]);
 
 	return (
-		<Main>
-			<FunctionColumnView path={path} />
-			<CreateAndRedirectEffect />
-		</Main>
+		<>
+			<Header />
+			<Main>
+				<FunctionColumnView path={path} />
+				<CreateAndRedirectEffect />
+			</Main>
+		</>
 	);
 }

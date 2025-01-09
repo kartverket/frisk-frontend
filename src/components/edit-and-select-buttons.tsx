@@ -2,12 +2,12 @@ import { Flex, IconButton, Text, Icon, useTheme } from "@kvib/react";
 import { Route } from "@/routes";
 import { useFunction } from "@/hooks/use-function";
 import { useHasFunctionAccess } from "@/hooks/use-has-function-access";
-import { config } from "../../frisk.config";
 
 export function EditAndSelectButtons({
 	functionId,
 	selected,
 }: { functionId: number; selected: boolean }) {
+	const { config } = Route.useLoaderData();
 	const theme = useTheme();
 	const search = Route.useSearch();
 	const navigate = Route.useNavigate();
