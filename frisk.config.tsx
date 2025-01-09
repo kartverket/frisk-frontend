@@ -19,6 +19,7 @@ export async function getConfig(): Promise<FriskConfig> {
 				key: "team",
 				type: "select",
 				title: "Team",
+				displayName: "Team",
 				label: "Ansvarlig team for denne funksjonen?",
 				getOptions: async () => {
 					const teams = await getMyMicrosoftTeams();
@@ -41,6 +42,7 @@ export async function getConfig(): Promise<FriskConfig> {
 				key: "kritikalitet",
 				type: "select",
 				title: "Kritikalitet",
+				displayName: "Kritikalitet",
 				label: "Kritikalitet",
 				inheritFromParent: false,
 				isRequired: false,
@@ -59,6 +61,7 @@ export async function getConfig(): Promise<FriskConfig> {
 				key: "backstage-url",
 				type: "url",
 				title: "Lenke til utviklerportalen",
+				displayName: "Lenke til utviklerportalen",
 				isExternal: true,
 				label: "Lenke til utviklerportalen",
 				showOn: "createAndUpdate",
@@ -72,7 +75,7 @@ export async function getConfig(): Promise<FriskConfig> {
 			{
 				key: "rr-skjema",
 				type: "text",
-				title: "Skjema",
+				displayName: "Skjema (legacy)",
 				label: "Regelrett skjema",
 				showOn: "readOnly",
 				isRequired: false,
@@ -100,6 +103,7 @@ export async function getConfig(): Promise<FriskConfig> {
 				(schema): InputMetadata => ({
 					key: schema.id,
 					type: "text",
+					displayName: schema.name,
 					label: "Regelrett skjema",
 					showOn: "readOnly",
 					isRequired: false,
@@ -128,6 +132,7 @@ export async function getConfig(): Promise<FriskConfig> {
 				key: "dependencies",
 				type: "select",
 				title: "Funksjonsavhengigheter",
+				displayName: "Funksjonsavhengigheter",
 				label: "Velg andre funksjoner denne funksjonen er avhengig av",
 				getOptions: async () => {
 					const functions = await getFunctions();
@@ -177,8 +182,25 @@ type FriskConfig = {
 
 type GeneralMetadataContent = {
 	key: string;
+
+	/**
+	 * Is showed over the input field
+	 */
 	label: string;
+
+	/**
+	 * Is showed above the value on a selected card
+	 */
 	title?: string;
+
+	/**
+	 * Is showed instead of the key in e.g. the filter dropdown.
+	 */
+	displayName?: string;
+
+	/**
+	 * When creating a new function, should the metadata be inherited from the parent function?
+	 */
 	inheritFromParent: boolean;
 
 	/**
