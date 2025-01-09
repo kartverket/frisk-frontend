@@ -16,7 +16,6 @@ import { useHasFunctionAccess } from "@/hooks/use-has-function-access";
 type FunctionFolderProps = {
 	functionIds: number[];
 };
-const FUNCTION_VIEW_OFFSET = 312;
 
 export function FunctionColumn({ functionIds }: FunctionFolderProps) {
 	const { config } = Route.useLoaderData();
@@ -46,12 +45,12 @@ export function FunctionColumn({ functionIds }: FunctionFolderProps) {
 	useLayoutEffect(() => {
 		const getParentPosition = (parentId: number) => {
 			const parent = document.getElementById(parentId.toString());
+			const top = document.getElementById("topBox");
 
-			if (!parent) return 0;
+			if (!parent || !top) return 0;
 
-			const scrollTop = window.scrollY || document.documentElement.scrollTop;
 			return (
-				parent.getBoundingClientRect().top - FUNCTION_VIEW_OFFSET + scrollTop
+				parent.getBoundingClientRect().top - top.getBoundingClientRect().bottom
 			);
 		};
 
@@ -70,6 +69,7 @@ export function FunctionColumn({ functionIds }: FunctionFolderProps) {
 				textAlign="center"
 				borderColor="gray.400"
 				minH="46px"
+				id="topBox"
 			>
 				<Text size="lg" fontWeight="700">
 					{config.columnName} nivå {currentLevel + 1}
