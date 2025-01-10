@@ -1,4 +1,4 @@
-import type { HTMLInputTypeAttribute } from "react";
+import { useState, type HTMLInputTypeAttribute } from "react";
 import {
 	getFunction,
 	getFunctions,
@@ -290,6 +290,7 @@ type FunctionCardComponentProps = {
 
 function createSchemaButton(schemas: RegelrettSchema[]) {
 	return function SchemaButton({ func, metadata }: FunctionCardComponentProps) {
+		const [selectedSchema, setSelectedSchema] = useState("");
 		const availableSchemas = schemas.filter(
 			(schema) => !metadata.data?.find((m) => m.key === schema.id),
 		);
@@ -320,12 +321,14 @@ function createSchemaButton(schemas: RegelrettSchema[]) {
 			>
 				<FormControl isRequired={true} style={{ width: "fit-content" }}>
 					<FormLabel style={{ fontSize: "14px" }}>
-						Velg sikkerhetsskjema
+						Opprett sikkerhetsskjema
 					</FormLabel>
 					<Select
 						name="schema"
 						onClick={(e) => e.stopPropagation()}
+						onChange={(e) => setSelectedSchema(e.target.value)}
 						placeholder="Velg sikkerhetsskjema"
+						size={"sm"}
 					>
 						{availableSchemas.map((schema) => (
 							<option key={schema.id} value={schema.id}>
@@ -342,6 +345,7 @@ function createSchemaButton(schemas: RegelrettSchema[]) {
 					width="fit-content"
 					my="16px"
 					onClick={(e) => e.stopPropagation()}
+					isDisabled={!selectedSchema}
 				>
 					Opprett skjema
 				</Button>
