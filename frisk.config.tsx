@@ -1,15 +1,18 @@
 import type { HTMLInputTypeAttribute } from "react";
 import {
+	createFunctionMetadata,
 	getFunction,
 	getFunctions,
 	getMyMicrosoftTeams,
 	getTeam,
 } from "@/services/backend";
 import { getregelrettFrontendUrl } from "@/config";
-import { object, string, array } from "zod";
-import { Button } from "@kvib/react";
+import { object, string, array, type z } from "zod";
+import { Button, FormControl, FormLabel, Select } from "@kvib/react";
 import type { useFunction } from "@/hooks/use-function";
-import type { useMetadata } from "@/hooks/use-metadata";
+import { useMetadata } from "@/hooks/use-metadata";
+import { msalInstance } from "@/services/msal";
+import { InteractionRequiredAuthError } from "@azure/msal-browser";
 
 export async function getConfig(): Promise<FriskConfig> {
 	const schemas = await getSchemasFromRegelrett();
@@ -164,7 +167,7 @@ export async function getConfig(): Promise<FriskConfig> {
 		columnName: "Funksjon",
 		addButtonName: "Legg til funksjon",
 		enableEntra: true,
-		functionCardComponents: [SchemaButton],
+		functionCardComponents: [createSchemaButton(schemas)],
 	};
 }
 
@@ -286,43 +289,66 @@ type FunctionCardComponentProps = {
 	metadata: ReturnType<typeof useMetadata>["metadata"];
 };
 
-function SchemaButton({ func, metadata }: FunctionCardComponentProps) {
-	return (
-		<Button
-			variant="primary"
-			colorScheme="blue"
-			size="sm"
-			width="fit-content"
-			my="16px"
-			onClick={(e) => {
-				e.preventDefault();
-				if (!func.data) return;
-				const teamId = metadata.data?.find((obj) => obj.key === "team")?.value;
-
-				const searchParamsRedirectURL = new URLSearchParams({
-					path: `"${func.data.path}"`,
-					functionId: func.data.id.toString(),
-					newMetadataKey: "{tableId}",
-					newMetadataValue: "{contextId}",
-					redirect: `"${location.origin}"`,
-				});
-				const redirectURL = `${location.origin}?${searchParamsRedirectURL.toString()}`;
-
-				const searchParams = new URLSearchParams({
-					name: func.data?.name,
-					...(teamId && { teamId }),
-					redirect: redirectURL,
-					locked: "true",
-					redirectBackUrl: window.location.href,
-					redirectBackTitle: "Funksjonsregisteret",
-				});
-				const path = `${getregelrettFrontendUrl()}/ny?${searchParams.toString()}`;
-				window.location.href = path;
-			}}
-		>
-			Opprett sikkerhetsskjema
-		</Button>
-	);
+function createSchemaButton(schemas: RegelrettSchema[]) {
+	return function SchemaButton({ func, metadata }: FunctionCardComponentProps) {
+		const availableSchemas = schemas.filter(
+			(schema) => !metadata.data?.find((m) => m.key === schema.id),
+		);
+		const { addMetadata } = useMetadata(func.data?.id);
+		return (
+			<form
+				onSubmit={async (e) => {
+					e.preventDefault();
+					if (!func.data) return;
+					const teamId = metadata.data?.find(
+						(obj) => obj.key === "team",
+					)?.value;
+					if (!teamId) return;
+					const schemaId = (
+						e.currentTarget.elements.namedItem("schema") as HTMLSelectElement
+					).value;
+					const response = await createRegelrettContext(
+						func.data.name,
+						teamId,
+						schemaId,
+					);
+					addMetadata.mutateAsync({
+						functionId: func.data.id,
+						key: schemaId,
+						value: response.id,
+					});
+				}}
+			>
+				<FormControl isRequired={true} style={{ width: "fit-content" }}>
+					<FormLabel style={{ fontSize: "14px" }}>
+						Velg sikkerhetsskjema
+					</FormLabel>
+					<Select
+						name="schema"
+						onClick={(e) => e.stopPropagation()}
+						placeholder="Velg sikkerhetsskjema"
+					>
+						{availableSchemas.map((schema) => (
+							<option key={schema.id} value={schema.id}>
+								{schema.name}
+							</option>
+						))}
+					</Select>
+				</FormControl>
+				<Button
+					type="submit"
+					variant="primary"
+					colorScheme="blue"
+					size="sm"
+					width="fit-content"
+					my="16px"
+					onClick={(e) => e.stopPropagation()}
+				>
+					Opprett skjema
+				</Button>
+			</form>
+		);
+	};
 }
 
 const REGELRETT_BACKEND_URL =
@@ -346,4 +372,79 @@ async function getSchemasFromRegelrett() {
 const RegelrettSchema = object({
 	id: string(),
 	name: string(),
+});
+
+type RegelrettSchema = z.infer<typeof RegelrettSchema>;
+
+async function getRegelrettTokens() {
+	const regelrettScopes = [
+		"api://e9dc946b-6fef-44ab-82f1-c0ec2e402903/.default",
+	];
+
+	const accounts = msalInstance.getAllAccounts();
+	const account = accounts[0];
+	if (!account) {
+		throw new Error("No active account");
+	}
+	const tokenResponse = await msalInstance
+		.acquireTokenSilent({
+			scopes: regelrettScopes,
+			account: account,
+		})
+		.catch((error) => {
+			if (error instanceof InteractionRequiredAuthError) {
+				return msalInstance.acquireTokenRedirect({
+					scopes: regelrettScopes,
+					account: account,
+				});
+			}
+		});
+
+	if (!tokenResponse) {
+		throw new Error("No tokenResponse");
+	}
+	return tokenResponse;
+}
+
+async function fetchFromRegelrett(path: string, options: RequestInit = {}) {
+	const tokens = await getRegelrettTokens();
+	const response = await fetch(`${REGELRETT_BACKEND_URL}${path}`, {
+		...options,
+		headers: {
+			...options.headers,
+			Authorization: `Bearer ${tokens.accessToken}`,
+		},
+	});
+	if (!response.ok) {
+		throw new Error(`Backend error: ${response.status} ${response.statusText}`);
+	}
+	return response;
+}
+
+export async function createRegelrettContext(
+	name: string,
+	teamId: string,
+	tableId: string,
+) {
+	const response = await fetchFromRegelrett("/contexts", {
+		method: "POST",
+		headers: {
+			"Content-Type": "application/json",
+		},
+		body: JSON.stringify({
+			name,
+			teamId,
+			tableId,
+		}),
+	});
+
+	const json = await response.json();
+	return RegelrettContext.parse(json);
+}
+
+const RegelrettContext = object({
+	id: string(),
+	name: string(),
+	tableId: string(),
+	teamId: string(),
 });
