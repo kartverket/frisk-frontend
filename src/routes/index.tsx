@@ -1,11 +1,13 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { FunctionColumnView } from "../components/function-column-view";
-import { number, object, string, array } from "zod";
+import { number, object, string, array, unknown } from "zod";
 import { fallback, zodSearchValidator } from "@tanstack/router-zod-adapter";
 import { useEffect } from "react";
 import { Main } from "@/components/main";
 import { CreateAndRedirectEffect } from "@/effects/create-and-redirect-effect";
 import { useFunctions } from "@/hooks/use-functions";
+import { getConfig } from "../../frisk.config";
+import { Header } from "@/components/header";
 
 const functionSearchSchema = object({
 	path: fallback(
@@ -23,11 +25,17 @@ const functionSearchSchema = object({
 	newMetadataKey: string().optional(),
 	newMetadataValue: string().optional(),
 	redirect: string().optional(),
+	filters: object({
+		metadata: array(object({ key: string(), value: unknown().optional() })),
+	}).optional(),
 });
 
 export const Route = createFileRoute("/")({
 	component: Index,
 	validateSearch: zodSearchValidator(functionSearchSchema),
+	loader: async () => {
+		return { config: await getConfig() };
+	},
 });
 
 function Index() {
@@ -58,9 +66,12 @@ function Index() {
 	}, [functions, path, navigate, idArrays]);
 
 	return (
-		<Main>
-			<FunctionColumnView path={path} />
-			<CreateAndRedirectEffect />
-		</Main>
+		<>
+			<Header />
+			<Main>
+				<FunctionColumnView path={path} />
+				<CreateAndRedirectEffect />
+			</Main>
+		</>
 	);
 }

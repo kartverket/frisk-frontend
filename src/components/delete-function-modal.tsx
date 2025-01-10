@@ -23,7 +23,7 @@ type Props = {
 export function DeleteFunctionModal({ onClose, isOpen, functionId }: Props) {
 	const { func, removeFunction } = useFunction(functionId);
 	const navigate = Route.useNavigate();
-	const { path } = Route.useSearch();
+	const { path, filters } = Route.useSearch();
 
 	return (
 		<Modal onClose={onClose} isOpen={isOpen} isCentered>
@@ -61,6 +61,7 @@ export function DeleteFunctionModal({ onClose, isOpen, functionId }: Props) {
 												? deletedFunctionParentPath
 												: pathString,
 										) ?? ["1"],
+										filters,
 									},
 								});
 							}}

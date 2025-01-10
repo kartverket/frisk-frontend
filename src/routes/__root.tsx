@@ -1,4 +1,3 @@
-import { Header } from "@/components/header";
 import { Flex, KvibProvider } from "@kvib/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { createRootRoute, Outlet } from "@tanstack/react-router";
@@ -18,7 +17,6 @@ export const Route = createRootRoute({
 				>
 					<KvibProvider>
 						<Flex flexDirection="column" minHeight="100svh" bgColor="gray.50">
-							<Header />
 							<Outlet />
 						</Flex>
 					</KvibProvider>

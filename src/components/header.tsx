@@ -1,8 +1,9 @@
+import { Route } from "@/routes";
 import { useMsal } from "@azure/msal-react";
 import { Button, Text } from "@kvib/react";
-import { config } from "../../frisk.config";
 
 export function Header() {
+	const { config } = Route.useLoaderData();
 	const msal = useMsal();
 	const accounts = msal.accounts;
 	const account = accounts[0];

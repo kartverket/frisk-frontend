@@ -1,4 +1,4 @@
-import { Button, Flex, Text, useToast } from "@kvib/react";
+import { Button, Flex, IconButton, Select, Text, useToast } from "@kvib/react";
 import { FunctionColumn } from "./function-column";
 import { getIdsFromPath } from "@/lib/utils";
 
@@ -13,8 +13,12 @@ import {
 	type DragEndEvent,
 } from "@dnd-kit/core";
 import type { useFunction } from "@/hooks/use-function";
-import { config } from "../../frisk.config";
 import { getFunctionsCSVDump } from "@/services/backend";
+import { Route } from "@/routes";
+import {
+	MetadataInput,
+	type MultiSelectOption,
+} from "./metadata/metadata-input";
 import { SearchField } from "./search-field";
 import { useState } from "react";
 import { FunctionCard } from "./function-card";
@@ -24,6 +28,9 @@ type FunctionColumnViewProps = {
 };
 
 export function FunctionColumnView({ path }: FunctionColumnViewProps) {
+	const { config } = Route.useLoaderData();
+	const search = Route.useSearch();
+	const navigate = Route.useNavigate();
 	const [activeId, setActiveId] = useState<number | null>(null);
 	const selectedFunctionIds = getIdsFromPath(path);
 
@@ -104,6 +111,31 @@ export function FunctionColumnView({ path }: FunctionColumnViewProps) {
 		}
 	};
 
+	const removeFilter = (key: string) => {
+		const newFilters = search.filters?.metadata.filter((m) => m.key !== key);
+		if (newFilters?.length === 0) {
+			navigate({
+				search: {
+					...search,
+					filters: undefined,
+				},
+			});
+		} else {
+			navigate({
+				search: {
+					...search,
+					...(search.filters
+						? {
+								filters: {
+									metadata: newFilters ?? [],
+								},
+							}
+						: {}),
+				},
+			});
+		}
+	};
+
 	return (
 		<Flex flexDirection="column" paddingY="38" paddingX="75" marginBottom="76">
 			<Text fontSize="2xl" fontWeight="700" marginBottom="3">
@@ -122,7 +154,141 @@ export function FunctionColumnView({ path }: FunctionColumnViewProps) {
 			>
 				Eksporter funksjonsregisteret
 			</Button>
-			<SearchField />
+
+			<Flex flexDirection="column" w="fit-content" gap={1} pb={2}>
+				<SearchField />
+				<Select
+					size="sm"
+					borderRadius="5px"
+					placeholder="Legg til filter"
+					onChange={(e) => {
+						if (e.target.value) {
+							navigate({
+								search: {
+									...search,
+									filters: {
+										metadata: [
+											...(search.filters?.metadata ?? []),
+											{ key: e.target.value },
+										],
+									},
+								},
+							});
+						}
+					}}
+				>
+					{config.metadata
+						?.filter(
+							(m) => !search.filters?.metadata?.some((f) => f.key === m.key),
+						)
+						.map((m) => {
+							return (
+								<option key={m.key} value={m.key}>
+									{m.displayName ?? m.key}
+								</option>
+							);
+						})}
+				</Select>
+				{search.filters?.metadata.map((filterMeta) => {
+					const metadata = config.metadata?.find(
+						(m) => m.key === filterMeta.key,
+					);
+					if (!metadata) {
+						return null;
+					}
+					return (
+						<Flex
+							key={filterMeta.key + filterMeta.value}
+							gap={1}
+							alignItems="center"
+						>
+							<Select
+								size="sm"
+								borderRadius="5px"
+								value={filterMeta.key}
+								placeholder="Fjern filter"
+								onChange={(e) => {
+									if (e.target.value) {
+										navigate({
+											search: {
+												...search,
+												...(search.filters
+													? {
+															filters: {
+																metadata: search.filters?.metadata.map((m) => {
+																	if (m.key === filterMeta.key) {
+																		return {
+																			key: e.target.value,
+																		};
+																	}
+																	return m;
+																}),
+															},
+														}
+													: {}),
+											},
+										});
+									} else {
+										removeFilter(filterMeta.key);
+									}
+								}}
+							>
+								{config.metadata
+									?.filter(
+										(m) =>
+											m.key === filterMeta.key ||
+											!search.filters?.metadata?.some((f) => f.key === m.key),
+									)
+									.map((m) => {
+										return (
+											<option key={m.key} value={m.key}>
+												{m.displayName ?? m.key}
+											</option>
+										);
+									})}
+							</Select>
+							<MetadataInput
+								hideLabel
+								value={filterMeta.value as string | MultiSelectOption[]}
+								onChange={(value) => {
+									navigate({
+										search: {
+											...search,
+											...(search.filters
+												? {
+														filters: {
+															metadata: search.filters?.metadata.map((m) => {
+																if (m.key === filterMeta.key) {
+																	return {
+																		key: filterMeta.key,
+																		value: value !== "" ? value : undefined,
+																	};
+																}
+																return m;
+															}),
+														},
+													}
+												: {}),
+										},
+									});
+								}}
+								metadata={metadata}
+								functionId={undefined}
+								parentFunctionId={undefined}
+							/>
+							<IconButton
+								aria-label="Remove filter"
+								onClick={() => {
+									removeFilter(filterMeta.key);
+								}}
+								icon="delete"
+								colorScheme="red"
+								variant="ghost"
+							/>
+						</Flex>
+					);
+				})}
+			</Flex>
 			<DndContext
 				onDragStart={handleDragStart}
 				onDragEnd={handleDragEnd}
@@ -136,7 +302,11 @@ export function FunctionColumnView({ path }: FunctionColumnViewProps) {
 
 				<DragOverlay>
 					{activeId ? (
-						<FunctionCard functionId={activeId} selected={false} />
+						<FunctionCard
+							functionId={activeId}
+							selected={false}
+							lowlighted={false}
+						/>
 					) : null}
 				</DragOverlay>
 			</DndContext>

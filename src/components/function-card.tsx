@@ -5,13 +5,14 @@ import { FunctionCardEdit } from "./function-card-edit";
 import { FunctionCardSelectedView } from "./function-card-selected-view";
 import { EditAndSelectButtons } from "./edit-and-select-buttons";
 import { useEffect, useState } from "react";
-import { config } from "../../frisk.config";
 import { useHasFunctionAccess } from "@/hooks/use-has-function-access";
 
 export function FunctionCard({
 	functionId,
 	selected,
-}: { functionId: number; selected: boolean }) {
+	lowlighted,
+}: { functionId: number; selected: boolean; lowlighted: boolean }) {
+	const { config } = Route.useLoaderData();
 	const { func } = useFunction(functionId);
 	const search = Route.useSearch();
 	const navigate = Route.useNavigate();
@@ -40,6 +41,7 @@ export function FunctionCard({
 			id={functionId.toString()}
 			marginBottom={bottomMargin}
 			borderColor="blue.500"
+			opacity={lowlighted ? 0.5 : 1}
 			borderWidth={1}
 			onClick={() => {
 				if (search.edit !== undefined) {
@@ -57,7 +59,7 @@ export function FunctionCard({
 								? [func?.data?.path.slice(0, func?.data?.path.lastIndexOf("."))]
 								: [`${func?.data?.path}`]),
 						],
-
+						filters: search.filters,
 						edit: search.edit,
 					},
 				});
