@@ -1,6 +1,5 @@
 import type { HTMLInputTypeAttribute } from "react";
 import {
-	createFunctionMetadata,
 	getFunction,
 	getFunctions,
 	getMyMicrosoftTeams,
