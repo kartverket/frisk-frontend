@@ -4,6 +4,7 @@ import { Route } from "@/routes";
 
 export function SearchField() {
 	const navigate = Route.useNavigate();
+	const search = Route.useSearch();
 
 	return (
 		<Box maxW="400px" my="10px">
@@ -22,7 +23,7 @@ export function SearchField() {
 				}}
 				onChange={(newFunc: { value: string } | null) => {
 					if (newFunc) {
-						navigate({ search: { path: [newFunc.value] } });
+						navigate({ search: { ...search, path: [newFunc.value] } });
 					}
 				}}
 				placeholder="Søk på funksjonsnavnet her..."
