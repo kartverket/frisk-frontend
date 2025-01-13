@@ -189,7 +189,10 @@ function LinkView({
 						variant="tertiary"
 						size="sm"
 						color="black"
-						onClick={onOpen}
+						onClick={(e) => {
+							e.stopPropagation();
+							onOpen();
+						}}
 					/>
 				)}
 				{functionId && metadataId && (
