@@ -307,11 +307,11 @@ function createSchemaButton(schemas: RegelrettSchema[]) {
 					const schemaId = (
 						e.currentTarget.elements.namedItem("schema") as HTMLSelectElement
 					).value;
-					const response = await createRegelrettContext(
-						func.data.name,
-						teamId,
-						schemaId,
-					);
+					const response = await createRegelrettContext({
+						name: func.data.name,
+						teamId: teamId,
+						tableId: schemaId,
+					});
 					addMetadata.mutateAsync({
 						functionId: func.data.id,
 						key: schemaId,
@@ -424,11 +424,11 @@ async function fetchFromRegelrett(path: string, options: RequestInit = {}) {
 	return response;
 }
 
-export async function createRegelrettContext(
-	name: string,
-	teamId: string,
-	tableId: string,
-) {
+export async function createRegelrettContext({
+	name,
+	teamId,
+	tableId,
+}: { name: string; teamId: string; tableId: string }) {
 	const response = await fetchFromRegelrett("/contexts", {
 		method: "POST",
 		headers: {
