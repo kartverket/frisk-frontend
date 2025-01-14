@@ -60,28 +60,23 @@ export function FunctionColumn({ functionIds }: FunctionFolderProps) {
 	}, [functionIds, isFetching]);
 
 	return (
-		<Flex flexDirection="column" width="380px">
+		<Flex
+			flexDirection="column"
+			width="350px"
+			minW="350px"
+			bgColor="white"
+			borderRadius={5}
+			padding={2}
+		>
 			<Box
 				bgColor="gray.200"
-				border="1px"
-				height="46px"
 				alignContent="center"
 				textAlign="center"
-				borderColor="gray.400"
-				minH="46px"
 				id="topBox"
-			>
-				<Text size="lg" fontWeight="700">
-					{config.columnName} nivå {currentLevel + 1}
-				</Text>
-			</Box>
+			/>
 
 			<Box
-				border="1px"
-				borderColor="gray.400"
-				backgroundColor={"white"}
 				position="relative"
-				minH="100%"
 				h={`${getColumnHeight()}px`}
 				id={`${currentLevel}-column`}
 			>

@@ -294,7 +294,7 @@ export function FunctionColumnView({ path }: FunctionColumnViewProps) {
 				onDragEnd={handleDragEnd}
 				sensors={sensors}
 			>
-				<Flex>
+				<Flex overflowX="scroll" gap={2}>
 					{selectedFunctionIds?.map((ids) => (
 						<FunctionColumn key={ids[0]} functionIds={ids} />
 					))}
