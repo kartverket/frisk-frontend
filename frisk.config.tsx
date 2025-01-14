@@ -1,4 +1,4 @@
-import { useState, type HTMLInputTypeAttribute } from "react";
+import { useEffect, useState, type HTMLInputTypeAttribute } from "react";
 import {
 	getFunction,
 	getFunctions,
@@ -166,7 +166,8 @@ export async function getConfig(): Promise<FriskConfig> {
 		columnName: "Funksjon",
 		addButtonName: "Legg til funksjon",
 		enableEntra: true,
-		functionCardComponents: [createSchemaButton(schemas)],
+		//functionCardComponents: [createSchemaButton(schemas)],
+		functionCardComponents: [SchemaButton],
 	};
 }
 
@@ -288,70 +289,113 @@ type FunctionCardComponentProps = {
 	metadata: ReturnType<typeof useMetadata>["metadata"];
 };
 
-function createSchemaButton(schemas: RegelrettSchema[]) {
-	return function SchemaButton({ func, metadata }: FunctionCardComponentProps) {
-		const [selectedSchema, setSelectedSchema] = useState("");
-		const availableSchemas = schemas.filter(
-			(schema) => !metadata.data?.find((m) => m.key === schema.id),
-		);
-		const { addMetadata } = useMetadata(func.data?.id);
-		return (
-			<form
-				onSubmit={async (e) => {
-					e.preventDefault();
-					if (!func.data) return;
-					const teamId = metadata.data?.find(
-						(obj) => obj.key === "team",
-					)?.value;
-					if (!teamId) return;
-					const schemaId = (
-						e.currentTarget.elements.namedItem("schema") as HTMLSelectElement
-					).value;
-					const response = await createRegelrettContext({
-						name: func.data.name,
-						teamId: teamId,
-						tableId: schemaId,
-					});
-					addMetadata.mutateAsync({
-						functionId: func.data.id,
-						key: schemaId,
-						value: response.id,
-					});
-				}}
-			>
-				<FormControl isRequired={true} style={{ width: "fit-content" }}>
-					<FormLabel style={{ fontSize: "14px" }}>
-						Opprett sikkerhetsskjema
-					</FormLabel>
-					<Select
-						name="schema"
-						onClick={(e) => e.stopPropagation()}
-						onChange={(e) => setSelectedSchema(e.target.value)}
-						placeholder="Velg sikkerhetsskjema"
-						size={"sm"}
-					>
-						{availableSchemas.map((schema) => (
-							<option key={schema.id} value={schema.id}>
-								{schema.name}
-							</option>
-						))}
-					</Select>
-				</FormControl>
-				<Button
-					type="submit"
-					variant="primary"
-					colorScheme="blue"
-					size="sm"
-					width="fit-content"
-					my="16px"
+function SchemaButton({ func, metadata }: FunctionCardComponentProps) {
+	return (
+		<Button
+			variant="primary"
+			colorScheme="blue"
+			size="sm"
+			width="fit-content"
+			my="16px"
+			onClick={(e) => {
+				e.preventDefault();
+				if (!func.data) return;
+				const teamId = metadata.data?.find((obj) => obj.key === "team")?.value;
+
+				const searchParamsRedirectURL = new URLSearchParams({
+					path: `"${func.data.path}"`,
+					functionId: func.data.id.toString(),
+					newMetadataKey: "{tableId}",
+					newMetadataValue: "{contextId}",
+					redirect: `"${location.origin}"`,
+				});
+				const redirectURL = `${location.origin}?${searchParamsRedirectURL.toString()}`;
+
+				const searchParams = new URLSearchParams({
+					name: func.data?.name,
+					...(teamId && { teamId }),
+					redirect: redirectURL,
+					locked: "true",
+					redirectBackUrl: window.location.href,
+					redirectBackTitle: "Funksjonsregisteret",
+				});
+				const path = `${getregelrettFrontendUrl()}/ny?${searchParams.toString()}`;
+				window.location.href = path;
+			}}
+		>
+			Opprett sikkerhetsskjema
+		</Button>
+	);
+}
+
+export function OboFlowFeature({ func, metadata }: FunctionCardComponentProps) {
+	const [schemas, setSchemas] = useState<Array<{ id: string; name: string }>>(
+		[],
+	);
+	const [selectedSchema, setSelectedSchema] = useState("");
+
+	useEffect(() => {
+		getSchemasFromRegelrett().then((result) => setSchemas(result));
+	}, []);
+
+	const availableSchemas = schemas.filter(
+		(schema) => !metadata.data?.find((m) => m.key === schema.id),
+	);
+	const { addMetadata } = useMetadata(func.data?.id);
+	return (
+		<form
+			onSubmit={async (e) => {
+				e.preventDefault();
+				if (!func.data) return;
+				const teamId = metadata.data?.find((obj) => obj.key === "team")?.value;
+				if (!teamId) return;
+				const schemaId = (
+					e.currentTarget.elements.namedItem("schema") as HTMLSelectElement
+				).value;
+				const response = await createRegelrettContext({
+					name: func.data.name,
+					teamId: teamId,
+					tableId: schemaId,
+				});
+				addMetadata.mutateAsync({
+					functionId: func.data.id,
+					key: schemaId,
+					value: response.id,
+				});
+			}}
+		>
+			<FormControl isRequired={true} style={{ width: "fit-content" }}>
+				<FormLabel style={{ fontSize: "14px" }}>
+					Opprett sikkerhetsskjema
+				</FormLabel>
+				<Select
+					name="schema"
 					onClick={(e) => e.stopPropagation()}
-					isDisabled={!selectedSchema}
+					onChange={(e) => setSelectedSchema(e.target.value)}
+					placeholder="Velg sikkerhetsskjema"
+					size={"sm"}
 				>
-					Opprett skjema
-				</Button>
-			</form>
-		);
-	};
+					{availableSchemas.map((schema) => (
+						<option key={schema.id} value={schema.id}>
+							{schema.name}
+						</option>
+					))}
+				</Select>
+			</FormControl>
+			<Button
+				type="submit"
+				variant="primary"
+				colorScheme="blue"
+				size="sm"
+				width="fit-content"
+				my="16px"
+				onClick={(e) => e.stopPropagation()}
+				isDisabled={!selectedSchema}
+			>
+				Opprett skjema
+			</Button>
+		</form>
+	);
 }
 
 const REGELRETT_BACKEND_URL =
