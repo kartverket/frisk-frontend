@@ -61,6 +61,7 @@ export function FunctionCard({
 						],
 						filters: search.filters,
 						edit: search.edit,
+						flags: search.flags,
 					},
 				});
 			}}
