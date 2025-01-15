@@ -9,7 +9,7 @@ import { getregelrettFrontendUrl } from "@/config";
 import { object, string, array, type z } from "zod";
 import { Button, FormControl, FormLabel, Select } from "@kvib/react";
 import type { useFunction } from "@/hooks/use-function";
-import { useMetadata } from "@/hooks/use-metadata";
+import type { useMetadata } from "@/hooks/use-metadata";
 import { msalInstance } from "@/services/msal";
 import { InteractionRequiredAuthError } from "@azure/msal-browser";
 
@@ -260,6 +260,7 @@ type Logo = {
 type FunctionCardComponentProps = {
 	func: ReturnType<typeof useFunction>["func"];
 	metadata: ReturnType<typeof useMetadata>["metadata"];
+	addMetadata: ReturnType<typeof useMetadata>["addMetadata"];
 };
 
 function SchemaButton({ func, metadata }: FunctionCardComponentProps) {
@@ -301,7 +302,11 @@ function SchemaButton({ func, metadata }: FunctionCardComponentProps) {
 	);
 }
 
-export function OboFlowFeature({ func, metadata }: FunctionCardComponentProps) {
+export function OboFlowFeature({
+	func,
+	metadata,
+	addMetadata,
+}: FunctionCardComponentProps) {
 	const [schemas, setSchemas] = useState<Array<{ id: string; name: string }>>(
 		[],
 	);
@@ -314,7 +319,6 @@ export function OboFlowFeature({ func, metadata }: FunctionCardComponentProps) {
 	const availableSchemas = schemas.filter(
 		(schema) => !metadata.data?.find((m) => m.key === schema.id),
 	);
-	const { addMetadata } = useMetadata(func.data?.id);
 	return (
 		<form
 			onSubmit={async (e) => {

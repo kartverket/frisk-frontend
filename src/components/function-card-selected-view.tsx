@@ -10,7 +10,7 @@ export function FunctionCardSelectedView({
 	functionId,
 }: { functionId: number }) {
 	const { func } = useFunction(functionId);
-	const { metadata } = useMetadata(functionId);
+	const { metadata, addMetadata } = useMetadata(functionId);
 	const { config } = Route.useLoaderData();
 	const { flags } = Route.useSearch();
 
@@ -34,13 +34,18 @@ export function FunctionCardSelectedView({
 				<MetadataView key={meta.key} metadata={meta} functionId={functionId} />
 			))}
 			{flags?.includes("oboflow") ? (
-				<OboFlowFeature func={func} metadata={metadata} />
+				<OboFlowFeature
+					func={func}
+					metadata={metadata}
+					addMetadata={addMetadata}
+				/>
 			) : (
 				config.functionCardComponents.map((Component) => (
 					<Component
 						key={Component.toString()}
 						func={func}
 						metadata={metadata}
+						addMetadata={addMetadata}
 					/>
 				))
 			)}
