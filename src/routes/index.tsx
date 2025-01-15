@@ -28,6 +28,8 @@ const functionSearchSchema = object({
 	filters: object({
 		metadata: array(object({ key: string(), value: unknown().optional() })),
 	}).optional(),
+
+	flags: array(string()).optional(),
 });
 
 export const Route = createFileRoute("/")({
@@ -39,7 +41,7 @@ export const Route = createFileRoute("/")({
 });
 
 function Index() {
-	const { path } = Route.useSearch();
+	const { path, flags } = Route.useSearch();
 	const navigate = Route.useNavigate();
 
 	const idArrays = path.map((pathArray) =>
@@ -59,11 +61,12 @@ function Index() {
 					search: {
 						path: updatedPathArray,
 						edit: undefined,
+						flags: flags,
 					},
 				});
 			}
 		});
-	}, [functions, path, navigate, idArrays]);
+	}, [functions, path, navigate, idArrays, flags]);
 
 	return (
 		<>

@@ -4,13 +4,15 @@ import { EditAndSelectButtons } from "./edit-and-select-buttons";
 import { MetadataView } from "./metadata/metadata-view";
 import { useMetadata } from "@/hooks/use-metadata";
 import { Route } from "@/routes";
+import { OboFlowFeature } from "../../frisk.config";
 
 export function FunctionCardSelectedView({
 	functionId,
 }: { functionId: number }) {
 	const { func } = useFunction(functionId);
-	const { metadata } = useMetadata(functionId);
+	const { metadata, addMetadata } = useMetadata(functionId);
 	const { config } = Route.useLoaderData();
+	const { flags } = Route.useSearch();
 
 	return (
 		<Stack paddingLeft="10px" w="100%">
@@ -31,16 +33,22 @@ export function FunctionCardSelectedView({
 			{config.metadata?.map((meta) => (
 				<MetadataView key={meta.key} metadata={meta} functionId={functionId} />
 			))}
-
-			{config.functionCardComponents.map((Component) => {
-				return (
+			{flags?.includes("oboflow") ? (
+				<OboFlowFeature
+					func={func}
+					metadata={metadata}
+					addMetadata={addMetadata}
+				/>
+			) : (
+				config.functionCardComponents.map((Component) => (
 					<Component
 						key={Component.toString()}
 						func={func}
 						metadata={metadata}
+						addMetadata={addMetadata}
 					/>
-				);
-			})}
+				))
+			)}
 		</Stack>
 	);
 }
