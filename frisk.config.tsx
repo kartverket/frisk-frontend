@@ -402,16 +402,16 @@ export function OboFlowFeature({
 	);
 }
 
-const REGELRETT_BACKEND_URL =
-	import.meta.env.MODE === "development" ||
-	import.meta.env.MODE === "production"
-		? "https://regelrett-frontend-1024826672490.europe-north1.run.app/api"
-		: import.meta.env.MODE === "skip"
-			? "https://regelrett.atgcp1-prod.kartverket-intern.cloud/api"
-			: "http://localhost:8080";
+// const REGELRETT_BACKEND_URL =
+// 	import.meta.env.MODE === "development" ||
+// 	import.meta.env.MODE === "production"
+// 		? "https://regelrett-frontend-1024826672490.europe-north1.run.app/api"
+// 		: import.meta.env.MODE === "skip"
+// 			? "https://regelrett.atgcp1-prod.kartverket-intern.cloud/api"
+// 			: "http://localhost:8080";
 
 async function getSchemasFromRegelrett() {
-	const response = await fetch(`${REGELRETT_BACKEND_URL}/schemas`);
+	const response = await fetch(`${getregelrettFrontendUrl()}/api/schemas`);
 	if (!response.ok) {
 		throw new Error(`Backend error: ${response.status} ${response.statusText}`);
 	}
@@ -428,9 +428,10 @@ const RegelrettSchema = object({
 type RegelrettSchema = z.infer<typeof RegelrettSchema>;
 
 async function getRegelrettTokens() {
-	const regelrettScopes = [
-		"api://e9dc946b-6fef-44ab-82f1-c0ec2e402903/.default",
-	];
+	const regelrettScope =
+		import.meta.env.MODE === "skip"
+			? "api://regelrett-backend/regelrett"
+			: "api://e9dc946b-6fef-44ab-82f1-c0ec2e402903/.default";
 
 	const accounts = msalInstance.getAllAccounts();
 	const account = accounts[0];
@@ -439,13 +440,13 @@ async function getRegelrettTokens() {
 	}
 	const tokenResponse = await msalInstance
 		.acquireTokenSilent({
-			scopes: regelrettScopes,
+			scopes: [regelrettScope],
 			account: account,
 		})
 		.catch((error) => {
 			if (error instanceof InteractionRequiredAuthError) {
 				return msalInstance.acquireTokenRedirect({
-					scopes: regelrettScopes,
+					scopes: [regelrettScope],
 					account: account,
 				});
 			}
@@ -459,7 +460,7 @@ async function getRegelrettTokens() {
 
 async function fetchFromRegelrett(path: string, options: RequestInit = {}) {
 	const tokens = await getRegelrettTokens();
-	const response = await fetch(`${REGELRETT_BACKEND_URL}${path}`, {
+	const response = await fetch(`${getregelrettFrontendUrl()}/api/${path}`, {
 		...options,
 		headers: {
 			...options.headers,
