@@ -6,8 +6,14 @@ import { useEffect } from "react";
 
 export function CreateAndRedirectEffect() {
 	const navigate = Route.useNavigate();
-	const { path, functionId, newMetadataKey, newMetadataValue, redirect } =
-		Route.useSearch();
+	const {
+		path,
+		flags,
+		functionId,
+		newMetadataKey,
+		newMetadataValue,
+		redirect,
+	} = Route.useSearch();
 
 	const { func } = useFunction(functionId ?? 1);
 	const { addMetadata } = useMetadata(functionId ?? 1);
@@ -29,7 +35,7 @@ export function CreateAndRedirectEffect() {
 					if (redirect) {
 						window.location.href = redirect;
 					} else {
-						navigate({ search: { path: path } });
+						navigate({ search: { path: path, flags: flags } });
 					}
 				});
 		}
@@ -39,6 +45,7 @@ export function CreateAndRedirectEffect() {
 		newMetadataValue,
 		func.data,
 		path,
+		flags,
 		addMetadata,
 		navigate,
 	]);

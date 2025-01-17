@@ -61,6 +61,7 @@ export function FunctionCard({
 						],
 						filters: search.filters,
 						edit: search.edit,
+						flags: search.flags,
 					},
 				});
 			}}
@@ -86,7 +87,9 @@ export function FunctionCard({
 							variant="ghost"
 							aria-label="drag"
 							icon="drag_indicator"
+							isDisabled={!hasAccess}
 						/>
+
 						<Skeleton isLoaded={!func.isLoading} flex="1" minWidth={0}>
 							<Text
 								fontWeight="bold"
