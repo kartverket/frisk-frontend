@@ -12,7 +12,6 @@ export function FunctionCard({
 	selected,
 	lowlighted,
 }: { functionId: number; selected: boolean; lowlighted: boolean }) {
-	const { config } = Route.useLoaderData();
 	const { func } = useFunction(functionId);
 	const search = Route.useSearch();
 	const navigate = Route.useNavigate();
@@ -32,9 +31,7 @@ export function FunctionCard({
 		setBottomMargin(getParentDistance());
 	});
 
-	const hasAccess = config.enableEntra
-		? useHasFunctionAccess(functionId)
-		: true;
+	const hasAccess = useHasFunctionAccess(functionId);
 
 	return (
 		<Card

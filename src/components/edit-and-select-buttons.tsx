@@ -7,7 +7,6 @@ export function EditAndSelectButtons({
 	functionId,
 	selected,
 }: { functionId: number; selected: boolean }) {
-	const { config } = Route.useLoaderData();
 	const theme = useTheme();
 	const search = Route.useSearch();
 	const navigate = Route.useNavigate();
@@ -15,9 +14,7 @@ export function EditAndSelectButtons({
 		includeChildren: true,
 	});
 
-	const hasAccess = config.enableEntra
-		? useHasFunctionAccess(functionId)
-		: true;
+	const hasAccess = useHasFunctionAccess(functionId);
 
 	return (
 		<Flex gap="2px">

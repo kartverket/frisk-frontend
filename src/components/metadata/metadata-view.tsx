@@ -11,16 +11,25 @@ import {
 import { useQueries } from "@tanstack/react-query";
 import type { Metadata } from "../../../frisk.config";
 import { DeleteMetadataModal } from "../delete-metadata-modal";
+import { useHasFunctionAccess } from "@/hooks/use-has-function-access";
 
 type Props = {
 	metadata: Metadata;
-	functionId: number | undefined;
+	functionId: number;
 };
 
 export function MetadataView({ metadata, functionId }: Props) {
 	const {
 		metadata: { data: currentMetadata, isPending: isCurrentMetadataLoading },
 	} = useMetadata(functionId);
+	const hasAccess = useHasFunctionAccess(functionId);
+
+	// metadata is deletable if it is not required, and only shows in read mode, and you have access
+	const isDeletable =
+		!metadata.isRequired &&
+		metadata.show("read", hasAccess) &&
+		!metadata.show("update", hasAccess) &&
+		!metadata.show("create", hasAccess);
 
 	const metadataToDisplay = currentMetadata?.filter(
 		(m) => metadata.key === m.key,
@@ -76,9 +85,7 @@ export function MetadataView({ metadata, functionId }: Props) {
 								url={metaDataValue}
 								displayValue={displayValue}
 								isExternal={dv.data?.displayOptions?.isExternal ?? true}
-								isDeletable={
-									metadata.showOn === "readOnly" && metadata.isDeletable
-								}
+								isDeletable={isDeletable}
 								metadataId={metadataId}
 								functionId={functionId}
 								isLoading={isLoading}
@@ -113,9 +120,7 @@ export function MetadataView({ metadata, functionId }: Props) {
 										url={metaDataValue}
 										displayValue={displayValue}
 										isExternal={metadata.isExternal}
-										isDeletable={
-											metadata.showOn === "readOnly" && metadata.isDeletable
-										}
+										isDeletable={isDeletable}
 										metadataId={metadataId}
 										functionId={functionId}
 										isLoading={isLoading}
