@@ -47,6 +47,17 @@ async function fetchFromBackend(path: Path, options: RequestInit) {
 	return response;
 }
 
+export async function hei(key: string, value: string, path: string) {
+	const funcs = await fetchFromBackend(
+		`/metadata/indicator?key=${key}&value=${value}&path=${path}`,
+		{
+			method: "GET",
+		},
+	).then((res) => res.json());
+	console.log(funcs);
+	return funcs;
+}
+
 export async function getFunctions(search?: string) {
 	const response = await fetchFromBackend(
 		`/functions${search ? `?search=${search}` : ""}`,

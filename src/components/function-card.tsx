@@ -6,6 +6,7 @@ import { FunctionCardSelectedView } from "./function-card-selected-view";
 import { EditAndSelectButtons } from "./edit-and-select-buttons";
 import { useEffect, useState } from "react";
 import { useHasFunctionAccess } from "@/hooks/use-has-function-access";
+import { test } from "@/hooks/use-test";
 
 export function FunctionCard({
 	functionId,
@@ -18,6 +19,12 @@ export function FunctionCard({
 	const navigate = Route.useNavigate();
 
 	const [bottomMargin, setBottomMargin] = useState(0);
+
+	test(
+		"rr-skjema",
+		"9360a014-493a-4a2b-9b9a-1f8d93dbbce7:splitTarget:Sikkerhetskontrollere:splitTarget:Malin",
+		"1",
+	);
 
 	function getParentDistance() {
 		const childrenGroup = document.getElementById(`${functionId}-children`);
