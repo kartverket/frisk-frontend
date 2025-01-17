@@ -361,11 +361,20 @@ export function OboFlowFeature({
 					teamId: teamId,
 					tableId: schemaId,
 				});
+				const contextId = response.id;
 				addMetadata.mutateAsync({
 					functionId: func.data.id,
 					key: schemaId,
-					value: response.id,
+					value: contextId,
 				});
+
+				const searchParams = new URLSearchParams({
+					redirectBackUrl: window.location.href,
+					redirectBackTitle: "Funksjonsregisteret",
+				});
+
+				const url = `${getregelrettFrontendUrl()}/context/${contextId}?${contextId}?${searchParams.toString()}`;
+				window.location.href = url;
 			}}
 		>
 			<FormControl isRequired={true} style={{ width: "fit-content" }}>
@@ -402,16 +411,10 @@ export function OboFlowFeature({
 	);
 }
 
-// const REGELRETT_BACKEND_URL =
-// 	import.meta.env.MODE === "development" ||
-// 	import.meta.env.MODE === "production"
-// 		? "https://regelrett-frontend-1024826672490.europe-north1.run.app/api"
-// 		: import.meta.env.MODE === "skip"
-// 			? "https://regelrett.atgcp1-prod.kartverket-intern.cloud/api"
-// 			: "http://localhost:8080";
+const REGELRETT_BACKEND_URL = `${getregelrettFrontendUrl()}/api`;
 
 async function getSchemasFromRegelrett() {
-	const response = await fetch(`${getregelrettFrontendUrl()}/api/schemas`);
+	const response = await fetch(`${REGELRETT_BACKEND_URL}/schemas`);
 	if (!response.ok) {
 		throw new Error(`Backend error: ${response.status} ${response.statusText}`);
 	}
@@ -460,7 +463,7 @@ async function getRegelrettTokens() {
 
 async function fetchFromRegelrett(path: string, options: RequestInit = {}) {
 	const tokens = await getRegelrettTokens();
-	const response = await fetch(`${getregelrettFrontendUrl()}/api/${path}`, {
+	const response = await fetch(`${REGELRETT_BACKEND_URL}/${path}`, {
 		...options,
 		headers: {
 			...options.headers,
