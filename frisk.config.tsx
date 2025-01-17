@@ -373,7 +373,7 @@ export function OboFlowFeature({
 					redirectBackTitle: "Funksjonsregisteret",
 				});
 
-				const url = `${getregelrettFrontendUrl()}/context/${contextId}?${contextId}?${searchParams.toString()}`;
+				const url = `${getregelrettFrontendUrl()}/context/${contextId}?${searchParams.toString()}`;
 				window.location.href = url;
 			}}
 		>
