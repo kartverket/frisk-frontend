@@ -4,7 +4,7 @@ import { Card, Flex, IconButton, Skeleton, Stack, Text } from "@kvib/react";
 import { FunctionCardEdit } from "./function-card-edit";
 import { FunctionCardExpandableContent } from "./function-card-expandable-content";
 import { EditAndSelectButtons } from "./edit-and-select-buttons";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useHasFunctionAccess } from "@/hooks/use-has-function-access";
 
 export function FunctionCard({
@@ -17,10 +17,19 @@ export function FunctionCard({
 	const search = Route.useSearch();
 	const navigate = Route.useNavigate();
 
-	const [isCardExpanded, setIsCardExpanded] = useState(false);
+	const isCardExpanded = useMemo(() => {
+		return search.expandedCards?.includes(functionId) ?? false;
+	}, [functionId, search.expandedCards]);
 
 	const toggleCardExpanded = () => {
-		setIsCardExpanded((prev) => !prev);
+		navigate({
+			search: {
+				...search,
+				expandedCards: isCardExpanded
+					? search.expandedCards?.filter((id) => id !== functionId)
+					: [...(search.expandedCards ?? []), functionId],
+			},
+		});
 	};
 
 	const [bottomMargin, setBottomMargin] = useState(0);
@@ -65,6 +74,7 @@ export function FunctionCard({
 								? [func?.data?.path.slice(0, func?.data?.path.lastIndexOf("."))]
 								: [`${func?.data?.path}`]),
 						],
+						expandedCards: search.expandedCards,
 						filters: search.filters,
 						edit: search.edit,
 						flags: search.flags,

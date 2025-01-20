@@ -13,6 +13,7 @@ export function CreateAndRedirectEffect() {
 		newMetadataKey,
 		newMetadataValue,
 		redirect,
+		expandedCards,
 	} = Route.useSearch();
 
 	const { func } = useFunction(functionId ?? 1);
@@ -35,7 +36,13 @@ export function CreateAndRedirectEffect() {
 					if (redirect) {
 						window.location.href = redirect;
 					} else {
-						navigate({ search: { path: path, flags: flags } });
+						navigate({
+							search: {
+								path: path,
+								flags: flags,
+								expandedCards: expandedCards,
+							},
+						});
 					}
 				});
 		}
@@ -47,6 +54,7 @@ export function CreateAndRedirectEffect() {
 		path,
 		flags,
 		addMetadata,
+		expandedCards,
 		navigate,
 	]);
 

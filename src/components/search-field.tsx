@@ -23,7 +23,15 @@ export function SearchField() {
 				}}
 				onChange={(newFunc: { value: string } | null) => {
 					if (newFunc) {
-						navigate({ search: { ...search, path: [newFunc.value] } });
+						const newPath = newFunc.value;
+						const newId = Number.parseInt(newPath.split(".").pop() ?? "1");
+						navigate({
+							search: {
+								...search,
+								path: [newFunc.value],
+								expandedCards: [newId],
+							},
+						});
 					}
 				}}
 				placeholder="Søk på funksjonsnavnet her..."

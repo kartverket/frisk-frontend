@@ -23,7 +23,7 @@ type Props = {
 export function DeleteFunctionModal({ onClose, isOpen, functionId }: Props) {
 	const { func, removeFunction } = useFunction(functionId);
 	const navigate = Route.useNavigate();
-	const { path, flags, filters } = Route.useSearch();
+	const { path, flags, filters, expandedCards } = Route.useSearch();
 
 	return (
 		<Modal onClose={onClose} isOpen={isOpen} isCentered>
@@ -62,6 +62,7 @@ export function DeleteFunctionModal({ onClose, isOpen, functionId }: Props) {
 												: pathString,
 										) ?? ["1"],
 										filters,
+										expandedCards,
 										flags: flags,
 									},
 								});

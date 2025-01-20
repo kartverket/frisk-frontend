@@ -20,6 +20,7 @@ const functionSearchSchema = object({
 		),
 		["1"],
 	),
+	expandedCards: array(number()).optional(),
 	functionId: number().optional(),
 	edit: number().optional(),
 	newMetadataKey: string().optional(),
