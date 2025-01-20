@@ -35,7 +35,7 @@ export async function getConfig(): Promise<FriskConfig> {
 					return { displayValue: team.displayName };
 				},
 				selectMode: "single",
-				showOn: "createAndUpdate",
+				show: () => true,
 				isRequired: true,
 				placeholder: "Velg team",
 				inheritFromParent: true,
@@ -48,7 +48,7 @@ export async function getConfig(): Promise<FriskConfig> {
 				label: "Kritikalitet",
 				inheritFromParent: false,
 				isRequired: false,
-				showOn: "createAndUpdate",
+				show: () => true,
 				selectMode: "single",
 				getOptions: async () => {
 					return [
@@ -66,7 +66,7 @@ export async function getConfig(): Promise<FriskConfig> {
 				displayName: "Lenke til utviklerportalen",
 				isExternal: true,
 				label: "Lenke til utviklerportalen",
-				showOn: "createAndUpdate",
+				show: () => true,
 				isRequired: false,
 				placeholder: "Sett inn lenke",
 				inheritFromParent: false,
@@ -80,11 +80,10 @@ export async function getConfig(): Promise<FriskConfig> {
 					type: "text",
 					displayName: schema.name,
 					label: "Regelrett skjema",
-					showOn: "readOnly",
+					show: (mode, hasAccess) => mode === "read" && hasAccess,
 					isRequired: false,
 					placeholder: "Sett inn skjema",
 					inheritFromParent: false,
-					isDeletable: true,
 					getDisplayValue: async (input) => {
 						const contextId = input.value;
 						const searchParams = new URLSearchParams({
@@ -122,7 +121,7 @@ export async function getConfig(): Promise<FriskConfig> {
 					return { displayValue: func.name, displayOptions: { type: "pill" } };
 				},
 				selectMode: "multi",
-				showOn: "createAndUpdate",
+				show: () => true,
 				isRequired: false,
 				placeholder: "Søk etter funksjoner",
 				inheritFromParent: false,
@@ -179,6 +178,9 @@ type GeneralMetadataContent = {
 	 */
 	inheritFromParent: boolean;
 
+	isRequired: boolean;
+	show: (mode: "create" | "update" | "read", hasAccess: boolean) => boolean;
+
 	/**
 	 * Get the display value that will be used when rendering the metadata.
 	 * Visual only
@@ -207,21 +209,11 @@ type GeneralMetadataContent = {
 	}>;
 };
 
-type GeneralRequiredMetadata = GeneralMetadataContent & {
-	isRequired: true;
-	showOn: "createAndUpdate";
-};
+type GeneralRequiredMetadata = GeneralMetadataContent;
 
-type GeneralOptionalMetadata = GeneralMetadataContent & {
-	isRequired: false;
-	showOn: "update" | "createAndUpdate";
-};
+type GeneralOptionalMetadata = GeneralMetadataContent;
 
-type ReadOnlyMetadata = GeneralMetadataContent & {
-	isRequired: false;
-	showOn: "readOnly";
-	isDeletable: boolean;
-};
+type ReadOnlyMetadata = GeneralMetadataContent;
 
 type GeneralMetadata =
 	| GeneralRequiredMetadata
