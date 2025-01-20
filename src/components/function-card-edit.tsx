@@ -8,6 +8,7 @@ import {
 	Stack,
 	IconButton,
 	Tooltip,
+	Box,
 } from "@kvib/react";
 import { useFunction } from "@/hooks/use-function";
 import { Route } from "@/routes";
@@ -128,7 +129,7 @@ export function FunctionCardEdit({ functionId }: { functionId: number }) {
 	}
 
 	return (
-		<>
+		<Box maxWidth="100%">
 			<form onSubmit={handleSubmit}>
 				<Stack
 					paddingLeft="10px"
@@ -207,6 +208,6 @@ export function FunctionCardEdit({ functionId }: { functionId: number }) {
 				isOpen={isOpen}
 				functionId={functionId}
 			/>
-		</>
+		</Box>
 	);
 }

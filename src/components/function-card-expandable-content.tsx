@@ -14,7 +14,7 @@ export function FunctionCardExpandableContent({
 	const { flags } = Route.useSearch();
 
 	return (
-		<Stack pl="10px">
+		<Stack pl="10px" overflow="hidden">
 			{config.metadata?.map((meta) => (
 				<MetadataView key={meta.key} metadata={meta} functionId={functionId} />
 			))}
