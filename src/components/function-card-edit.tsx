@@ -46,7 +46,7 @@ export function FunctionCardEdit({ functionId }: { functionId: number }) {
 				| HTMLInputElement
 				| HTMLSelectElement
 				| null;
-			if (!formElement?.value) continue;
+			if (!formElement) continue;
 			if (md.type === "select" && md.selectMode === "multi") {
 				const newMetadata = JSON.parse(
 					formElement.value,
