@@ -215,7 +215,7 @@ function SingleSelect({
 			name={metadata.key}
 			size="sm"
 			borderRadius="5px"
-			placeholder={currentMetadataValue ?? metadata.placeholder}
+			placeholder={metadata.placeholder}
 			defaultValue={
 				currentMetadataValue ??
 				(metadata.inheritFromParent ? parentMetadataValue : undefined)
