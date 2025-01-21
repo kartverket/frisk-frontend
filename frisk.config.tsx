@@ -74,33 +74,6 @@ export async function getConfig(): Promise<FriskConfig> {
 					return { displayValue: "Utviklerportalen" };
 				},
 			},
-			{
-				key: "rr-skjema",
-				type: "text",
-				displayName: "Skjema (legacy)",
-				label: "Regelrett skjema",
-				showOn: "readOnly",
-				isRequired: false,
-				placeholder: "Sett inn skjema",
-				inheritFromParent: false,
-				isDeletable: true,
-				getDisplayValue: async (input) => {
-					const [contextId, tableName, __] = input.value.split(":splitTarget:");
-					const searchParams = new URLSearchParams({
-						redirectBackUrl: window.location.href,
-						redirectBackTitle: "Funksjonsregisteret",
-					});
-					const url = `${getregelrettFrontendUrl()}/context/${contextId}?${searchParams.toString()}`;
-					return {
-						displayValue: tableName.replaceAll("+", " "),
-						value: url,
-						displayOptions: {
-							type: "url",
-							isExternal: false,
-						},
-					};
-				},
-			},
 			...schemas.map(
 				(schema): InputMetadata => ({
 					key: schema.id,
