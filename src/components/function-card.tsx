@@ -19,11 +19,7 @@ export function FunctionCard({
 
 	const [bottomMargin, setBottomMargin] = useState(0);
 
-	test(
-		"rr-skjema",
-		"9360a014-493a-4a2b-9b9a-1f8d93dbbce7:splitTarget:Sikkerhetskontrollere:splitTarget:Malin",
-		"1",
-	);
+	test("team", "9ef6a023-9869-410f-95d1-fa230ba9cd35", "3");
 
 	function getParentDistance() {
 		const childrenGroup = document.getElementById(`${functionId}-children`);
