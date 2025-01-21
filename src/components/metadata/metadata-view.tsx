@@ -18,7 +18,7 @@ type Props = {
 	functionId: number;
 };
 
-export function MetadataView({ metadata, functionId }: Props) {
+export function MetadataView({ metadata, functionId, hideTitle }: Props) {
 	const {
 		metadata: { data: currentMetadata, isPending: isCurrentMetadataLoading },
 	} = useMetadata(functionId);
@@ -51,11 +51,6 @@ export function MetadataView({ metadata, functionId }: Props) {
 
 	return (
 		<Box my={1}>
-			{metadata.title ? (
-				<Text fontSize="sm" fontWeight="700">
-					{metadata.title}:
-				</Text>
-			) : null}
 			{displayValues.map((dv, i) => {
 				const isDisplayValueLoading = dv.isLoading;
 				const displayValue =

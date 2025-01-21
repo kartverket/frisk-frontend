@@ -5,6 +5,7 @@ import { Route } from "@/routes";
 import { OboFlowFeature } from "../../frisk.config";
 import { Flex, Skeleton, Stack, Text } from "@kvib/react";
 import { EditAndSelectButtons } from "./edit-and-select-buttons";
+import { useIndicators } from "@/hooks/use-indicators";
 
 export function FunctionCardSelectedView({
 	functionId,
@@ -12,7 +13,7 @@ export function FunctionCardSelectedView({
 	const { func } = useFunction(functionId);
 	const { metadata, addMetadata } = useMetadata(functionId);
 	const { config } = Route.useLoaderData();
-	const { flags } = Route.useSearch();
+	const search = Route.useSearch();
 
 	return (
 		<Stack pl="10px" w="100%" overflow="hidden">
@@ -31,9 +32,28 @@ export function FunctionCardSelectedView({
 				<EditAndSelectButtons functionId={functionId} selected />
 			</Flex>
 			{config.metadata?.map((meta) => (
-				<MetadataView key={meta.key} metadata={meta} functionId={functionId} />
+				<>
+					{meta.title && (
+						<Text key={`${meta.key}-title`} fontSize="sm" fontWeight="700">
+							{meta.title}:
+						</Text>
+					)}
+					<MetadataView
+						key={meta.key}
+						metadata={meta}
+						functionId={functionId}
+					/>
+					{search.indicators?.metadata?.some((m) => m.key === meta.key) ? (
+						<Indicator
+							key={`${meta.key}-indicator`}
+							functionId={functionId}
+							metaKey={meta.key}
+							metaValue={search.indicators.metadata[0].value as string}
+						/>
+					) : null}
+				</>
 			))}
-			{flags?.includes("oboflow") ? (
+			{search.flags?.includes("oboflow") ? (
 				<OboFlowFeature
 					func={func}
 					metadata={metadata}
@@ -51,4 +71,32 @@ export function FunctionCardSelectedView({
 			)}
 		</Stack>
 	);
+}
+
+function Indicator(props: {
+	functionId: number;
+	metaKey: string;
+	metaValue?: string;
+}) {
+	const { config } = Route.useLoaderData();
+	const { func } = useFunction(props.functionId);
+	const { functionId, metaKey: key, metaValue: value } = props;
+	const indicators = useIndicators({
+		functionId,
+		key,
+		value,
+	});
+
+	return indicators.data
+		?.filter((indicator) => indicator.id !== func.data?.id)
+		?.map((indicator) => (
+			<Flex key={indicator.id}>
+				{indicator.path.split(".").length - func.data?.path.split(".").length}
+				{"> "}
+				<MetadataView
+					functionId={indicator.id}
+					metadata={config.metadata?.find((m) => m.key === key)}
+				/>
+			</Flex>
+		));
 }

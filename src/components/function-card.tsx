@@ -6,7 +6,6 @@ import { FunctionCardSelectedView } from "./function-card-selected-view";
 import { EditAndSelectButtons } from "./edit-and-select-buttons";
 import { useEffect, useState } from "react";
 import { useHasFunctionAccess } from "@/hooks/use-has-function-access";
-import { useIndicators } from "@/hooks/use-indicators";
 
 export function FunctionCard({
 	functionId,
@@ -47,6 +46,7 @@ export function FunctionCard({
 				}
 				navigate({
 					search: {
+						...search,
 						path: [
 							...search.path.filter(
 								(path) =>
@@ -57,20 +57,10 @@ export function FunctionCard({
 								? [func?.data?.path.slice(0, func?.data?.path.lastIndexOf("."))]
 								: [`${func?.data?.path}`]),
 						],
-						filters: search.filters,
-						edit: search.edit,
-						flags: search.flags,
 					},
 				});
 			}}
 		>
-			{search.indicators ? (
-				<Indicator
-					functionId={functionId}
-					metaKey={search.indicators.metadata[0].key}
-					metaValue={search.indicators.metadata[0].value as string}
-				/>
-			) : null}
 			<Flex
 				bgColor={selected && search.edit !== functionId ? "blue.50" : undefined}
 				display="flex"
@@ -112,19 +102,4 @@ export function FunctionCard({
 			</Flex>
 		</Card>
 	);
-}
-
-function Indicator(props: {
-	functionId: number;
-	metaKey: string;
-	metaValue?: string;
-}) {
-	const { functionId, metaKey: key, metaValue: value } = props;
-	const indicators = useIndicators({
-		functionId,
-		key,
-		value,
-	});
-
-	return <>{JSON.stringify(indicators.data, null, 2)}</>;
 }
