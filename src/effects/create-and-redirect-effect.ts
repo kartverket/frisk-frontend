@@ -35,7 +35,12 @@ export function CreateAndRedirectEffect() {
 					if (redirect) {
 						window.location.href = redirect;
 					} else {
-						navigate({ search: { path: path, flags: flags } });
+						navigate({
+							search: {
+								path: path,
+								flags: flags,
+							},
+						});
 					}
 				});
 		}

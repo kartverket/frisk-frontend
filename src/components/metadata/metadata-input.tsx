@@ -36,8 +36,12 @@ export function MetadataInput({
 	value,
 	hideLabel,
 }: MetadataInputProps) {
-	if (metadata.showOn === "readOnly") return null;
-	if (metadata.showOn === "update" && functionId === undefined) return null;
+	const mode = functionId === undefined ? "create" : "update";
+	const show = metadata.show(
+		mode,
+		true /* sets this to true now, but should actually be hasAccess */,
+	);
+	if (!show) return null;
 
 	const metadataInputType = metadata.type;
 	switch (metadataInputType) {
@@ -215,7 +219,7 @@ function SingleSelect({
 			name={metadata.key}
 			size="sm"
 			borderRadius="5px"
-			placeholder={currentMetadataValue ?? metadata.placeholder}
+			placeholder={metadata.placeholder}
 			defaultValue={
 				currentMetadataValue ??
 				(metadata.inheritFromParent ? parentMetadataValue : undefined)
