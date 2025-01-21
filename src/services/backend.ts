@@ -49,7 +49,7 @@ async function fetchFromBackend(path: Path, options: RequestInit) {
 
 export async function hei(key: string, value: string, path: string) {
 	const funcs = await fetchFromBackend(
-		`/metadata/indicator?key=${key}&value=${value}&path=${path}`,
+		`/metadata/indicator?key=${key}&value=${value}&functionId=${path}`,
 		{
 			method: "GET",
 		},
