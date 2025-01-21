@@ -332,14 +332,6 @@ export function OboFlowFeature({
 					key: schemaId,
 					value: contextId,
 				});
-
-				const searchParams = new URLSearchParams({
-					redirectBackUrl: window.location.href,
-					redirectBackTitle: "Funksjonsregisteret",
-				});
-
-				const url = `${getregelrettFrontendUrl()}/context/${contextId}?${searchParams.toString()}`;
-				window.location.href = url;
 			}}
 		>
 			<FormControl isRequired={true} style={{ width: "fit-content" }}>
