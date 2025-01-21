@@ -6,7 +6,7 @@ import { FunctionCardSelectedView } from "./function-card-selected-view";
 import { EditAndSelectButtons } from "./edit-and-select-buttons";
 import { useEffect, useState } from "react";
 import { useHasFunctionAccess } from "@/hooks/use-has-function-access";
-import { test } from "@/hooks/use-test";
+import { useIndicators } from "@/hooks/use-indicators";
 
 export function FunctionCard({
 	functionId,
@@ -18,8 +18,6 @@ export function FunctionCard({
 	const navigate = Route.useNavigate();
 
 	const [bottomMargin, setBottomMargin] = useState(0);
-
-	test("team", "9ef6a023-9869-410f-95d1-fa230ba9cd35", "3");
 
 	function getParentDistance() {
 		const childrenGroup = document.getElementById(`${functionId}-children`);
@@ -66,6 +64,13 @@ export function FunctionCard({
 				});
 			}}
 		>
+			{search.indicators ? (
+				<Indicator
+					functionId={functionId}
+					metaKey={search.indicators.metadata[0].key}
+					metaValue={search.indicators.metadata[0].value as string}
+				/>
+			) : null}
 			<Flex
 				bgColor={selected && search.edit !== functionId ? "blue.50" : undefined}
 				display="flex"
@@ -107,4 +112,19 @@ export function FunctionCard({
 			</Flex>
 		</Card>
 	);
+}
+
+function Indicator(props: {
+	functionId: number;
+	metaKey: string;
+	metaValue?: string;
+}) {
+	const { functionId, metaKey: key, metaValue: value } = props;
+	const indicators = useIndicators({
+		functionId,
+		key,
+		value,
+	});
+
+	return <>{JSON.stringify(indicators.data, null, 2)}</>;
 }

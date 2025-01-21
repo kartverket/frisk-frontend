@@ -28,6 +28,9 @@ const functionSearchSchema = object({
 	filters: object({
 		metadata: array(object({ key: string(), value: unknown().optional() })),
 	}).optional(),
+	indicators: object({
+		metadata: array(object({ key: string(), value: unknown().optional() })),
+	}).optional(),
 
 	flags: array(string()).optional(),
 });
@@ -41,10 +44,10 @@ export const Route = createFileRoute("/")({
 });
 
 function Index() {
-	const { path, flags } = Route.useSearch();
+	const search = Route.useSearch();
 	const navigate = Route.useNavigate();
 
-	const idArrays = path.map((pathArray) =>
+	const idArrays = search.path.map((pathArray) =>
 		pathArray.split(".").map((part) => Number.parseInt(part)),
 	);
 	const ids = idArrays.map((pathArray) => pathArray.pop() ?? 1);
@@ -55,24 +58,24 @@ function Index() {
 			if (func.error) {
 				// if function id is invalid, navigate to parent until it is valid
 				const updatedPathArray = idArrays.map((_, index) =>
-					i === index ? idArrays[i].join(".") : path[i],
+					i === index ? idArrays[i].join(".") : search.path[i],
 				);
 				navigate({
 					search: {
+						...search,
 						path: updatedPathArray,
 						edit: undefined,
-						flags: flags,
 					},
 				});
 			}
 		});
-	}, [functions, path, navigate, idArrays, flags]);
+	}, [functions, navigate, idArrays, search]);
 
 	return (
 		<>
 			<Header />
 			<Main>
-				<FunctionColumnView path={path} />
+				<FunctionColumnView path={search.path} />
 				<CreateAndRedirectEffect />
 			</Main>
 		</>
