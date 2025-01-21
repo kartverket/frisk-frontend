@@ -23,13 +23,10 @@ export function SearchField() {
 				}}
 				onChange={(newFunc: { value: string } | null) => {
 					if (newFunc) {
-						const newPath = newFunc.value;
-						const newId = Number.parseInt(newPath.split(".").pop() ?? "1");
 						navigate({
 							search: {
 								...search,
 								path: [newFunc.value],
-								expandedCards: [newId],
 							},
 						});
 					}

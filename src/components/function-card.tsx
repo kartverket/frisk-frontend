@@ -1,10 +1,10 @@
 import { useFunction } from "@/hooks/use-function";
 import { Route } from "@/routes";
-import { Card, Flex, IconButton, Skeleton, Stack, Text } from "@kvib/react";
+import { Card, Flex, IconButton, Skeleton, Text } from "@kvib/react";
 import { FunctionCardEdit } from "./function-card-edit";
-import { FunctionCardExpandableContent } from "./function-card-expandable-content";
+import { FunctionCardSelectedView } from "./function-card-selected-view";
 import { EditAndSelectButtons } from "./edit-and-select-buttons";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { useHasFunctionAccess } from "@/hooks/use-has-function-access";
 
 export function FunctionCard({
@@ -15,21 +15,6 @@ export function FunctionCard({
 	const { func } = useFunction(functionId);
 	const search = Route.useSearch();
 	const navigate = Route.useNavigate();
-
-	const isCardExpanded = useMemo(() => {
-		return search.expandedCards?.includes(functionId) ?? false;
-	}, [functionId, search.expandedCards]);
-
-	const toggleCardExpanded = () => {
-		navigate({
-			search: {
-				...search,
-				expandedCards: isCardExpanded
-					? search.expandedCards?.filter((id) => id !== functionId)
-					: [...(search.expandedCards ?? []), functionId],
-			},
-		});
-	};
 
 	const [bottomMargin, setBottomMargin] = useState(0);
 
@@ -71,7 +56,6 @@ export function FunctionCard({
 								? [func?.data?.path.slice(0, func?.data?.path.lastIndexOf("."))]
 								: [`${func?.data?.path}`]),
 						],
-						expandedCards: search.expandedCards,
 						filters: search.filters,
 						edit: search.edit,
 						flags: search.flags,
@@ -90,47 +74,32 @@ export function FunctionCard({
 			>
 				{search.edit === functionId && hasAccess ? (
 					<FunctionCardEdit functionId={functionId} />
+				) : selected ? (
+					<FunctionCardSelectedView functionId={functionId} />
 				) : (
-					<Stack w="100%">
-						<Flex alignItems="center" w="100%" flex-wrap="wrap">
-							<IconButton
-								type="button"
-								colorScheme="gray"
-								variant="ghost"
-								aria-label="drag"
-								icon="drag_indicator"
-								isDisabled={!hasAccess}
-							/>
-							<IconButton
-								colorScheme="gray"
-								variant="tertiary"
-								aria-label={isCardExpanded ? "close card" : "expand card"}
-								icon={isCardExpanded ? "keyboard_arrow_down" : "chevron_right"}
-								onClick={(e) => {
-									e.stopPropagation();
-									toggleCardExpanded();
-								}}
-							/>
-							<Skeleton isLoaded={!func.isLoading} flex="1" minWidth={0}>
-								<Text
-									fontWeight="bold"
-									as="span"
-									display="flex"
-									w="100%"
-									overflow="hidden"
-								>
-									{func.data?.name ?? "<Det skjedde en feil>"}
-								</Text>
-							</Skeleton>
-							<EditAndSelectButtons
-								functionId={functionId}
-								selected={selected}
-							/>
-						</Flex>
-						{isCardExpanded && (
-							<FunctionCardExpandableContent functionId={functionId} />
-						)}
-					</Stack>
+					<>
+						<IconButton
+							type="button"
+							colorScheme="gray"
+							variant="ghost"
+							aria-label="drag"
+							icon="drag_indicator"
+							isDisabled={!hasAccess}
+						/>
+
+						<Skeleton isLoaded={!func.isLoading} flex="1" minWidth={0}>
+							<Text
+								fontWeight="bold"
+								as="span"
+								display="flex"
+								w="100%"
+								overflow="hidden"
+							>
+								{func.data?.name ?? "<Det skjedde en feil>"}
+							</Text>
+						</Skeleton>
+						<EditAndSelectButtons functionId={functionId} selected={false} />
+					</>
 				)}
 			</Flex>
 		</Card>
