@@ -11,6 +11,14 @@ import {
 	useSensor,
 	useSensors,
 	type DragEndEvent,
+	closestCenter,
+	closestCorners,
+	pointerWithin,
+	rectIntersection,
+	type Collision,
+	Active,
+	ClientRect,
+	DroppableContainer,
 } from "@dnd-kit/core";
 import type { useFunction } from "@/hooks/use-function";
 import { getFunctionsCSVDump } from "@/services/backend";
@@ -22,6 +30,8 @@ import {
 import { SearchField } from "./search-field";
 import { useState } from "react";
 import { FunctionCard } from "./function-card";
+import { RectMap } from "@dnd-kit/core/dist/store";
+import { Coordinates } from "@dnd-kit/core/dist/types";
 
 type FunctionColumnViewProps = {
 	path: string[];
@@ -293,6 +303,9 @@ export function FunctionColumnView({ path }: FunctionColumnViewProps) {
 				onDragStart={handleDragStart}
 				onDragEnd={handleDragEnd}
 				sensors={sensors}
+				collisionDetection={(args) =>
+					args.pointerCoordinates ? pointerWithin(args) : rectIntersection(args)
+				}
 			>
 				<Flex>
 					{selectedFunctionIds?.map((ids) => (
