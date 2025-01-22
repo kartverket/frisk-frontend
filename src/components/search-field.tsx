@@ -1,11 +1,4 @@
-import {
-	SearchAsync,
-	Box,
-	InputGroup,
-	InputLeftElement,
-	Icon,
-	Input,
-} from "@kvib/react";
+import { SearchAsync, Box } from "@kvib/react";
 import { getFunctions } from "@/services/backend";
 import { Route } from "@/routes";
 
