@@ -22,9 +22,7 @@ const defaultConfig: IConfig = {
 	regelrett_frontend_url:
 		import.meta.env.VITE_REGLERRETT_FRONTEND_URL ??
 		"https://regelrett-frontend-1024826672490.europe-north1.run.app",
-	regelrett_client_id:
-		import.meta.env.VITE_REGELRETT_CLIENT_ID ??
-		"api://e9dc946b-6fef-44ab-82f1-c0ec2e402903/.default",
+	regelrett_client_id: import.meta.env.REGELRETT_CLIENT_ID ?? "",
 };
 
 export async function getConfig(): Promise<IConfig> {
