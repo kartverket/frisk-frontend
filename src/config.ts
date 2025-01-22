@@ -6,6 +6,7 @@ export interface IConfig {
 	redirect_uri: string;
 	backend_url: string;
 	regelrett_frontend_url: string;
+	regelrett_client_id: string;
 }
 
 const defaultConfig: IConfig = {
@@ -21,6 +22,9 @@ const defaultConfig: IConfig = {
 	regelrett_frontend_url:
 		import.meta.env.VITE_REGLERRETT_FRONTEND_URL ??
 		"https://regelrett-frontend-1024826672490.europe-north1.run.app",
+	regelrett_client_id:
+		import.meta.env.VITE_REGELRETT_CLIENT_ID ??
+		"api://e9dc946b-6fef-44ab-82f1-c0ec2e402903/.default",
 };
 
 export async function getConfig(): Promise<IConfig> {
@@ -61,4 +65,8 @@ export function getBackendUrl() {
 
 export function getregelrettFrontendUrl() {
 	return config.regelrett_frontend_url;
+}
+
+export function getRegelrettClientId() {
+	return config.regelrett_client_id;
 }
