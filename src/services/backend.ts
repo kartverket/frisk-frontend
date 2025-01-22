@@ -59,8 +59,7 @@ export async function getIndicators(args: {
 			method: "GET",
 		},
 	).then((res) => res.json());
-	console.log(funcs);
-	return funcs;
+	return array(BackendFunction).parse(funcs);
 }
 
 export async function getFunctions(search?: string) {

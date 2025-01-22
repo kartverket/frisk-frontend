@@ -29,8 +29,6 @@ type FunctionColumnViewProps = {
 
 export function FunctionColumnView({ path }: FunctionColumnViewProps) {
 	const { config } = Route.useLoaderData();
-	const search = Route.useSearch();
-	const navigate = Route.useNavigate();
 	const [activeId, setActiveId] = useState<number | null>(null);
 	const selectedFunctionIds = getIdsFromPath(path);
 
