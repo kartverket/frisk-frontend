@@ -1,4 +1,11 @@
-import { SearchAsync, Box } from "@kvib/react";
+import {
+	SearchAsync,
+	Box,
+	InputGroup,
+	InputLeftElement,
+	Icon,
+	Input,
+} from "@kvib/react";
 import { getFunctions } from "@/services/backend";
 import { Route } from "@/routes";
 
@@ -7,9 +14,9 @@ export function SearchField() {
 	const search = Route.useSearch();
 
 	return (
-		<Box maxW="400px" my="10px">
+		<Box maxW="450px" my="10px" bg="white" borderRadius={"md"}>
 			<SearchAsync
-				size="sm"
+				size="md"
 				debounceTime={300}
 				defaultOptions
 				loadOptions={async (inputValue, callback) => {
