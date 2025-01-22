@@ -219,6 +219,15 @@ function Filters(props: {
 					?.filter(
 						(m) => !search[props.type]?.metadata?.some((f) => f.key === m.key),
 					)
+					/* Vi tar ennå ikke hensyn til arrays i indicators */
+					.filter(
+						(m) =>
+							!(
+								props.type === "indicators" &&
+								m.type === "select" &&
+								m.selectMode === "multi"
+							),
+					)
 					.map((m) => {
 						return (
 							<option key={m.key} value={m.key}>

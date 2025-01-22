@@ -46,11 +46,11 @@ export function MetadataView({
 				</Text>
 			)}
 			<MetadataValue metadata={metadata} functionId={functionId} />
-			{search.indicators?.metadata?.some((m) => m.key === metadata.key) ? (
+			{indicator ? (
 				<Indicators
 					functionId={functionId}
 					metaKey={metadata.key}
-					metaValue={search.indicators.metadata[0].value as string}
+					metaValue={indicator.value as string}
 				/>
 			) : null}
 		</Flex>
@@ -60,7 +60,7 @@ export function MetadataView({
 function Indicators(props: {
 	functionId: number;
 	metaKey: string;
-	metaValue?: string;
+	metaValue?: string; // TODO: For å tillate avhengigheter, så må vi ta hensyn til at dette kan være array
 }) {
 	const { config } = Route.useLoaderData();
 	const { func } = useFunction(props.functionId);
