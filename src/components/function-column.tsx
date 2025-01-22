@@ -3,7 +3,6 @@ import { Route } from "@/routes";
 import { Box, Button, Flex, List, ListItem, Skeleton, Text } from "@kvib/react";
 import { FunctionCard } from "./function-card";
 import { useLayoutEffect, useState } from "react";
-import { Draggable } from "./draggable";
 import { Droppable } from "./droppable";
 import { CreateFunctionForm } from "./create-function-form";
 import { useIsFetching } from "@tanstack/react-query";
@@ -11,7 +10,6 @@ import { useFunction } from "@/hooks/use-function";
 import { useMetadata } from "@/hooks/use-metadata";
 import type { BackendFunction } from "@/services/backend";
 import type { MultiSelectOption } from "./metadata/metadata-input";
-import { useHasFunctionAccess } from "@/hooks/use-has-function-access";
 
 type FunctionFolderProps = {
 	functionIds: number[];
@@ -159,11 +157,8 @@ function ChildrenGroupItem({
 	func,
 	selected,
 }: { func: BackendFunction; selected: boolean }) {
-	const { config } = Route.useLoaderData();
 	const { metadata } = useMetadata(func.id);
 	const { filters } = Route.useSearch();
-	const hasAccess = useHasFunctionAccess(func.id);
-	const isDraggable = config.enableEntra ? hasAccess : true;
 
 	const hasAllMetadataInFilter = filters?.metadata.every((filter) =>
 		metadata.data?.some(
@@ -185,13 +180,11 @@ function ChildrenGroupItem({
 	return (
 		<Skeleton fitContent isLoaded={!filters || !metadata.isLoading}>
 			<ListItem>
-				<Draggable functionId={func.id} hasAccess={isDraggable}>
-					<FunctionCard
-						functionId={func.id}
-						selected={selected}
-						lowlighted={!!filters && !hasAllMetadataInFilter}
-					/>
-				</Draggable>
+				<FunctionCard
+					functionId={func.id}
+					selected={selected}
+					lowlighted={!!filters && !hasAllMetadataInFilter}
+				/>
 			</ListItem>
 		</Skeleton>
 	);
