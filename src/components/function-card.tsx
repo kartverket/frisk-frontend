@@ -152,7 +152,7 @@ export function FunctionCard({
 									variant="ghost"
 									aria-label="drag"
 									icon="drag_indicator"
-									isDisabled={!hasAccess}
+									isDisabled={false}
 									{...listeners}
 								/>
 								<Skeleton isLoaded={!func.isLoading} flex="1" minWidth={0}>
