@@ -4,7 +4,6 @@ import { number, object, string, array, unknown } from "zod";
 import { fallback, zodSearchValidator } from "@tanstack/router-zod-adapter";
 import { useEffect } from "react";
 import { Main } from "@/components/main";
-import { CreateAndRedirectEffect } from "@/effects/create-and-redirect-effect";
 import { useFunctions } from "@/hooks/use-functions";
 import { getConfig } from "../../frisk.config";
 import { Header } from "@/components/header";
@@ -73,7 +72,6 @@ function Index() {
 			<Header />
 			<Main>
 				<FunctionColumnView path={path} />
-				<CreateAndRedirectEffect />
 			</Main>
 		</>
 	);
