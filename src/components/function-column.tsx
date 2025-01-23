@@ -158,7 +158,7 @@ function ChildrenGroupItem({
 	func,
 	selected,
 }: { func: BackendFunction; selected: boolean }) {
-	const { config } = Route.useLoaderData();
+	//const { config } = Route.useLoaderData();
 	const { metadata } = useMetadata(func.id);
 	const { filters } = Route.useSearch();
 
