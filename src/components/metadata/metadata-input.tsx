@@ -11,7 +11,6 @@ import {
 	Icon,
 	Input,
 	SearchAsync,
-	Select,
 	Skeleton,
 	Text,
 	Textarea,
@@ -25,7 +24,7 @@ type MetadataInputProps = {
 	parentFunctionId: number | undefined;
 	functionId: number | undefined;
 	onChange?: (value: string | string[]) => void;
-	value?: string | MultiSelectOption[];
+	value?: string | MultiSelectOption | MultiSelectOption[];
 	hideLabel?: boolean;
 };
 
@@ -53,7 +52,7 @@ export function MetadataInput({
 					functionId={functionId}
 					parentFunctionId={parentFunctionId}
 					onChange={onChange}
-					value={value}
+					value={value as MultiSelectOption}
 					hideLabel={hideLabel}
 				/>
 			);
@@ -82,7 +81,7 @@ type SelectInputProps = {
 	functionId: number | undefined;
 	parentFunctionId: number | undefined;
 	onChange?: (value: string | string[]) => void;
-	value?: string | MultiSelectOption[];
+	value?: MultiSelectOption | MultiSelectOption[];
 	hideLabel?: boolean;
 };
 
@@ -102,9 +101,26 @@ function SelectInput({
 		(m) => metadata.key === m.key,
 	);
 
-	const currentMetadataValue = currentMetadata?.find(
-		(m) => metadata.key === m.key,
-	)?.value;
+	const displayValue = useQuery({
+		queryKey: [
+			functionId,
+			metadata.key,
+			metadataToDisplay?.[0]?.value,
+			"getDisplayValue",
+		],
+		queryFn: async () => {
+			if (metadataToDisplay?.[0] === undefined) return null;
+			return (
+				metadata.getDisplayValue?.({
+					key: metadata.key,
+					value: metadataToDisplay?.[0]?.value ?? "",
+					id: metadataToDisplay?.[0]?.id,
+					functionId: metadataToDisplay?.[0]?.functionId,
+				}) ?? null
+			);
+		},
+		enabled: !!metadataToDisplay?.[0],
+	});
 
 	const displayValues = useQueries({
 		queries:
@@ -116,6 +132,14 @@ function SelectInput({
 			})) ?? [],
 	});
 
+	const currentMetadataValue = metadataToDisplay?.[0]?.value
+		? {
+				value: metadataToDisplay?.[0].value ?? "",
+				label:
+					displayValue.data?.displayValue ?? metadataToDisplay?.[0].value ?? "",
+			}
+		: undefined;
+
 	const currentMetadataValues = metadataToDisplay?.map((m, i) => ({
 		value: m.value,
 		label: displayValues[i].data?.displayValue ?? m.value,
@@ -125,15 +149,45 @@ function SelectInput({
 		MultiSelectOption[] | undefined
 	>();
 
+	const [newMetadataValue, setCurrentMetadataValue] = useState<
+		MultiSelectOption | undefined
+	>();
+
 	const { metadata: parentMetadata } = useMetadata(parentFunctionId);
 
 	const parentMetadataToDisplay = parentMetadata.data?.filter(
 		(m) => metadata.key === m.key,
 	);
 
-	const parentMetadataValue = parentMetadata.data?.find(
-		(m) => metadata.key === m.key,
-	)?.value;
+	const parentDisplayValue = useQuery({
+		queryKey: [
+			parentFunctionId,
+			metadata.key,
+			parentMetadataToDisplay?.[0]?.value,
+			"getDisplayValue",
+		],
+		queryFn: async () => {
+			if (parentMetadataToDisplay?.[0] === undefined) return null;
+			return metadata.getDisplayValue?.({
+				key: metadata.key,
+				value: parentMetadataToDisplay?.[0]?.value ?? "",
+				id: parentMetadataToDisplay?.[0]?.id,
+				functionId: parentMetadataToDisplay?.[0]?.functionId,
+			});
+		},
+		enabled: !!parentMetadataToDisplay?.[0],
+	});
+
+	const parentMetadataValue: MultiSelectOption | undefined =
+		parentMetadataToDisplay?.[0]?.value
+			? {
+					value: parentMetadataToDisplay?.[0]?.value ?? "",
+					label:
+						parentDisplayValue.data?.displayValue ??
+						parentMetadataToDisplay?.[0]?.value ??
+						"",
+				}
+			: undefined;
 
 	const parentDisplayValues = useQueries({
 		queries:
@@ -174,10 +228,11 @@ function SelectInput({
 						<SingleSelect
 							options={options}
 							metadata={metadata}
-							currentMetadataValue={currentMetadataValue}
+							currentMetadataValue={newMetadataValue ?? currentMetadataValue}
 							parentMetadataValue={parentMetadataValue}
+							setCurrentMetadataValue={setCurrentMetadataValue}
 							onChange={onChange}
-							value={value as string}
+							value={value as MultiSelectOption}
 						/>
 					) : (
 						<MultiSelect
@@ -201,10 +256,11 @@ function SelectInput({
 type SingleSelectProps = {
 	metadata: SelectMetadata;
 	options: UseQueryResult<SelectOption[]>;
-	currentMetadataValue: string | undefined;
-	parentMetadataValue: string | undefined;
+	currentMetadataValue: MultiSelectOption | undefined;
+	setCurrentMetadataValue: (value: MultiSelectOption) => void;
+	parentMetadataValue: MultiSelectOption | undefined;
 	onChange?: (value: string | string[]) => void;
-	value?: string;
+	value?: MultiSelectOption;
 };
 
 function SingleSelect({
@@ -212,30 +268,44 @@ function SingleSelect({
 	options,
 	currentMetadataValue,
 	parentMetadataValue,
+	setCurrentMetadataValue,
 	onChange,
-	value,
+	value: overrideValue,
 }: SingleSelectProps) {
+	const value =
+		currentMetadataValue ??
+		(metadata.inheritFromParent ? parentMetadataValue : undefined);
+
 	return (
-		<Select
-			name={metadata.key}
-			size="sm"
-			backgroundColor="white"
-			placeholder={metadata.placeholder}
-			defaultValue={
-				currentMetadataValue ??
-				(metadata.inheritFromParent ? parentMetadataValue : undefined)
-			}
-			onChange={(e) => {
-				onChange?.(e.target.value);
-			}}
-			value={value}
-		>
-			{options.data?.map((option) => (
-				<option key={option.value} value={option.value}>
-					{option.name}
-				</option>
-			))}
-		</Select>
+		<>
+			<SearchAsync
+				size="sm"
+				value={overrideValue ?? value}
+				placeholder={metadata.placeholder}
+				dropdownIndicator={<Icon icon="expand_more" weight={400} />}
+				debounceTime={100}
+				defaultOptions
+				onChange={(newValue) => {
+					// @ts-expect-error
+					setCurrentMetadataValue(newValue);
+					// @ts-expect-error
+					onChange?.(newValue ?? undefined);
+				}}
+				loadOptions={(inputValue, callback) => {
+					const filteredOptions = options.data
+						?.filter((option) =>
+							option.name.toLowerCase().includes(inputValue.toLowerCase()),
+						)
+						.map((option) => ({
+							value: option.value,
+							label: option.name,
+						}));
+					// @ts-expect-error
+					callback(filteredOptions);
+				}}
+			/>
+			<Input type="hidden" name={metadata.key} value={value?.value} />
+		</>
 	);
 }
 
