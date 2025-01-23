@@ -11,7 +11,6 @@ import { useFunction } from "@/hooks/use-function";
 import { useMetadata } from "@/hooks/use-metadata";
 import type { BackendFunction } from "@/services/backend";
 import type { MultiSelectOption } from "./metadata/metadata-input";
-import { useHasFunctionAccess } from "@/hooks/use-has-function-access";
 
 type FunctionFolderProps = {
 	functionIds: number[];
@@ -162,8 +161,10 @@ function ChildrenGroupItem({
 	const { config } = Route.useLoaderData();
 	const { metadata } = useMetadata(func.id);
 	const { filters } = Route.useSearch();
-	const hasAccess = useHasFunctionAccess(func.id);
-	const isDraggable = config.enableEntra ? hasAccess : true;
+
+	// Tillater at alle funksjoner kan flyttes på inntil videre
+	//const hasAccess = useHasFunctionAccess(func.id);
+	//const isDraggable = config.enableEntra ? hasAccess : true;
 
 	const hasAllMetadataInFilter = filters?.metadata.every((filter) =>
 		metadata.data?.some(
@@ -185,7 +186,7 @@ function ChildrenGroupItem({
 	return (
 		<Skeleton fitContent isLoaded={!filters || !metadata.isLoading}>
 			<ListItem>
-				<Draggable functionId={func.id} hasAccess={isDraggable}>
+				<Draggable functionId={func.id} hasAccess={true}>
 					<FunctionCard
 						functionId={func.id}
 						selected={selected}
