@@ -2,10 +2,9 @@ import { getIdsFromPath } from "@/lib/utils";
 import { Route } from "@/routes";
 import { Box, Button, Flex, List, ListItem, Skeleton, Text } from "@kvib/react";
 import { FunctionCard } from "./function-card";
-import { useLayoutEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Droppable } from "./droppable";
 import { CreateFunctionForm } from "./create-function-form";
-import { useIsFetching } from "@tanstack/react-query";
 import { useFunction } from "@/hooks/use-function";
 import { useMetadata } from "@/hooks/use-metadata";
 import type { BackendFunction } from "@/services/backend";
@@ -17,45 +16,43 @@ type FunctionFolderProps = {
 
 export function FunctionColumn({ functionIds }: FunctionFolderProps) {
 	const { config } = Route.useLoaderData();
-	const [functionPositions, setFunctionPositions] = useState<number[]>([]);
-
 	const { path } = Route.useSearch();
 
 	const selectedFunctionIds = getIdsFromPath(path);
 	const currentLevel = selectedFunctionIds.findIndex(
 		(ids) => ids.join() === functionIds.join(),
 	);
+	const [columnHeight, setColumnHeight] = useState<number>();
 
-	const isFetching = useIsFetching();
+	useEffect(() => {
+		function getColumnHeight() {
+			const column = document.getElementById(`${currentLevel}-column`);
 
-	function getColumnHeight() {
-		const column = document.getElementById(`${currentLevel}-column`);
+			if (!column) return 0;
+			const children = column.querySelectorAll("[data-child]");
 
-		if (!column) return 0;
-		const children = column.querySelectorAll("[data-child]");
+			return Array.from(children).reduce((total, children) => {
+				return total + children.getBoundingClientRect().height;
+			}, 0);
+		}
+		setColumnHeight(getColumnHeight());
 
-		return Array.from(children).reduce((total, children) => {
-			return total + children.getBoundingClientRect().height;
-		}, 0);
-	}
+		const observer = new MutationObserver(() => {
+			setColumnHeight(getColumnHeight());
+		});
 
-	// biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
-	useLayoutEffect(() => {
-		const getParentPosition = (parentId: number) => {
-			const parent = document.getElementById(parentId.toString());
-			const top = document.getElementById("topBox");
+		const root = document.getElementById("root");
+		if (!root) return;
+		observer.observe(root, {
+			attributes: true,
+			childList: true,
+			subtree: true,
+		});
 
-			if (!parent || !top) return 0;
-
-			return (
-				parent.getBoundingClientRect().top - top.getBoundingClientRect().bottom
-			);
+		return () => {
+			observer.disconnect();
 		};
-
-		const newPositions = functionIds.map((func) => getParentPosition(func));
-
-		setFunctionPositions(newPositions);
-	}, [functionIds, isFetching]);
+	}, [currentLevel]);
 
 	return (
 		<Flex flexDirection="column" width="380px">
@@ -80,15 +77,11 @@ export function FunctionColumn({ functionIds }: FunctionFolderProps) {
 				backgroundColor={"white"}
 				position="relative"
 				minH="100%"
-				h={`${getColumnHeight()}px`}
+				h={`${columnHeight}px`}
 				id={`${currentLevel}-column`}
 			>
-				{functionIds.map((id, i) => (
-					<ChildrenGroup
-						key={id}
-						functionId={id}
-						functionPosition={functionPositions[i]}
-					/>
+				{functionIds.map((id) => (
+					<ChildrenGroup key={id} functionId={id} />
 				))}
 			</Box>
 		</Flex>
@@ -97,8 +90,9 @@ export function FunctionColumn({ functionIds }: FunctionFolderProps) {
 
 function ChildrenGroup({
 	functionId,
-	functionPosition,
-}: { functionId: number; functionPosition: number }) {
+}: {
+	functionId: number;
+}) {
 	const { config } = Route.useLoaderData();
 	const { path } = Route.useSearch();
 	const selectedFunctionIds = getIdsFromPath(path);
@@ -106,7 +100,36 @@ function ChildrenGroup({
 	const { children } = useFunction(functionId, {
 		includeChildren: true,
 	});
+	const [functionPosition, setFunctionPosition] = useState(0);
 	const [selectedForm, setSelectedForm] = useState<number | null>(null);
+
+	useEffect(() => {
+		function getPosition() {
+			const top = document.getElementById("topBox");
+			const parent = document.getElementById(functionId.toString());
+			if (!parent || !top) return 0;
+			return (
+				parent.getBoundingClientRect().top - top.getBoundingClientRect().bottom
+			);
+		}
+		setFunctionPosition(getPosition());
+
+		const observer = new MutationObserver(() => {
+			setFunctionPosition(getPosition());
+		});
+
+		const root = document.getElementById("root");
+		if (!root) return;
+		observer.observe(root, {
+			attributes: true,
+			childList: true,
+			subtree: true,
+		});
+
+		return () => {
+			observer.disconnect();
+		};
+	}, [functionId]);
 
 	return (
 		<Skeleton key={functionId} isLoaded={!children.isLoading} minH={60}>

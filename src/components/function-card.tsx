@@ -20,18 +20,34 @@ export function FunctionCard({
 
 	const [bottomMargin, setBottomMargin] = useState(0);
 
-	function getParentDistance() {
-		const childrenGroup = document.getElementById(`${functionId}-children`);
-		const self = document.getElementById(functionId.toString());
-		if (!childrenGroup || !self) return 0;
-
-		const cHeight = childrenGroup.getBoundingClientRect().height;
-		const sHeight = self.getBoundingClientRect().height;
-		return cHeight > sHeight ? cHeight - sHeight : 2;
-	}
 	useEffect(() => {
+		function getParentDistance() {
+			const childrenGroup = document.getElementById(`${functionId}-children`);
+			const self = document.getElementById(functionId.toString());
+			if (!childrenGroup || !self) return 0;
+
+			const cHeight = childrenGroup.getBoundingClientRect().height;
+			const sHeight = self.getBoundingClientRect().height;
+			return cHeight > sHeight ? cHeight - sHeight : 2;
+		}
 		setBottomMargin(getParentDistance());
-	});
+
+		const observer = new MutationObserver(() => {
+			setBottomMargin(getParentDistance());
+		});
+
+		const root = document.getElementById("root");
+		if (!root) return;
+		observer.observe(root, {
+			attributes: true,
+			childList: true,
+			subtree: true,
+		});
+
+		() => {
+			observer.disconnect();
+		};
+	}, [functionId]);
 
 	const hasAccess = useHasFunctionAccess(functionId);
 	// const isDraggable = config.enableEntra ? hasAccess : true;
