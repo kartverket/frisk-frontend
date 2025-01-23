@@ -7,7 +7,16 @@ import {
 } from "@/services/backend";
 import { getRegelrettClientId, getregelrettFrontendUrl } from "@/config";
 import { object, string, array, type z } from "zod";
-import { Button, FormControl, FormLabel, Select } from "@kvib/react";
+import {
+	Box,
+	Button,
+	Flex,
+	FormControl,
+	FormLabel,
+	Icon,
+	Link,
+	Select,
+} from "@kvib/react";
 import type { useFunction } from "@/hooks/use-function";
 import type { useMetadata } from "@/hooks/use-metadata";
 import { msalInstance } from "@/services/msal";
@@ -74,34 +83,6 @@ export async function getConfig(): Promise<FriskConfig> {
 					return { displayValue: "Utviklerportalen" };
 				},
 			},
-			...schemas.map(
-				(schema): InputMetadata => ({
-					key: schema.id,
-					type: "text",
-					displayName: schema.name,
-					label: "Regelrett skjema",
-					show: (mode, hasAccess) => mode === "read" && hasAccess,
-					isRequired: false,
-					placeholder: "Sett inn skjema",
-					inheritFromParent: false,
-					getDisplayValue: async (input) => {
-						const contextId = input.value;
-						const searchParams = new URLSearchParams({
-							redirectBackUrl: window.location.href,
-							redirectBackTitle: "Funksjonsregisteret",
-						});
-						const url = `${getregelrettFrontendUrl()}/context/${contextId}?${searchParams.toString()}`;
-						return {
-							displayValue: schema.name,
-							value: url,
-							displayOptions: {
-								type: "url",
-								isExternal: false,
-							},
-						};
-					},
-				}),
-			),
 			{
 				key: "dependencies",
 				type: "select",
@@ -126,6 +107,35 @@ export async function getConfig(): Promise<FriskConfig> {
 				placeholder: "Søk etter funksjoner",
 				inheritFromParent: false,
 			},
+			...schemas.map(
+				(schema): InputMetadata => ({
+					key: schema.id,
+					type: "text",
+					displayName: schema.name,
+					label: "Regelrett skjema",
+					show: (mode, hasAccess) => mode === "read" && hasAccess,
+					isRequired: false,
+					placeholder: "Sett inn skjema",
+					inheritFromParent: false,
+					getDisplayValue: async (input) => {
+						const contextId = input.value;
+						const searchParams = new URLSearchParams({
+							redirectBackUrl: window.location.href,
+							redirectBackTitle: "Funksjonsregisteret",
+						});
+						const url = `${getregelrettFrontendUrl()}/context/${contextId}?${searchParams.toString()}`;
+						return {
+							displayValue: "Skjema",
+							displayOptions: {
+								type: "custom",
+								component: (
+									<SchemaDisplay schema={schema} url={url} key={contextId} />
+								),
+							},
+						};
+					},
+				}),
+			),
 		],
 
 		logo: {
@@ -204,6 +214,10 @@ type GeneralMetadataContent = {
 			| {
 					type: "url";
 					isExternal: boolean;
+			  }
+			| {
+					type: "custom";
+					component: React.ReactNode;
 			  };
 	}>;
 };
@@ -318,6 +332,44 @@ function createSchemaComponent(schemas: RegelrettSchema[]) {
 			</form>
 		);
 	};
+}
+
+type Schema = {
+	id: string;
+	name: string;
+};
+
+type SchemaDisplayProps = {
+	schema: Schema;
+	url: string;
+};
+
+function SchemaDisplay({ schema, url }: SchemaDisplayProps) {
+	return (
+		<Box
+			border="2px solid"
+			borderColor="blue.500"
+			borderRadius="md"
+			backgroundColor="white"
+			p={3}
+			_hover={{ borderColor: "blue.600", cursor: "pointer" }}
+		>
+			<Link
+				href={url}
+				isExternal
+				onClick={(e) => e.stopPropagation()}
+				textDecoration="none"
+				_hover={{ textDecoration: "none" }}
+			>
+				<Flex alignItems="center" gap={2}>
+					<Icon icon="edit" color="blue.500" /> {/* Schema icon */}
+					<Box fontWeight="medium" color="gray.700">
+						{schema.name}
+					</Box>
+				</Flex>
+			</Link>
+		</Box>
+	);
 }
 
 const REGELRETT_BACKEND_URL = `${getregelrettFrontendUrl()}/api`;

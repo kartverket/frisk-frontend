@@ -58,10 +58,6 @@ export function MetadataView({ metadata, functionId }: Props) {
 			) : null}
 			{displayValues.map((dv, i) => {
 				const isDisplayValueLoading = dv.isLoading;
-				const displayValue =
-					dv.data?.displayValue ?? metadataToDisplay?.[i]?.value;
-				const metadataDisplayType = dv.data?.displayOptions?.type;
-				const metadataType = metadata.type;
 				const metaDataValue = dv.data?.value ?? metadataToDisplay?.[i]?.value;
 				const metadataId = metadataToDisplay?.[i]?.id;
 				const isLoading = isCurrentMetadataLoading || isDisplayValueLoading;
@@ -69,12 +65,12 @@ export function MetadataView({ metadata, functionId }: Props) {
 
 				if (isNoMetadata) return null;
 
-				switch (metadataDisplayType) {
+				switch (dv.data?.displayOptions?.type) {
 					case "text":
 						return (
 							<TextView
 								key={metaDataValue}
-								displayValue={displayValue}
+								displayValue={dv.data.displayValue}
 								isLoading={isLoading}
 							/>
 						);
@@ -83,8 +79,8 @@ export function MetadataView({ metadata, functionId }: Props) {
 							<LinkView
 								key={metaDataValue}
 								url={metaDataValue}
-								displayValue={displayValue}
-								isExternal={dv.data?.displayOptions?.isExternal ?? true}
+								displayValue={dv.data.displayValue}
+								isExternal={dv.data.displayOptions.isExternal}
 								isDeletable={isDeletable}
 								metadataId={metadataId}
 								functionId={functionId}
@@ -96,20 +92,22 @@ export function MetadataView({ metadata, functionId }: Props) {
 						return (
 							<PillView
 								key={metaDataValue}
-								displayValue={displayValue}
+								displayValue={dv.data.displayValue}
 								isLoading={isLoading}
 							/>
 						);
+					case "custom":
+						return dv.data.displayOptions.component;
 
 					case undefined:
-						switch (metadataType) {
+						switch (metadata.type) {
 							case "select":
 							case "number":
 							case "text":
 								return (
 									<TextView
 										key={metaDataValue}
-										displayValue={displayValue}
+										displayValue={dv.data?.displayValue ?? metaDataValue}
 										isLoading={isLoading}
 									/>
 								);
@@ -118,7 +116,7 @@ export function MetadataView({ metadata, functionId }: Props) {
 									<LinkView
 										key={metaDataValue}
 										url={metaDataValue}
-										displayValue={displayValue}
+										displayValue={dv.data?.displayValue ?? metaDataValue}
 										isExternal={metadata.isExternal}
 										isDeletable={isDeletable}
 										metadataId={metadataId}
@@ -127,12 +125,12 @@ export function MetadataView({ metadata, functionId }: Props) {
 									/>
 								);
 							default:
-								metadataType satisfies never;
+								metadata satisfies never;
 								console.error("Unsupported data type");
 								return null;
 						}
 					default:
-						metadataDisplayType satisfies never;
+						dv.data?.displayOptions satisfies undefined;
 						console.error("Unsupported data type");
 						return null;
 				}
