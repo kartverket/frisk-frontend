@@ -11,6 +11,8 @@ import {
 	useSensor,
 	useSensors,
 	type DragEndEvent,
+	pointerWithin,
+	rectIntersection,
 } from "@dnd-kit/core";
 import type { useFunction } from "@/hooks/use-function";
 import { getFunctionsCSVDump } from "@/services/backend";
@@ -293,6 +295,9 @@ export function FunctionColumnView({ path }: FunctionColumnViewProps) {
 				onDragStart={handleDragStart}
 				onDragEnd={handleDragEnd}
 				sensors={sensors}
+				collisionDetection={(args) =>
+					args.pointerCoordinates ? pointerWithin(args) : rectIntersection(args)
+				}
 			>
 				<Flex>
 					{selectedFunctionIds?.map((ids) => (

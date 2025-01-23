@@ -5,7 +5,7 @@ import {
 	getMyMicrosoftTeams,
 	getTeam,
 } from "@/services/backend";
-import { getregelrettFrontendUrl } from "@/config";
+import { getRegelrettClientId, getregelrettFrontendUrl } from "@/config";
 import { object, string, array, type z } from "zod";
 import { Button, FormControl, FormLabel, Select } from "@kvib/react";
 import type { useFunction } from "@/hooks/use-function";
@@ -388,9 +388,10 @@ const RegelrettSchema = object({
 type RegelrettSchema = z.infer<typeof RegelrettSchema>;
 
 async function getRegelrettTokens() {
+	const REGELRETT_CLIENT_ID = getRegelrettClientId();
 	const regelrettScope =
 		import.meta.env.MODE === "skip"
-			? "api://regelrett-backend/regelrett"
+			? `api://${REGELRETT_CLIENT_ID}/regelrett`
 			: "api://e9dc946b-6fef-44ab-82f1-c0ec2e402903/.default";
 
 	const accounts = msalInstance.getAllAccounts();
