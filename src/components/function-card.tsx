@@ -13,7 +13,7 @@ export function FunctionCard({
 	selected,
 	lowlighted,
 }: { functionId: number; selected: boolean; lowlighted: boolean }) {
-	const { config } = Route.useLoaderData();
+	// const { config } = Route.useLoaderData();
 	const { func } = useFunction(functionId);
 	const search = Route.useSearch();
 	const navigate = Route.useNavigate();
@@ -34,10 +34,10 @@ export function FunctionCard({
 	});
 
 	const hasAccess = useHasFunctionAccess(functionId);
-	const isDraggable = config.enableEntra ? hasAccess : true;
+	// const isDraggable = config.enableEntra ? hasAccess : true;
 
 	return (
-		<Draggable functionId={functionId} hasAccess={isDraggable}>
+		<Draggable functionId={functionId} hasAccess={true /* isDraggable */}>
 			{({ listeners }) => (
 				<Card
 					id={functionId.toString()}

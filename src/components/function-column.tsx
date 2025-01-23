@@ -160,6 +160,10 @@ function ChildrenGroupItem({
 	const { metadata } = useMetadata(func.id);
 	const { filters } = Route.useSearch();
 
+	// Tillater at alle funksjoner kan flyttes på inntil videre
+	//const hasAccess = useHasFunctionAccess(func.id);
+	//const isDraggable = config.enableEntra ? hasAccess : true;
+
 	const hasAllMetadataInFilter = filters?.metadata.every((filter) =>
 		metadata.data?.some(
 			(m) =>
