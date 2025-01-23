@@ -1,17 +1,26 @@
 import { Route } from "@/routes";
 import { useMetadata } from "./use-metadata";
-import { useUser } from "./use-user";
+import { useQuery } from "@tanstack/react-query";
 
 export function useHasFunctionAccess(functionId: number) {
 	const { config } = Route.useLoaderData();
-	const { teams } = useUser();
-
 	const functionMetadata = useMetadata(functionId);
-	if (!config.enableEntra) return true;
+	const authMetadata = config.metadata?.find((metadata) => metadata.auth);
+	const authMetadataValue = functionMetadata.metadata.data?.find(
+		(metadata) => metadata.key === authMetadata?.key,
+	)?.value;
 
-	const teamMetadata = functionMetadata.metadata.data?.find(
-		(metadata) => metadata.key === "team",
-	);
+	const auth = useQuery({
+		queryKey: ["auth", authMetadata?.key, authMetadataValue],
+		queryFn: async () => {
+			if (!config.auth) return true;
+			if (!authMetadata) return true;
+			if (!authMetadataValue) return false;
 
-	return teams.data?.some((team) => team.id === teamMetadata?.value) ?? false;
+			const auth = await config.auth(authMetadataValue);
+			return auth;
+		},
+	});
+
+	return auth.data ?? false;
 }

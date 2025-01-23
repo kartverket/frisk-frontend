@@ -16,8 +16,13 @@ import { InteractionRequiredAuthError } from "@azure/msal-browser";
 export async function getConfig(): Promise<FriskConfig> {
 	const schemas = await getSchemasFromRegelrett();
 	return {
+		auth: async (value) => {
+			const teamsIHaveAccessTo = await getMyMicrosoftTeams();
+			return teamsIHaveAccessTo.some((team) => team.id === value);
+		},
 		metadata: [
 			{
+				auth: true,
 				key: "team",
 				type: "select",
 				title: "Team",
@@ -144,6 +149,7 @@ export async function getConfig(): Promise<FriskConfig> {
 }
 
 type FriskConfig = {
+	auth?: (value: string) => Promise<boolean>;
 	metadata?: Metadata[];
 	logo: Logo;
 	title: string;
@@ -156,6 +162,7 @@ type FriskConfig = {
 };
 
 type GeneralMetadataContent = {
+	auth?: boolean;
 	key: string;
 
 	/**
