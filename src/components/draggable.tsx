@@ -1,11 +1,13 @@
 import { useFunction } from "@/hooks/use-function";
 import { Route } from "@/routes";
 import { useDraggable } from "@dnd-kit/core";
-import type { ReactNode } from "react";
+import type { SyntheticListenerMap } from "@dnd-kit/core/dist/hooks/utilities";
 
 type DraggableProps = {
 	functionId: number;
-	children: ReactNode;
+	children: (props: {
+		listeners: SyntheticListenerMap | undefined;
+	}) => React.ReactNode;
 	hasAccess?: boolean;
 };
 
@@ -32,8 +34,8 @@ export function Draggable({
 			}
 		: undefined;
 	return (
-		<div ref={setNodeRef} {...listeners} {...attributes} style={dragableStyle}>
-			{children}
+		<div ref={setNodeRef} {...attributes} style={dragableStyle}>
+			{children({ listeners })}
 		</div>
 	);
 }

@@ -3,7 +3,6 @@ import { Route } from "@/routes";
 import { Box, Button, Flex, List, ListItem, Skeleton, Text } from "@kvib/react";
 import { FunctionCard } from "./function-card";
 import { useLayoutEffect, useState } from "react";
-import { Draggable } from "./draggable";
 import { Droppable } from "./droppable";
 import { CreateFunctionForm } from "./create-function-form";
 import { useIsFetching } from "@tanstack/react-query";
@@ -158,7 +157,6 @@ function ChildrenGroupItem({
 	func,
 	selected,
 }: { func: BackendFunction; selected: boolean }) {
-	//const { config } = Route.useLoaderData();
 	const { metadata } = useMetadata(func.id);
 	const { filters } = Route.useSearch();
 
@@ -186,13 +184,11 @@ function ChildrenGroupItem({
 	return (
 		<Skeleton fitContent isLoaded={!filters || !metadata.isLoading}>
 			<ListItem>
-				<Draggable functionId={func.id} hasAccess={true}>
-					<FunctionCard
-						functionId={func.id}
-						selected={selected}
-						lowlighted={!!filters && !hasAllMetadataInFilter}
-					/>
-				</Draggable>
+				<FunctionCard
+					functionId={func.id}
+					selected={selected}
+					lowlighted={!!filters && !hasAllMetadataInFilter}
+				/>
 			</ListItem>
 		</Skeleton>
 	);
