@@ -62,6 +62,7 @@ export function FunctionCard({
 					opacity={lowlighted ? 0.5 : 1}
 					borderWidth={1}
 					onClick={() => {
+						if (!func.data) return;
 						if (search.edit !== undefined) {
 							return;
 						}
@@ -87,6 +88,45 @@ export function FunctionCard({
 								flags: search.flags,
 							},
 						});
+						if (selected) {
+							const newPath = search.path.map((path) => {
+								const funcId = func.data.id;
+								if (path.includes(funcId.toString())) {
+									const indexOfFuncId = path
+										.split(".")
+										.indexOf(funcId.toString());
+									const pathBeforeFuncPath = path
+										.split(".")
+										.slice(0, indexOfFuncId);
+									return pathBeforeFuncPath.join(".");
+								}
+								return path;
+							});
+							navigate({
+								search: {
+									path: newPath,
+									filters: search.filters,
+									edit: search.edit,
+									flags: search.flags,
+								},
+							});
+						} else {
+							navigate({
+								search: {
+									path: [
+										...search.path.filter(
+											(path) =>
+												!func?.data?.path.includes(path) &&
+												!path.includes(`${func?.data?.path}`),
+										),
+										func?.data?.path,
+									],
+									filters: search.filters,
+									edit: search.edit,
+									flags: search.flags,
+								},
+							});
+						}
 					}}
 				>
 					<Flex
