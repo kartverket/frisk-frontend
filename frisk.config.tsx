@@ -8,19 +8,21 @@ import {
 import { getRegelrettClientId, getregelrettFrontendUrl } from "@/config";
 import { object, string, array, type z } from "zod";
 import {
-	Box,
 	Button,
 	Flex,
 	FormControl,
 	FormLabel,
-	Icon,
+	IconButton,
 	Link,
 	Select,
+	Skeleton,
+	useDisclosure,
 } from "@kvib/react";
 import type { useFunction } from "@/hooks/use-function";
-import type { useMetadata } from "@/hooks/use-metadata";
 import { msalInstance } from "@/services/msal";
 import { InteractionRequiredAuthError } from "@azure/msal-browser";
+import type { useMetadata } from "@/hooks/use-metadata";
+import { DeleteMetadataModal } from "@/components/delete-metadata-modal";
 
 export async function getConfig(): Promise<FriskConfig> {
 	const schemas = await getSchemasFromRegelrett();
@@ -129,7 +131,13 @@ export async function getConfig(): Promise<FriskConfig> {
 							displayOptions: {
 								type: "custom",
 								component: (
-									<SchemaDisplay schema={schema} url={url} key={contextId} />
+									<SchemaDisplay
+										key={contextId}
+										schema={schema}
+										url={url}
+										functionId={input.functionId}
+										metadataId={input.id}
+									/>
 								),
 							},
 						};
@@ -201,7 +209,12 @@ type GeneralMetadataContent = {
 	 * you can use this function to get the display value. Often used together with inputType: "select" since
 	 * selects has both a value, and a name.
 	 */
-	getDisplayValue?: (input: { key: string; value: string }) => Promise<{
+	getDisplayValue?: (input: {
+		key: string;
+		value: string;
+		functionId: number;
+		id: number;
+	}) => Promise<{
 		displayValue: string;
 		value?: string;
 		displayOptions?:
@@ -342,33 +355,63 @@ type Schema = {
 type SchemaDisplayProps = {
 	schema: Schema;
 	url: string;
+	functionId: number;
+	metadataId: number;
 };
 
-function SchemaDisplay({ schema, url }: SchemaDisplayProps) {
+function SchemaDisplay({
+	schema,
+	url,
+	functionId,
+	metadataId,
+}: SchemaDisplayProps) {
+	const { isOpen, onOpen, onClose } = useDisclosure();
+
 	return (
-		<Box
-			border="2px solid"
-			borderColor="blue.500"
-			borderRadius="md"
-			backgroundColor="white"
-			p={3}
-			_hover={{ borderColor: "blue.600", cursor: "pointer" }}
-		>
-			<Link
+		<Flex width="90%" gap={2} alignItems="center">
+			<Button
+				colorScheme="blue"
+				as={Link}
 				href={url}
-				isExternal
-				onClick={(e) => e.stopPropagation()}
+				isExternal={false}
+				variant="secondary"
+				borderRadius="md"
+				backgroundColor="white"
+				leftIcon="article"
 				textDecoration="none"
-				_hover={{ textDecoration: "none" }}
+				size="sm"
+				onClick={(e) => e.stopPropagation()}
+				overflow="hidden"
+				fontWeight="medium"
+				fontSize="sm"
+				justifyContent="start"
+				flex="1"
 			>
-				<Flex alignItems="center" gap={2}>
-					<Icon icon="edit" color="blue.500" /> {/* Schema icon */}
-					<Box fontWeight="medium" color="gray.700">
-						{schema.name}
-					</Box>
-				</Flex>
-			</Link>
-		</Box>
+				{schema.name}
+			</Button>
+
+			<IconButton
+				aria-label="Delete schema"
+				icon="delete"
+				variant="tertiary"
+				size="sm"
+				colorScheme="red"
+				borderRadius="md"
+				_hover={{ backgroundColor: "red.50" }}
+				onClick={(e) => {
+					e.stopPropagation();
+					onOpen();
+				}}
+			/>
+			<DeleteMetadataModal
+				onOpen={onOpen}
+				onClose={onClose}
+				isOpen={isOpen}
+				functionId={functionId}
+				metadataId={metadataId}
+				displayValue={schema.name}
+			/>
+		</Flex>
 	);
 }
 

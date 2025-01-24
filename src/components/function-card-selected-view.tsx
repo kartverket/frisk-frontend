@@ -29,7 +29,12 @@ export function FunctionCardSelectedView({
 				<EditAndSelectButtons functionId={functionId} selected />
 			</Flex>
 			{config.metadata?.map((meta) => (
-				<MetadataView key={meta.key} metadata={meta} functionId={functionId} />
+				<MetadataView
+					key={meta.key}
+					metadata={meta}
+					functionId={functionId}
+					metadataId={metadata.data?.find((m) => m.key === meta.key)?.id}
+				/>
 			))}
 			{config.functionCardComponents.map((Component) => (
 				<Component
