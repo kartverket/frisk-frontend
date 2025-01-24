@@ -33,7 +33,7 @@ export function FunctionCardSelectedView({
 					key={meta.key}
 					metadata={meta}
 					functionId={functionId}
-					metadataId={metadata.data?.find((m) => m.key === meta.key)?.id}
+					//metadataId={metadata.data?.find((m) => m.key === meta.key)?.id}
 				/>
 			))}
 			{config.functionCardComponents.map((Component) => (
