@@ -15,7 +15,6 @@ import {
 	IconButton,
 	Link,
 	Select,
-	Skeleton,
 	useDisclosure,
 } from "@kvib/react";
 import type { useFunction } from "@/hooks/use-function";
