@@ -16,7 +16,6 @@ import { useHasFunctionAccess } from "@/hooks/use-has-function-access";
 type Props = {
 	metadata: Metadata;
 	functionId: number;
-	//metadataId: number | undefined;
 };
 
 export function MetadataView({ metadata, functionId }: Props) {
