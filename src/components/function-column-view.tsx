@@ -61,7 +61,8 @@ export function FunctionColumnView({ path }: FunctionColumnViewProps) {
 		if (
 			over &&
 			active.data.current &&
-			active.data.current.func.parentId !== Number(over.id)
+			over.data.current &&
+			active.data.current.func.parentId !== Number(over.data.current.group)
 		) {
 			const update = active.data.current.update as ReturnType<
 				typeof useFunction
@@ -69,7 +70,7 @@ export function FunctionColumnView({ path }: FunctionColumnViewProps) {
 
 			await update.mutateAsync({
 				...active.data.current.func,
-				parentId: Number(over.id),
+				parentId: Number(over.data.current.group),
 			});
 		}
 	}

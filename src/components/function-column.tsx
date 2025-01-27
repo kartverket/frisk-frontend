@@ -142,7 +142,7 @@ function ChildrenGroup({
 				left={0}
 				right={0}
 			>
-				<Droppable id={functionId}>
+				<Droppable functionId={functionId} droppableId={functionId.toString()}>
 					<List display="flex" flexDirection="column" gap={2} marginBottom="2">
 						{children.data?.map((child) => (
 							<ChildrenGroupItem

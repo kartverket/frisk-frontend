@@ -4,33 +4,21 @@ import { useState, type ReactNode } from "react";
 import { useFunction } from "@/hooks/use-function";
 
 type DroppableProps = {
-	id: number;
+	functionId: number;
+	droppableId: string;
 	children: ReactNode;
 };
 
-export function Droppable({ id, children }: DroppableProps) {
-	const { func } = useFunction(id);
+export function Droppable({
+	functionId,
+	droppableId,
+	children,
+}: DroppableProps) {
+	const { setNodeRef, over } = useDroppable({
+		id: droppableId,
 
-	const [disabled, setDisabled] = useState<boolean>(false);
-
-	const { isOver, setNodeRef } = useDroppable({
-		id: id,
-		disabled: disabled,
-	});
-
-	useDndMonitor({
-		onDragOver(event) {
-			const { active, over } = event;
-			if (func?.data && over && active.data.current) {
-				if (over.id === id && active.data.current.func.parentId === over.id) {
-					setDisabled(true);
-				} else if (over.id === id) {
-					setDisabled(func.data.path.includes(active.id.toString()));
-				}
-			}
-		},
-		onDragEnd() {
-			setDisabled(false);
+		data: {
+			group: functionId,
 		},
 	});
 
@@ -38,7 +26,9 @@ export function Droppable({ id, children }: DroppableProps) {
 		<Box
 			ref={setNodeRef}
 			padding={"8px"}
-			backgroundColor={isOver ? "blue.100" : "gray.200"}
+			backgroundColor={
+				over?.data.current?.group === functionId ? "blue.100" : "gray.200"
+			}
 			borderRadius="md"
 			border="1px"
 			marginBottom={2}
