@@ -1,39 +1,23 @@
-import { useDndMonitor, useDroppable } from "@dnd-kit/core";
-import { Box } from "@kvib/react";
-import { useState, type ReactNode } from "react";
-import { useFunction } from "@/hooks/use-function";
+import { useDroppable } from "@dnd-kit/core";
 
 type DroppableProps = {
-	functionId: number;
+	groupId: number;
 	droppableId: string;
-	children: ReactNode;
+	children: (props: {
+		isOver: boolean;
+		setNodeRef: (element: HTMLElement | null) => void;
+	}) => React.ReactNode;
 };
 
-export function Droppable({
-	functionId,
-	droppableId,
-	children,
-}: DroppableProps) {
+export function Droppable({ groupId, droppableId, children }: DroppableProps) {
 	const { setNodeRef, over } = useDroppable({
 		id: droppableId,
-
 		data: {
-			group: functionId,
+			group: groupId,
 		},
 	});
 
-	return (
-		<Box
-			ref={setNodeRef}
-			padding={"8px"}
-			backgroundColor={
-				over?.data.current?.group === functionId ? "blue.100" : "gray.200"
-			}
-			borderRadius="md"
-			border="1px"
-			marginBottom={2}
-		>
-			{children}
-		</Box>
-	);
+	const isOver = over?.data.current?.group === groupId;
+
+	return children({ isOver, setNodeRef });
 }
