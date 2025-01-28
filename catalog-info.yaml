@@ -9,7 +9,7 @@ spec:
   type: "website"
   lifecycle: "production"
   owner: "skvis"
-  system: "sikkerhetsmetrikker"
+  system: "funksjon-skjema-register"
 ---
 apiVersion: "backstage.io/v1alpha1"
 kind: "Group"
