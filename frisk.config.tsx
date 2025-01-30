@@ -61,8 +61,8 @@ export async function getConfig(): Promise<FriskConfig> {
 				isRequired: false,
 				placeholder: "Legg til en beskrivelse",
 				inheritFromParent: false,
-				getDisplayValue: async () => {
-					return { displayValue: "???" };
+				getDisplayValue: async (input) => {
+					return { displayValue: input.value };
 				},
 			},
 			{
