@@ -14,6 +14,7 @@ import {
 	Select,
 	Skeleton,
 	Text,
+	Textarea,
 } from "@kvib/react";
 import { useQueries, useQuery } from "@tanstack/react-query";
 import type { UseQueryResult } from "@tanstack/react-query";
@@ -310,6 +311,12 @@ type InputProps = {
 	hideLabel?: boolean;
 };
 
+function isMultilineText(
+	metadata: InputMetadata,
+): metadata is InputMetadata & { type: "text"; multiline: true } {
+	return metadata.type === "text" && metadata.textArea === true;
+}
+
 function InputField({
 	metadata,
 	functionId,
@@ -336,21 +343,38 @@ function InputField({
 					{metadata.label}
 				</FormLabel>
 			)}
-			<Input
-				type={metadata.type}
-				name={metadata.key}
-				defaultValue={
-					currentMetadataValue ??
-					(metadata.inheritFromParent ? parentMetadataValue : undefined)
-				}
-				onChange={(e) => {
-					onChange?.(e.target.value);
-				}}
-				placeholder={metadata.placeholder}
-				size="sm"
-				borderRadius="5px"
-				value={value}
-			/>
+			{isMultilineText(metadata) ? (
+				<Textarea
+					name={metadata.key}
+					defaultValue={
+						currentMetadataValue ??
+						(metadata.inheritFromParent ? parentMetadataValue : undefined)
+					}
+					onChange={(e) => {
+						onChange?.(e.target.value);
+					}}
+					placeholder={metadata.placeholder}
+					size="sm"
+					borderRadius="5px"
+					value={value}
+				/>
+			) : (
+				<Input
+					type={metadata.type}
+					name={metadata.key}
+					defaultValue={
+						currentMetadataValue ??
+						(metadata.inheritFromParent ? parentMetadataValue : undefined)
+					}
+					onChange={(e) => {
+						onChange?.(e.target.value);
+					}}
+					placeholder={metadata.placeholder}
+					size="sm"
+					borderRadius="5px"
+					value={value}
+				/>
+			)}
 		</FormControl>
 	);
 }
