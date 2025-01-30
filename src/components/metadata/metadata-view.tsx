@@ -153,29 +153,24 @@ const TextView: React.FC<TextViewProps> = ({
 	isLoading,
 	isTextArea,
 }) => {
-	if (isTextArea) {
-		return (
-			<Skeleton isLoaded={!isLoading} borderRadius="5px" fitContent>
+	return (
+		<Skeleton isLoaded={!isLoading} fitContent>
+			{isTextArea ? (
 				<Textarea
-					height="10p"
 					backgroundColor="white"
 					variant="filled"
 					readOnly
 					fontSize="sm"
 					value={displayValue ?? ""}
 					size="sm"
-					padding="5px"
 					borderRadius="5px"
 					resize="none"
 					_hover={{ backgroundColor: "white" }}
 					maxWidth="90%"
 				/>
-			</Skeleton>
-		);
-	}
-	return (
-		<Skeleton isLoaded={!isLoading} fitContent>
-			<Text fontSize="sm">{displayValue ?? "<Ingen tekst>"}</Text>
+			) : (
+				<Text fontSize="sm">{displayValue ?? "<Ingen tekst>"}</Text>
+			)}
 		</Skeleton>
 	);
 };
