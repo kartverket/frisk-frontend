@@ -142,7 +142,7 @@ export async function getConfig(): Promise<FriskConfig> {
 						});
 						const url = `${getregelrettFrontendUrl()}/context/${contextId}?${searchParams.toString()}`;
 						return {
-							displayValue: "Skjema",
+							displayValue: schema.name,
 							displayOptions: {
 								type: "custom",
 								component: (
@@ -403,7 +403,7 @@ function SchemaDisplay({
 				onClick={(e) => e.stopPropagation()}
 				overflow="hidden"
 				fontWeight="medium"
-				fontSize="sm"
+				fontSize="xs"
 				justifyContent="start"
 				flex="1"
 			>
