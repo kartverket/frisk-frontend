@@ -31,6 +31,7 @@ const functionSearchSchema = object({
 	indicators: object({
 		metadata: array(object({ key: string(), value: unknown().optional() })),
 	}).optional(),
+	highlighted: number().optional(),
 
 	flags: array(string()).optional(),
 });

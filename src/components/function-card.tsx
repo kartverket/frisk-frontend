@@ -6,6 +6,7 @@ import { FunctionCardSelectedView } from "./function-card-selected-view";
 import { EditAndSelectButtons } from "./edit-and-select-buttons";
 import { useEffect, useState } from "react";
 import { useHasFunctionAccess } from "@/hooks/use-has-function-access";
+import { css, keyframes } from "@emotion/react";
 
 export function FunctionCard({
 	functionId,
@@ -31,7 +32,35 @@ export function FunctionCard({
 		setBottomMargin(getParentDistance());
 	});
 
+	useEffect(() => {
+		if (search.highlighted === functionId) {
+			const timeout = setTimeout(() => {
+				navigate({
+					search: {
+						...search,
+						highlighted: undefined,
+					},
+				});
+			}, 2000);
+			return () => {
+				clearTimeout(timeout);
+			};
+		}
+	}, [search, functionId, navigate]);
+
 	const hasAccess = useHasFunctionAccess(functionId);
+
+	const highlightBorder = keyframes`
+	0% {
+	  outline: 1px solid black;
+	}
+	50% {
+	  outline: 3px solid black;
+	}
+	100% {
+	  outline: 1px solid black;
+	}
+  `;
 
 	return (
 		<Card
@@ -40,6 +69,13 @@ export function FunctionCard({
 			borderColor="blue.500"
 			opacity={lowlighted ? 0.5 : 1}
 			borderWidth={1}
+			css={
+				search.highlighted === functionId
+					? css`
+				animation:  ${highlightBorder} 1s ease;
+			  `
+					: undefined
+			}
 			onClick={() => {
 				if (search.edit !== undefined) {
 					return;

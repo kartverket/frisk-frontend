@@ -1,4 +1,4 @@
-import { Flex, Text } from "@kvib/react";
+import { Button, Flex, Text } from "@kvib/react";
 import type { Metadata } from "frisk.config";
 import { MetadataValue } from "./metadata-value";
 import { Route } from "@/routes";
@@ -70,6 +70,8 @@ function Indicators(props: {
 		key,
 		value,
 	});
+	const navigate = Route.useNavigate();
+	const search = Route.useSearch();
 
 	return indicators.data
 		?.filter((indicator) => indicator.id !== func.data?.id)
@@ -77,13 +79,57 @@ function Indicators(props: {
 			const metadata = config.metadata?.find((m) => m.key === key);
 			if (!metadata) return null;
 
+			const indicatorPosition =
+				indicator.path.split(".").length -
+				(func.data?.path.split(".").length ?? 0);
+
 			return (
-				<Flex key={indicator.id}>
-					{indicator.path.split(".").length -
-						(func.data?.path.split(".").length ?? 0)}
-					{"> "}
-					<MetadataValue functionId={indicator.id} metadata={metadata} />
-				</Flex>
+				<Button
+					key={indicator.id}
+					variant="secondary"
+					size="xs"
+					colorScheme="blue"
+					backgroundColor="white"
+					mb="5px"
+					onClick={(e) => {
+						e.stopPropagation();
+						const updatedSearch = {
+							...search,
+							highlighted: indicator.id,
+						};
+
+						if (
+							indicatorPosition > 0 &&
+							!search.path.some((p) =>
+								p.split(".").includes(indicator.id.toString()),
+							)
+						) {
+							const oldPaths = search.path;
+							const newPaths = oldPaths.filter(
+								(p) => !indicator.path.includes(p),
+							);
+							updatedSearch.path = [...newPaths, indicator.path];
+						}
+
+						navigate({ search: updatedSearch });
+					}}
+					maxW="fit-content"
+					px="20px"
+					overflow="hidden"
+					justifyContent="left"
+				>
+					<Flex alignItems="center" gap="10px">
+						{indicatorPosition < 0
+							? "<".repeat(Math.abs(indicatorPosition))
+							: ">".repeat(indicatorPosition)}
+
+						<MetadataValue
+							functionId={indicator.id}
+							metadata={metadata}
+							isIndicator
+						/>
+					</Flex>
+				</Button>
 			);
 		});
 }

@@ -16,9 +16,10 @@ import { useHasFunctionAccess } from "@/hooks/use-has-function-access";
 type Props = {
 	metadata: Metadata;
 	functionId: number;
+	isIndicator?: boolean;
 };
 
-export function MetadataValue({ metadata, functionId }: Props) {
+export function MetadataValue({ metadata, functionId, isIndicator }: Props) {
 	const {
 		metadata: { data: currentMetadata, isPending: isCurrentMetadataLoading },
 	} = useMetadata(functionId);
@@ -63,6 +64,8 @@ export function MetadataValue({ metadata, functionId }: Props) {
 				const isNoMetadata = !currentMetadata && !isCurrentMetadataLoading;
 
 				if (isNoMetadata) return null;
+
+				if (isIndicator) return displayValue;
 
 				switch (metadataDisplayType) {
 					case "text":

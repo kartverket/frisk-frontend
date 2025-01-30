@@ -1,4 +1,15 @@
-import { Button, Flex, IconButton, Select, Text, useToast } from "@kvib/react";
+import {
+	Box,
+	Button,
+	Flex,
+	Icon,
+	IconButton,
+	Select,
+	Text,
+	Tooltip,
+	useTheme,
+	useToast,
+} from "@kvib/react";
 import { FunctionColumn } from "./function-column";
 import { getIdsFromPath } from "@/lib/utils";
 
@@ -128,9 +139,9 @@ export function FunctionColumnView({ path }: FunctionColumnViewProps) {
 				Eksporter funksjonsregisteret
 			</Button>
 
-			<Flex flexDirection="column" w="fit-content" gap={1} pb={2}>
+			<Flex flexDirection="column" w="fit-content" gap={2} py={4}>
 				<SearchField />
-				<Flex gap={2}>
+				<Flex gap="6">
 					<Filters type="filters" />
 					<Filters type="indicators" />
 				</Flex>
@@ -166,6 +177,7 @@ function Filters(props: {
 	const { config } = Route.useLoaderData();
 	const search = Route.useSearch();
 	const navigate = Route.useNavigate();
+	const theme = useTheme();
 	const removeFilter = (key: string) => {
 		const newFilters = search[props.type]?.metadata.filter(
 			(m) => m.key !== key,
@@ -195,10 +207,27 @@ function Filters(props: {
 
 	return (
 		<Flex flexDirection="column" gap={1}>
+			<Flex alignItems="center" gap="1">
+				<Text fontSize="sm" as="b" color="blue.500">
+					{props.type === "filters" ? "Filter" : "Indikator"}
+				</Text>
+				{props.type === "indicators" && (
+					<Tooltip label="Indikatorer viser om og på hvilke funksjoner valgt metadata finnes i treet">
+						<Box as="span" display="inline-flex" alignItems="center">
+							<Icon
+								aria-label="info"
+								icon="info"
+								size={21}
+								color={theme.colors.blue[500]}
+							/>
+						</Box>
+					</Tooltip>
+				)}
+			</Flex>
 			<Select
 				size="sm"
 				borderRadius="5px"
-				placeholder={`Legg til ${props.type}`}
+				placeholder={`Legg til ${props.type === "filters" ? "filter" : "indikator"}`}
 				onChange={(e) => {
 					if (e.target.value) {
 						navigate({
