@@ -51,6 +51,21 @@ export async function getConfig(): Promise<FriskConfig> {
 				inheritFromParent: true,
 			},
 			{
+				key: "beskrivelse",
+				type: "text",
+				textArea: true,
+				title: "Beskrivelse",
+				displayName: "Beskrivelse",
+				label: "Funksjonsbeskrivelse",
+				show: () => true,
+				isRequired: false,
+				placeholder: "Legg til en beskrivelse",
+				inheritFromParent: false,
+				getDisplayValue: async () => {
+					return { displayValue: "???" };
+				},
+			},
+			{
 				key: "kritikalitet",
 				type: "select",
 				title: "Kritikalitet",
@@ -112,6 +127,7 @@ export async function getConfig(): Promise<FriskConfig> {
 				(schema): InputMetadata => ({
 					key: schema.id,
 					type: "text",
+					textArea: false,
 					displayName: schema.name,
 					label: "Regelrett skjema",
 					show: (mode, hasAccess) => mode === "read" && hasAccess,
@@ -255,7 +271,12 @@ export type SelectMetadata = GeneralMetadata & {
 export type InputMetadata = GeneralMetadata &
 	(
 		| {
-				type: Extract<HTMLInputTypeAttribute, "number" | "text">;
+				type: "number";
+				placeholder: string;
+		  }
+		| {
+				type: "text";
+				textArea: boolean;
 				placeholder: string;
 		  }
 		| {
