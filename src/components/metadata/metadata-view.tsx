@@ -166,6 +166,7 @@ const TextView: React.FC<TextViewProps> = ({
 					borderRadius="5px"
 					resize="none"
 					_hover={{ backgroundColor: "white" }}
+					maxWidth="90%"
 				/>
 			</Skeleton>
 		);
