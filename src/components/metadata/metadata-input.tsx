@@ -127,7 +127,7 @@ function SelectInput({
 			metadataToDisplay?.map((m) => ({
 				queryKey: [functionId, metadata.key, m.value, "getDisplayValue"],
 				queryFn: async () => {
-					return metadata.getDisplayValue?.(m);
+					return metadata.getDisplayValue?.(m) ?? null;
 				},
 			})) ?? [],
 	});
@@ -150,7 +150,7 @@ function SelectInput({
 	>();
 
 	const [newMetadataValue, setCurrentMetadataValue] = useState<
-		MultiSelectOption | undefined
+		MultiSelectOption | undefined | null
 	>();
 
 	const { metadata: parentMetadata } = useMetadata(parentFunctionId);
@@ -228,7 +228,11 @@ function SelectInput({
 						<SingleSelect
 							options={options}
 							metadata={metadata}
-							currentMetadataValue={newMetadataValue ?? currentMetadataValue}
+							currentMetadataValue={
+								(newMetadataValue !== undefined
+									? newMetadataValue
+									: currentMetadataValue) ?? undefined
+							}
 							parentMetadataValue={parentMetadataValue}
 							setCurrentMetadataValue={setCurrentMetadataValue}
 							onChange={onChange}
@@ -286,6 +290,7 @@ function SingleSelect({
 				debounceTime={100}
 				defaultOptions
 				onChange={(newValue) => {
+					console.log(newValue);
 					// @ts-expect-error
 					setCurrentMetadataValue(newValue);
 					// @ts-expect-error
@@ -304,7 +309,7 @@ function SingleSelect({
 					callback(filteredOptions);
 				}}
 			/>
-			<Input type="hidden" name={metadata.key} value={value?.value} />
+			<Input type="hidden" name={metadata.key} value={value?.value ?? ""} />
 		</>
 	);
 }
