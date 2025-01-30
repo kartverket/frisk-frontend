@@ -155,14 +155,16 @@ const TextView: React.FC<TextViewProps> = ({
 }) => {
 	if (isTextArea) {
 		return (
-			<Skeleton isLoaded={!isLoading} height="100px" borderRadius="5px">
+			<Skeleton isLoaded={!isLoading} borderRadius="5px" fitContent>
 				<Textarea
+					height="10p"
 					backgroundColor="white"
 					variant="filled"
 					readOnly
 					fontSize="sm"
 					value={displayValue ?? ""}
 					size="sm"
+					padding="5px"
 					borderRadius="5px"
 					resize="none"
 					_hover={{ backgroundColor: "white" }}
