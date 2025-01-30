@@ -71,18 +71,23 @@ export async function getConfig(): Promise<FriskConfig> {
 			},
 			{
 				key: "backstage-url",
-				type: "url",
+				type: "select",
 				title: "Lenke til utviklerportalen",
 				displayName: "Lenke til utviklerportalen",
-				isExternal: true,
 				label: "Lenke til utviklerportalen",
+				getOptions: async () => {
+					const entities = await getBackstageEntities();
+
+					return [{ value: "", name: "" }];
+				},
+				getDisplayValue: async (input) => {
+					return { displayValue: "", displayOptions: { type: "text" } };
+				},
+				selectMode: "single",
 				show: () => true,
 				isRequired: false,
-				placeholder: "Sett inn lenke",
+				placeholder: "Velg backstage lenke",
 				inheritFromParent: false,
-				getDisplayValue: async () => {
-					return { displayValue: "Utviklerportalen" };
-				},
 			},
 			{
 				key: "dependencies",
@@ -412,6 +417,47 @@ function SchemaDisplay({
 			/>
 		</Flex>
 	);
+}
+
+const BackstageEntity = object({
+	metadata: object({
+		namespace: string(),
+		name: string(),
+		description: string(),
+	}),
+});
+
+type BackstageQueryResponse = {
+	items: unknown[];
+	totalItems?: number;
+	pageInfo?: Record<string, unknown>;
+};
+
+async function getBackstageEntities(): Promise<
+	z.infer<typeof BackstageEntity>[]
+> {
+	const BACKSTAGE_BASE_URL = "TODO";
+	const namespace = "TODO";
+	const token = "TODO";
+
+	const url = `${BACKSTAGE_BASE_URL}/api/catalog/entities/by-query?filter=metadata.namespace=${namespace}`;
+
+	const response = await fetch(url, {
+		method: "GET",
+		headers: {
+			Authorization: `Bearer ${token}`,
+			Accept: "application/json",
+		},
+	});
+
+	if (!response.ok) {
+		throw new Error(
+			`Backstage error: ${response.status} ${response.statusText}`,
+		);
+	}
+	const json = (await response.json()) as BackstageQueryResponse;
+
+	return array(BackstageEntity).parse(json.items);
 }
 
 const REGELRETT_BACKEND_URL = `${getregelrettFrontendUrl()}/api`;
