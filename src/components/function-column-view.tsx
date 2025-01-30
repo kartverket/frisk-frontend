@@ -227,7 +227,7 @@ function Filters(props: {
 					{props.type === "filters" ? "Filter" : "Indikator"}
 				</Text>
 				{props.type === "indicators" && (
-					<Tooltip label="Viser indikatorer om metadata ">
+					<Tooltip label="Viser indikatorer om metadata finnes på under-/overfunksjoner">
 						<Box as="span" display="inline-flex" alignItems="center">
 							<Icon
 								aria-label="info"
