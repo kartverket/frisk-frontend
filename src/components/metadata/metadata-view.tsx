@@ -1,238 +1,134 @@
+import { Button, Flex, Text } from "@kvib/react";
+import type { Metadata } from "frisk.config";
+import { MetadataValue } from "./metadata-value";
+import { Route } from "@/routes";
+import { useFunction } from "@/hooks/use-function";
 import { useMetadata } from "@/hooks/use-metadata";
-import {
-	Box,
-	Flex,
-	IconButton,
-	Link,
-	Skeleton,
-	Text,
-	useDisclosure,
-} from "@kvib/react";
-import { useQueries } from "@tanstack/react-query";
-import type { Metadata } from "../../../frisk.config";
-import { DeleteMetadataModal } from "../delete-metadata-modal";
-import { useHasFunctionAccess } from "@/hooks/use-has-function-access";
+import { useIndicators } from "@/hooks/use-indicators";
 
-type Props = {
+export function MetadataView({
+	metadata,
+	functionId,
+}: {
 	metadata: Metadata;
 	functionId: number;
-};
-
-export function MetadataView({ metadata, functionId }: Props) {
-	const {
-		metadata: { data: currentMetadata, isPending: isCurrentMetadataLoading },
-	} = useMetadata(functionId);
-	const hasAccess = useHasFunctionAccess(functionId);
-
-	// metadata is deletable if it is not required, and only shows in read mode, and you have access
-	const isDeletable =
-		!metadata.isRequired &&
-		metadata.show("read", hasAccess) &&
-		!metadata.show("update", hasAccess) &&
-		!metadata.show("create", hasAccess);
-
-	const metadataToDisplay = currentMetadata?.filter(
-		(m) => metadata.key === m.key,
+}) {
+	const search = Route.useSearch();
+	const indicator = search.indicators?.metadata.find(
+		(m) => m.key === metadata.key,
+	);
+	const metadataQuery = useMetadata(functionId);
+	const indicators = useIndicators(
+		indicator
+			? {
+					functionId,
+					key: indicator.key,
+					value: indicator.value as string,
+				}
+			: undefined,
 	);
 
-	const displayValues = useQueries({
-		queries:
-			metadataToDisplay?.map((m) => ({
-				queryKey: [functionId, metadata.key, m.value, "getDisplayValue"],
-				queryFn: async () => {
-					return metadata.getDisplayValue?.(m);
-				},
-			})) ?? [],
-	});
+	const hasMetadata =
+		metadataQuery.metadata.data?.find((m) => m.key === metadata.key) !==
+		undefined;
+	const hasIndicators =
+		indicator !== undefined && (indicators.data?.length ?? 0) > 0;
 
-	if (displayValues.length === 0 && !isCurrentMetadataLoading) {
-		return null;
-	}
+	const shouldRender = hasMetadata || hasIndicators;
+
+	if (!shouldRender) return null;
 
 	return (
-		<Box my={1}>
-			{metadata.title ? (
+		<Flex key={metadata.key} flexDirection="column">
+			{metadata.title && (
 				<Text fontSize="sm" fontWeight="700">
 					{metadata.title}:
 				</Text>
+			)}
+			<MetadataValue metadata={metadata} functionId={functionId} />
+			{indicator ? (
+				<Indicators
+					functionId={functionId}
+					metaKey={metadata.key}
+					metaValue={indicator.value as string}
+				/>
 			) : null}
-			{displayValues.map((dv, i) => {
-				const isDisplayValueLoading = dv.isLoading;
-				const metaDataValue = dv.data?.value ?? metadataToDisplay?.[i]?.value;
-				const metadataId = metadataToDisplay?.[i]?.id;
-				const isLoading = isCurrentMetadataLoading || isDisplayValueLoading;
-				const isNoMetadata = !currentMetadata && !isCurrentMetadataLoading;
-
-				if (isNoMetadata) return null;
-
-				switch (dv.data?.displayOptions?.type) {
-					case "text":
-						return (
-							<TextView
-								key={metaDataValue}
-								displayValue={dv.data.displayValue}
-								isLoading={isLoading}
-							/>
-						);
-					case "url":
-						return (
-							<LinkView
-								key={metaDataValue}
-								url={metaDataValue}
-								displayValue={dv.data.displayValue}
-								isExternal={dv.data.displayOptions.isExternal}
-								isDeletable={isDeletable}
-								metadataId={metadataId}
-								functionId={functionId}
-								isLoading={isLoading}
-							/>
-						);
-
-					case "pill":
-						return (
-							<PillView
-								key={metaDataValue}
-								displayValue={dv.data.displayValue}
-								isLoading={isLoading}
-							/>
-						);
-					case "custom":
-						return dv.data.displayOptions.component;
-
-					case undefined:
-						switch (metadata.type) {
-							case "select":
-							case "number":
-							case "text":
-								return (
-									<TextView
-										key={metaDataValue}
-										displayValue={dv.data?.displayValue ?? metaDataValue}
-										isLoading={isLoading}
-									/>
-								);
-							case "url":
-								return (
-									<LinkView
-										key={metaDataValue}
-										url={metaDataValue}
-										displayValue={dv.data?.displayValue ?? metaDataValue}
-										isExternal={metadata.isExternal}
-										isDeletable={isDeletable}
-										metadataId={metadataId}
-										functionId={functionId}
-										isLoading={isLoading}
-									/>
-								);
-							default:
-								metadata satisfies never;
-								console.error("Unsupported data type");
-								return null;
-						}
-					default:
-						dv.data?.displayOptions satisfies undefined;
-						console.error("Unsupported data type");
-						return null;
-				}
-			})}
-		</Box>
+		</Flex>
 	);
 }
 
-type TextViewProps = {
-	displayValue: string | undefined;
-	isLoading: boolean;
-};
+function Indicators(props: {
+	functionId: number;
+	metaKey: string;
+	metaValue?: string; // TODO: For å tillate avhengigheter, så må vi ta hensyn til at dette kan være array
+}) {
+	const { config } = Route.useLoaderData();
+	const { func } = useFunction(props.functionId);
+	const { functionId, metaKey: key, metaValue: value } = props;
+	const indicators = useIndicators({
+		functionId,
+		key,
+		value,
+	});
+	const navigate = Route.useNavigate();
+	const search = Route.useSearch();
 
-function TextView({ displayValue, isLoading }: TextViewProps) {
-	return (
-		<Skeleton isLoaded={!isLoading} fitContent>
-			<Text fontSize="sm">{displayValue ?? "<Ingen tekst>"}</Text>
-		</Skeleton>
-	);
-}
+	return indicators.data
+		?.filter((indicator) => indicator.id !== func.data?.id)
+		?.map((indicator) => {
+			const metadata = config.metadata?.find((m) => m.key === key);
+			if (!metadata) return null;
 
-type LinkViewProps = {
-	url: string | undefined;
-	displayValue: string | undefined;
-	isExternal: boolean;
-	isDeletable: boolean;
-	metadataId: number | undefined;
-	functionId: number | undefined;
-	isLoading: boolean;
-};
+			const indicatorPosition =
+				indicator.path.split(".").length -
+				(func.data?.path.split(".").length ?? 0);
 
-function LinkView({
-	url,
-	displayValue,
-	isExternal,
-	isDeletable,
-	metadataId,
-	functionId,
-	isLoading,
-}: LinkViewProps) {
-	const { isOpen, onOpen, onClose } = useDisclosure();
-	return (
-		<Skeleton isLoaded={!isLoading} fitContent>
-			<Flex alignItems="center">
-				<Link
-					fontSize="sm"
+			return (
+				<Button
+					key={indicator.id}
+					variant="secondary"
+					size="xs"
 					colorScheme="blue"
-					width="fit-content"
-					isExternal={isExternal}
-					href={url}
-					onClick={(e) => e.stopPropagation()}
+					backgroundColor="white"
+					mb="5px"
+					onClick={(e) => {
+						e.stopPropagation();
+						const updatedSearch = {
+							...search,
+							highlighted: indicator.id,
+						};
+
+						if (
+							indicatorPosition > 0 &&
+							!search.path.some((p) =>
+								p.split(".").includes(indicator.id.toString()),
+							)
+						) {
+							const oldPaths = search.path;
+							const newPaths = oldPaths.filter(
+								(p) => !indicator.path.includes(p),
+							);
+							updatedSearch.path = [...newPaths, indicator.path];
+						}
+						navigate({ search: updatedSearch });
+					}}
+					maxW="fit-content"
+					px="20px"
+					overflow="hidden"
+					justifyContent="left"
 				>
-					{displayValue ?? "<Ingen lenke>"}
-				</Link>
-				{isDeletable && (
-					<IconButton
-						aria-label="delete"
-						icon="delete"
-						variant="tertiary"
-						size="sm"
-						color="black"
-						onClick={(e) => {
-							e.stopPropagation();
-							onOpen();
-						}}
-					/>
-				)}
-				{functionId && metadataId && (
-					<DeleteMetadataModal
-						onOpen={onOpen}
-						onClose={onClose}
-						isOpen={isOpen}
-						functionId={functionId}
-						metadataId={metadataId}
-						displayValue={displayValue}
-					/>
-				)}
-			</Flex>
-		</Skeleton>
-	);
-}
+					<Flex alignItems="center" gap="10px">
+						{indicatorPosition < 0
+							? "<".repeat(Math.abs(indicatorPosition))
+							: ">".repeat(indicatorPosition)}
 
-type PillViewProps = {
-	displayValue: string | undefined;
-	isLoading: boolean;
-};
-
-function PillView({ displayValue, isLoading }: PillViewProps) {
-	return (
-		<Skeleton isLoaded={!isLoading} fitContent>
-			<Box
-				bg="#BAD7F8"
-				paddingRight={1}
-				paddingLeft={1}
-				borderRadius="md"
-				w="fit-content"
-				my={1}
-			>
-				<Text fontSize="sm" fontWeight="500">
-					{displayValue ?? "<Ingen verdi>"}
-				</Text>
-			</Box>
-		</Skeleton>
-	);
+						<MetadataValue
+							functionId={indicator.id}
+							metadata={metadata}
+							isIndicator
+						/>
+					</Flex>
+				</Button>
+			);
+		});
 }
