@@ -52,11 +52,6 @@ export function MetadataValue({ metadata, functionId, isIndicator }: Props) {
 
 	return (
 		<Box my={1}>
-			{metadata.title && !isIndicator ? (
-				<Text fontSize="sm" fontWeight="700">
-					{metadata.title}:
-				</Text>
-			) : null}
 			{displayValues.map((dv, i) => {
 				const isDisplayValueLoading = dv.isLoading;
 				const metaDataValue = dv.data?.value ?? metadataToDisplay?.[i]?.value;

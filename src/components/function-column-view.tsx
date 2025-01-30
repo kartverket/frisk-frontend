@@ -217,7 +217,7 @@ function Filters(props: {
 					{props.type === "filters" ? "Filter" : "Indikator"}
 				</Text>
 				{props.type === "indicators" && (
-					<Tooltip label="Indikatorer viser om og på hvilke funksjoner valgt metadata finnes i treet">
+					<Tooltip label="Viser indikatorer om metadata ">
 						<Box as="span" display="inline-flex" alignItems="center">
 							<Icon
 								aria-label="info"
