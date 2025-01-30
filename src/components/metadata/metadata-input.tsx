@@ -218,7 +218,7 @@ function SingleSelect({
 		<Select
 			name={metadata.key}
 			size="sm"
-			borderRadius="5px"
+			backgroundColor="white"
 			placeholder={metadata.placeholder}
 			defaultValue={
 				currentMetadataValue ??
