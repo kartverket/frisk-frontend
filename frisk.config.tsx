@@ -1,4 +1,4 @@
-import { useState, type HTMLInputTypeAttribute } from "react";
+import { useState } from "react";
 import {
 	getFunction,
 	getFunctions,
