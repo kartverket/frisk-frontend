@@ -172,7 +172,7 @@ const TextView: React.FC<TextViewProps> = ({
 		);
 	}
 	return (
-		<Skeleton isLoaded={!isLoading} height="fitContent">
+		<Skeleton isLoaded={!isLoading} fitContent>
 			<Text fontSize="sm">{displayValue ?? "<Ingen tekst>"}</Text>
 		</Skeleton>
 	);
