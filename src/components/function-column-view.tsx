@@ -1,4 +1,15 @@
-import { Button, Flex, IconButton, Select, Text, useToast } from "@kvib/react";
+import {
+	Box,
+	Button,
+	Flex,
+	Icon,
+	IconButton,
+	Select,
+	Text,
+	Tooltip,
+	useTheme,
+	useToast,
+} from "@kvib/react";
 import { FunctionColumn } from "./function-column";
 import { getIdsFromPath } from "@/lib/utils";
 
@@ -31,8 +42,6 @@ type FunctionColumnViewProps = {
 
 export function FunctionColumnView({ path }: FunctionColumnViewProps) {
 	const { config } = Route.useLoaderData();
-	const search = Route.useSearch();
-	const navigate = Route.useNavigate();
 	const [activeId, setActiveId] = useState<number | null>(null);
 	const selectedFunctionIds = getIdsFromPath(path);
 
@@ -123,31 +132,6 @@ export function FunctionColumnView({ path }: FunctionColumnViewProps) {
 		}
 	};
 
-	const removeFilter = (key: string) => {
-		const newFilters = search.filters?.metadata.filter((m) => m.key !== key);
-		if (newFilters?.length === 0) {
-			navigate({
-				search: {
-					...search,
-					filters: undefined,
-				},
-			});
-		} else {
-			navigate({
-				search: {
-					...search,
-					...(search.filters
-						? {
-								filters: {
-									metadata: newFilters ?? [],
-								},
-							}
-						: {}),
-				},
-			});
-		}
-	};
-
 	return (
 		<Flex flexDirection="column" paddingY="38" paddingX="75" marginBottom="76">
 			<Text fontSize="2xl" fontWeight="700" marginBottom="3">
@@ -169,137 +153,10 @@ export function FunctionColumnView({ path }: FunctionColumnViewProps) {
 
 			<Flex flexDirection="column" w="fit-content" gap={1} pb={2}>
 				<SearchField />
-				<Select
-					size="sm"
-					borderRadius="5px"
-					placeholder="Legg til filter"
-					onChange={(e) => {
-						if (e.target.value) {
-							navigate({
-								search: {
-									...search,
-									filters: {
-										metadata: [
-											...(search.filters?.metadata ?? []),
-											{ key: e.target.value },
-										],
-									},
-								},
-							});
-						}
-					}}
-				>
-					{config.metadata
-						?.filter(
-							(m) => !search.filters?.metadata?.some((f) => f.key === m.key),
-						)
-						.map((m) => {
-							return (
-								<option key={m.key} value={m.key}>
-									{m.displayName ?? m.key}
-								</option>
-							);
-						})}
-				</Select>
-				{search.filters?.metadata.map((filterMeta) => {
-					const metadata = config.metadata?.find(
-						(m) => m.key === filterMeta.key,
-					);
-					if (!metadata) {
-						return null;
-					}
-					return (
-						<Flex
-							key={filterMeta.key + filterMeta.value}
-							gap={1}
-							alignItems="center"
-						>
-							<Select
-								size="sm"
-								borderRadius="5px"
-								value={filterMeta.key}
-								placeholder="Fjern filter"
-								onChange={(e) => {
-									if (e.target.value) {
-										navigate({
-											search: {
-												...search,
-												...(search.filters
-													? {
-															filters: {
-																metadata: search.filters?.metadata.map((m) => {
-																	if (m.key === filterMeta.key) {
-																		return {
-																			key: e.target.value,
-																		};
-																	}
-																	return m;
-																}),
-															},
-														}
-													: {}),
-											},
-										});
-									} else {
-										removeFilter(filterMeta.key);
-									}
-								}}
-							>
-								{config.metadata
-									?.filter(
-										(m) =>
-											m.key === filterMeta.key ||
-											!search.filters?.metadata?.some((f) => f.key === m.key),
-									)
-									.map((m) => {
-										return (
-											<option key={m.key} value={m.key}>
-												{m.displayName ?? m.key}
-											</option>
-										);
-									})}
-							</Select>
-							<MetadataInput
-								hideLabel
-								value={filterMeta.value as string | MultiSelectOption[]}
-								onChange={(value) => {
-									navigate({
-										search: {
-											...search,
-											...(search.filters
-												? {
-														filters: {
-															metadata: search.filters?.metadata.map((m) => {
-																if (m.key === filterMeta.key) {
-																	return {
-																		key: filterMeta.key,
-																		value: value !== "" ? value : undefined,
-																	};
-																}
-																return m;
-															}),
-														},
-													}
-												: {}),
-										},
-									});
-								}}
-								metadata={metadata}
-								functionId={undefined}
-								parentFunctionId={undefined}
-							/>
-							<IconButton
-								aria-label="Remove filter"
-								onClick={() => {
-									removeFilter(filterMeta.key);
-								}}
-								icon="delete"
-								colorScheme="red"
-								variant="ghost"
-							/>
-						</Flex>
-					);
-				})}
+				<Flex gap="6">
+					<Filters type="filters" />
+					<Filters type="indicators" />
+				</Flex>
 			</Flex>
 			<DndContext
 				onDragStart={handleDragStart}
@@ -325,6 +182,204 @@ export function FunctionColumnView({ path }: FunctionColumnViewProps) {
 					) : null}
 				</DragOverlay>
 			</DndContext>
+		</Flex>
+	);
+}
+
+function Filters(props: {
+	type: "filters" | "indicators";
+}) {
+	const { config } = Route.useLoaderData();
+	const search = Route.useSearch();
+	const navigate = Route.useNavigate();
+	const theme = useTheme();
+	const removeFilter = (key: string) => {
+		const newFilters = search[props.type]?.metadata.filter(
+			(m) => m.key !== key,
+		);
+		if (newFilters?.length === 0) {
+			navigate({
+				search: {
+					...search,
+					[props.type]: undefined,
+				},
+			});
+		} else {
+			navigate({
+				search: {
+					...search,
+					...(search[props.type]
+						? {
+								[props.type]: {
+									metadata: newFilters ?? [],
+								},
+							}
+						: {}),
+				},
+			});
+		}
+	};
+
+	return (
+		<Flex flexDirection="column" gap={1}>
+			<Flex alignItems="center" gap="1">
+				<Text fontSize="sm" as="b" color="blue.500">
+					{props.type === "filters" ? "Filter" : "Indikator"}
+				</Text>
+				{props.type === "indicators" && (
+					<Tooltip label="Indikatorer viser om og på hvilke funksjoner valgt metadata finnes i treet">
+						<Box as="span" display="inline-flex" alignItems="center">
+							<Icon
+								aria-label="info"
+								icon="info"
+								size={21}
+								color={theme.colors.blue[500]}
+							/>
+						</Box>
+					</Tooltip>
+				)}
+			</Flex>
+			<Select
+				size="sm"
+				backgroundColor="white"
+				placeholder={`Legg til ${props.type === "filters" ? "filter" : "indikator"}`}
+				onChange={(e) => {
+					if (e.target.value) {
+						navigate({
+							search: {
+								...search,
+								[props.type]: {
+									metadata: [
+										...(search[props.type]?.metadata ?? []),
+										{ key: e.target.value },
+									],
+								},
+							},
+						});
+					}
+				}}
+			>
+				{config.metadata
+					?.filter(
+						(m) => !search[props.type]?.metadata?.some((f) => f.key === m.key),
+					)
+					/* Vi tar ennå ikke hensyn til arrays i indicators */
+					.filter(
+						(m) =>
+							!(
+								props.type === "indicators" &&
+								m.type === "select" &&
+								m.selectMode === "multi"
+							),
+					)
+					.map((m) => {
+						return (
+							<option key={m.key} value={m.key}>
+								{m.displayName ?? m.key}
+							</option>
+						);
+					})}
+			</Select>
+
+			{search[props.type]?.metadata.map((filterMeta) => {
+				const metadata = config.metadata?.find((m) => m.key === filterMeta.key);
+				if (!metadata) {
+					return null;
+				}
+				return (
+					<Flex
+						key={filterMeta.key + filterMeta.value}
+						gap={1}
+						alignItems="center"
+					>
+						<Select
+							size="sm"
+							backgroundColor="white"
+							value={filterMeta.key}
+							placeholder="Fjern filter"
+							onChange={(e) => {
+								if (e.target.value) {
+									navigate({
+										search: {
+											...search,
+											...(search[props.type]
+												? {
+														[props.type]: {
+															metadata: search[props.type]?.metadata.map(
+																(m) => {
+																	if (m.key === filterMeta.key) {
+																		return {
+																			key: e.target.value,
+																		};
+																	}
+																	return m;
+																},
+															),
+														},
+													}
+												: {}),
+										},
+									});
+								} else {
+									removeFilter(filterMeta.key);
+								}
+							}}
+						>
+							{config.metadata
+								?.filter(
+									(m) =>
+										m.key === filterMeta.key ||
+										!search[props.type]?.metadata?.some((f) => f.key === m.key),
+								)
+								.map((m) => {
+									return (
+										<option key={m.key} value={m.key}>
+											{m.displayName ?? m.key}
+										</option>
+									);
+								})}
+						</Select>
+						<MetadataInput
+							hideLabel
+							value={filterMeta.value as string | MultiSelectOption[]}
+							onChange={(value) => {
+								navigate({
+									search: {
+										...search,
+										...(search[props.type]
+											? {
+													[props.type]: {
+														metadata: search[props.type]?.metadata.map((m) => {
+															if (m.key === filterMeta.key) {
+																return {
+																	key: filterMeta.key,
+																	value: value !== "" ? value : undefined,
+																};
+															}
+															return m;
+														}),
+													},
+												}
+											: {}),
+									},
+								});
+							}}
+							metadata={metadata}
+							functionId={undefined}
+							parentFunctionId={undefined}
+						/>
+						<IconButton
+							aria-label="Remove filter"
+							onClick={() => {
+								removeFilter(filterMeta.key);
+							}}
+							icon="delete"
+							colorScheme="red"
+							variant="ghost"
+						/>
+					</Flex>
+				);
+			})}
 		</Flex>
 	);
 }
