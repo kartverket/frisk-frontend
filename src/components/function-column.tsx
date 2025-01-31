@@ -209,6 +209,10 @@ function ChildrenGroupItem({
 				m.key === filter.key &&
 				(filter.value === undefined ||
 					m.value === filter.value ||
+					(filter.value &&
+						typeof filter.value === "object" &&
+						"value" in filter.value &&
+						filter.value.value === m.value) ||
 					(Array.isArray(filter.value) &&
 						filter.value.every((v) =>
 							metadata.data?.some(
