@@ -9,4 +9,4 @@ spec:
   type: "website"
   lifecycle: "production"
   owner: "skvis"
-  system: "sikkerhetsmetrikker"
+  system: "funksjon-skjema-register"

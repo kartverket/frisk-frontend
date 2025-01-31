@@ -1,61 +1,78 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { FunctionColumnView } from "../components/function-column-view";
-import { Breadcrumbs } from "@/components/breadcrumbs";
-import { boolean, object, string } from "zod";
+import { number, object, string, array, unknown } from "zod";
 import { fallback, zodSearchValidator } from "@tanstack/router-zod-adapter";
-import { useFunction } from "@/hooks/use-function";
 import { useEffect } from "react";
-import { FunctionView } from "@/components/function-view";
 import { Main } from "@/components/main";
-import { CreateAndRedirectEffect } from "@/effects/create-and-redirect-effect";
+import { useFunctions } from "@/hooks/use-functions";
+import { getConfig } from "../../frisk.config";
+import { Header } from "@/components/header";
 
 const functionSearchSchema = object({
 	path: fallback(
-		string()
-			.refine((arg) =>
-				arg.split(".").every((part) => Number.parseInt(part) >= 0),
-			)
-			.default("1"),
-		"1",
+		array(
+			string()
+				.refine((arg) =>
+					arg.split(".").every((part) => Number.parseInt(part) >= 0),
+				)
+				.default("1"),
+		),
+		["1"],
 	),
-	edit: fallback(boolean().default(false), false),
+	functionId: number().optional(),
+	edit: number().optional(),
 	newMetadataKey: string().optional(),
 	newMetadataValue: string().optional(),
 	redirect: string().optional(),
+	filters: object({
+		metadata: array(object({ key: string(), value: unknown().optional() })),
+	}).optional(),
+
+	flags: array(string()).optional(),
 });
 
 export const Route = createFileRoute("/")({
 	component: Index,
 	validateSearch: zodSearchValidator(functionSearchSchema),
+	loader: async () => {
+		return { config: await getConfig() };
+	},
 });
 
 function Index() {
-	const { path } = Route.useSearch();
+	const { path, flags } = Route.useSearch();
 	const navigate = Route.useNavigate();
-	const idArray = path.split(".").map((part) => Number.parseInt(part));
-	const id = idArray.pop() ?? 1;
 
-	const { func } = useFunction(id);
+	const idArrays = path.map((pathArray) =>
+		pathArray.split(".").map((part) => Number.parseInt(part)),
+	);
+	const ids = idArrays.map((pathArray) => pathArray.pop() ?? 1);
+	const { functions } = useFunctions(ids);
 
 	useEffect(() => {
-		if (func.error) {
-			// if function id is invalid, navigate to parent until it is valid
-			const parentPath = idArray.slice().join(".");
-			navigate({
-				search: {
-					path: parentPath,
-					edit: false,
-				},
-			});
-		}
-	}, [func.error, navigate, idArray]);
+		functions.map((func, i) => {
+			if (func.error) {
+				// if function id is invalid, navigate to parent until it is valid
+				const updatedPathArray = idArrays.map((_, index) =>
+					i === index ? idArrays[i].join(".") : path[i],
+				);
+				navigate({
+					search: {
+						path: updatedPathArray,
+						edit: undefined,
+						flags: flags,
+					},
+				});
+			}
+		});
+	}, [functions, path, navigate, idArrays, flags]);
 
 	return (
-		<Main>
-			<Breadcrumbs path={path} />
-			<FunctionView functionId={id} />
-			<FunctionColumnView path={path} />
-			<CreateAndRedirectEffect />
-		</Main>
+		<>
+			<Header />
+			<Main>
+				<FunctionColumnView path={path} />
+			</Main>
+		</>
 	);
 }

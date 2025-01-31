@@ -1,8 +1,9 @@
 import { array, number, object, string, type z } from "zod";
 import { msalInstance, scopes } from "./msal";
 import { InteractionRequiredAuthError } from "@azure/msal-browser";
+import { getBackendUrl } from "@/config";
 
-const BACKEND_URL = import.meta.env.VITE_BACKEND_URL ?? "http://localhost:8080";
+const BACKEND_URL = getBackendUrl() ?? "http://localhost:8080";
 
 async function getTokens() {
 	const accounts = msalInstance.getAllAccounts();
@@ -73,7 +74,9 @@ export async function getChildren(id: number) {
 	return array(BackendFunction).parse(json);
 }
 
-export async function createFunction(newFunction: BackendFunctionCreate) {
+export async function createFunction(
+	newFunction: BackendFunctionWithMetadataCreate,
+) {
 	const response = await fetchFromBackend("/functions", {
 		method: "POST",
 		headers: {
@@ -103,56 +106,6 @@ export async function deleteFunction(id: number) {
 	await fetchFromBackend(`/functions/${id}`, {
 		method: "DELETE",
 	});
-}
-
-export async function createDependency(functionDependency: FunctionDependency) {
-	const response = await fetchFromBackend(
-		`/functions/${functionDependency.functionId}/dependencies`,
-		{
-			method: "POST",
-			headers: {
-				"Content-Type": "application/json",
-			},
-			body: JSON.stringify(functionDependency),
-		},
-	);
-
-	const json = await response.json();
-	return FunctionDependency.parse(json);
-}
-
-export async function deleteDependency({
-	functionId,
-	dependencyFunctionId,
-}: FunctionDependency) {
-	await fetchFromBackend(
-		`/functions/${functionId}/dependencies/${dependencyFunctionId}`,
-		{
-			method: "DELETE",
-		},
-	);
-}
-
-export async function getDependencies(functionId: number) {
-	const response = await fetchFromBackend(
-		`/functions/${functionId}/dependencies`,
-		{
-			method: "GET",
-		},
-	);
-	const json = await response.json();
-	return array(number().int()).parse(json);
-}
-
-export async function getDependents(functionId: number) {
-	const response = await fetchFromBackend(
-		`/functions/${functionId}/dependents`,
-		{
-			method: "GET",
-		},
-	);
-	const json = await response.json();
-	return array(number().int()).parse(json);
 }
 
 export async function getMetadataKeys(search?: string) {
@@ -195,6 +148,31 @@ export async function deleteFunctionMetadata(id: number) {
 	});
 }
 
+export async function patchMetadataValue({
+	id,
+	...metadataValue
+}: MetadataValueUpdate) {
+	await fetchFromBackend(`/metadata/${id}`, {
+		method: "PATCH",
+		headers: {
+			"Content-Type": "application/json",
+		},
+		body: JSON.stringify(metadataValue),
+	});
+}
+
+export async function getFunctionsCSVDump() {
+	const response = await fetchFromBackend("/dump", {
+		method: "GET",
+		headers: {
+			"Content-Type": "text/csv",
+		},
+	});
+	return await response.text();
+}
+
+type MetadataValueUpdate = { id: number; value: string };
+
 export async function getMyMicrosoftTeams() {
 	const response = await fetchFromBackend("/microsoft/me/teams", {
 		method: "GET",
@@ -217,15 +195,17 @@ const BackendFunction = object({
 	description: string().nullable(),
 	path: string(),
 	parentId: number().int().nullable(),
+	orderIndex: number().int(),
 });
 export type BackendFunction = z.infer<typeof BackendFunction>;
-type BackendFunctionCreate = Omit<BackendFunction, "id" | "path">;
-
-const FunctionDependency = object({
-	functionId: number().int(),
-	dependencyFunctionId: number().int(),
-});
-export type FunctionDependency = z.infer<typeof FunctionDependency>;
+type BackendFunctionCreate = Omit<
+	BackendFunction,
+	"id" | "path" | "orderIndex"
+>;
+export type BackendFunctionWithMetadataCreate = {
+	function: BackendFunctionCreate;
+	metadata: Omit<FunctionMetadataCreate, "functionId">[];
+};
 
 const FunctionMetadata = object({
 	id: number().int(),

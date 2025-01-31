@@ -1,14 +1,19 @@
+import { Route } from "@/routes";
 import { useMsal } from "@azure/msal-react";
-import { Button, Header as KvibHeader, Text } from "@kvib/react";
+import { Button, Text } from "@kvib/react";
 
 export function Header() {
+	const { config } = Route.useLoaderData();
 	const msal = useMsal();
 	const accounts = msal.accounts;
 	const account = accounts[0];
 
 	return (
 		<header>
-			<KvibHeader>
+			<CustomHeader>
+				<a href={config.logo.logoLink ?? "/"}>
+					<img src={config.logo.imageSource} alt="logo" />
+				</a>
 				<Button
 					variant="tertiary"
 					leftIcon="logout"
@@ -20,7 +25,27 @@ export function Header() {
 				>
 					<Text>Logg ut</Text>
 				</Button>
-			</KvibHeader>
+			</CustomHeader>
 		</header>
+	);
+}
+
+function CustomHeader({ children }: { children: React.ReactNode }) {
+	return (
+		<div
+			style={{
+				display: "flex",
+				backgroundColor: "white",
+				borderBottomWidth: "2px",
+				borderBottomColor: "gray.200",
+				padding: "30px",
+				height: "90px",
+				justifyContent: "space-between",
+				alignItems: "center",
+				gap: "90px",
+			}}
+		>
+			{children}
+		</div>
 	);
 }

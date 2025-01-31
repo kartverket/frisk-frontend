@@ -1,34 +1,58 @@
-import { useFunction } from "@/hooks/use-function";
 import { getIdsFromPath } from "@/lib/utils";
 import { Route } from "@/routes";
-import {
-	Box,
-	Button,
-	Flex,
-	IconButton,
-	Input,
-	List,
-	ListItem,
-	Skeleton,
-	Text,
-} from "@kvib/react";
+import { Box, Button, Flex, List, ListItem, Skeleton, Text } from "@kvib/react";
 import { FunctionCard } from "./function-card";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { Droppable } from "./droppable";
+import { CreateFunctionForm } from "./create-function-form";
+import { useFunction } from "@/hooks/use-function";
+import { useMetadata } from "@/hooks/use-metadata";
+import type { BackendFunction } from "@/services/backend";
+import type { MultiSelectOption } from "./metadata/metadata-input";
 
 type FunctionFolderProps = {
-	functionId: number;
+	functionIds: number[];
 };
 
-export function FunctionColumn({ functionId }: FunctionFolderProps) {
+export function FunctionColumn({ functionIds }: FunctionFolderProps) {
+	const { config } = Route.useLoaderData();
 	const { path } = Route.useSearch();
-	const { children, addFunction } = useFunction(functionId, {
-		includeChildren: true,
-	});
 
 	const selectedFunctionIds = getIdsFromPath(path);
-	const currentLevel = selectedFunctionIds.indexOf(functionId);
+	const currentLevel = selectedFunctionIds.findIndex(
+		(ids) => ids.join() === functionIds.join(),
+	);
+	const [columnHeight, setColumnHeight] = useState<number>();
 
-	const [isFormVisible, setFormVisible] = useState(false);
+	useEffect(() => {
+		function getColumnHeight() {
+			const column = document.getElementById(`${currentLevel}-column`);
+
+			if (!column) return 0;
+			const children = column.querySelectorAll("[data-child]");
+
+			return Array.from(children).reduce((total, children) => {
+				return total + children.getBoundingClientRect().height;
+			}, 0);
+		}
+		setColumnHeight(getColumnHeight());
+
+		const observer = new MutationObserver(() => {
+			setColumnHeight(getColumnHeight());
+		});
+
+		const root = document.getElementById("root");
+		if (!root) return;
+		observer.observe(root, {
+			attributes: true,
+			childList: true,
+			subtree: true,
+		});
+
+		return () => {
+			observer.disconnect();
+		};
+	}, [currentLevel]);
 
 	return (
 		<Flex flexDirection="column" width="380px">
@@ -40,84 +64,155 @@ export function FunctionColumn({ functionId }: FunctionFolderProps) {
 				textAlign="center"
 				borderColor="gray.400"
 				minH="46px"
+				id="topBox"
 			>
 				<Text size="lg" fontWeight="700">
-					Funksjon nivå {currentLevel + 1}
+					{config.columnName} nivå {currentLevel + 1}
 				</Text>
 			</Box>
-			<Box border="1px" p="20px" borderColor="gray.400" minH="100%">
-				<Skeleton isLoaded={!!children.data} minH={60}>
+
+			<Box
+				border="1px"
+				borderColor="gray.400"
+				backgroundColor={"white"}
+				position="relative"
+				minH="100%"
+				h={`${columnHeight}px`}
+				id={`${currentLevel}-column`}
+			>
+				{functionIds.map((id) => (
+					<ChildrenGroup key={id} functionId={id} />
+				))}
+			</Box>
+		</Flex>
+	);
+}
+
+function ChildrenGroup({
+	functionId,
+}: {
+	functionId: number;
+}) {
+	const { config } = Route.useLoaderData();
+	const { path } = Route.useSearch();
+	const selectedFunctionIds = getIdsFromPath(path);
+
+	const { children } = useFunction(functionId, {
+		includeChildren: true,
+	});
+	const [functionPosition, setFunctionPosition] = useState(0);
+	const [selectedForm, setSelectedForm] = useState<number | null>(null);
+
+	useEffect(() => {
+		function getPosition() {
+			const top = document.getElementById("topBox");
+			const parent = document.getElementById(functionId.toString());
+			if (!parent || !top) return 0;
+			return (
+				parent.getBoundingClientRect().top - top.getBoundingClientRect().bottom
+			);
+		}
+		setFunctionPosition(getPosition());
+
+		const observer = new MutationObserver(() => {
+			setFunctionPosition(getPosition());
+		});
+
+		const root = document.getElementById("root");
+		if (!root) return;
+		observer.observe(root, {
+			attributes: true,
+			childList: true,
+			subtree: true,
+		});
+
+		return () => {
+			observer.disconnect();
+		};
+	}, [functionId]);
+
+	return (
+		<Skeleton key={functionId} isLoaded={!children.isLoading} minH={60}>
+			<Box
+				data-child
+				id={`${functionId}-children`}
+				position="absolute"
+				padding={"20px 2px 20px 2px"}
+				top={`${functionPosition}px`}
+				left={0}
+				right={0}
+			>
+				<Droppable id={functionId}>
 					<List display="flex" flexDirection="column" gap={2} marginBottom="2">
 						{children.data?.map((child) => (
-							<ListItem
-								key={child.id + child.name + child.parentId + child.path}
-							>
-								<FunctionCard
-									functionId={child.id}
-									selected={selectedFunctionIds.includes(child.id)}
-								/>
-							</ListItem>
+							<ChildrenGroupItem
+								key={child.id + child.name + child.parentId}
+								func={child}
+								selected={selectedFunctionIds.some((idList) =>
+									idList.includes(child.id),
+								)}
+							/>
 						))}
 					</List>
-					{isFormVisible && (
-						<form
-							onSubmit={(e) => {
-								e.preventDefault();
-								const form = e.target as HTMLFormElement;
-								const nameElement = form.elements.namedItem(
-									"name",
-								) as HTMLInputElement | null;
-								if (!nameElement) return;
-								addFunction.mutateAsync({
-									name: nameElement.value,
-									description: null,
-									parentId: functionId,
-								});
-								// clear form
-								nameElement.value = "";
-								setFormVisible(false);
-							}}
-						>
-							<Flex
-								border="1px"
-								borderRadius="8px"
-								borderColor="gray.400"
-								p="5px"
-							>
-								<Input
-									type="text"
-									name="name"
-									placeholder="Navn"
-									required
-									autoFocus
-								/>
-								<IconButton
-									type="submit"
-									icon="check"
-									aria-label="check"
-									variant="tertiary"
-									colorScheme="gray"
-								/>
-								<IconButton
-									icon="delete"
-									aria-label="delete"
-									variant="tertiary"
-									colorScheme="gray"
-									onClick={() => setFormVisible(false)}
-								/>
-							</Flex>
-						</form>
-					)}
 					<Button
 						leftIcon="add"
 						variant="tertiary"
 						colorScheme="blue"
-						onClick={() => setFormVisible(true)}
+						onClick={() => {
+							setSelectedForm(functionId);
+						}}
 					>
-						Legg til funksjon
+						{config.addButtonName}
 					</Button>
-				</Skeleton>
+				</Droppable>
+				{selectedForm === functionId && (
+					<CreateFunctionForm
+						functionId={functionId}
+						setSelectedForm={setSelectedForm}
+					/>
+				)}
 			</Box>
-		</Flex>
+		</Skeleton>
+	);
+}
+
+function ChildrenGroupItem({
+	func,
+	selected,
+}: { func: BackendFunction; selected: boolean }) {
+	const { metadata } = useMetadata(func.id);
+	const { filters } = Route.useSearch();
+
+	// Tillater at alle funksjoner kan flyttes på inntil videre
+	//const hasAccess = useHasFunctionAccess(func.id);
+	//const isDraggable = config.enableEntra ? hasAccess : true;
+
+	const hasAllMetadataInFilter = filters?.metadata.every((filter) =>
+		metadata.data?.some(
+			(m) =>
+				m.key === filter.key &&
+				(filter.value === undefined ||
+					m.value === filter.value ||
+					(Array.isArray(filter.value) &&
+						filter.value.every((v) =>
+							metadata.data?.some(
+								(m) =>
+									m.key === filter.key &&
+									m.value === (v as MultiSelectOption).value,
+							),
+						))),
+		),
+	);
+
+	return (
+		<Skeleton fitContent isLoaded={!filters || !metadata.isLoading}>
+			<ListItem>
+				<FunctionCard
+					functionId={func.id}
+					selected={selected}
+					lowlighted={!!filters && !hasAllMetadataInFilter}
+				/>
+			</ListItem>
+		</Skeleton>
 	);
 }
