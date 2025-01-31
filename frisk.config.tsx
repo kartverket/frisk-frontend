@@ -7,11 +7,21 @@ import {
 } from "@/services/backend";
 import { getRegelrettClientId, getregelrettFrontendUrl } from "@/config";
 import { object, string, array, type z } from "zod";
-import { Button, FormControl, FormLabel, Select } from "@kvib/react";
+import {
+	Button,
+	Flex,
+	FormControl,
+	FormLabel,
+	IconButton,
+	Link,
+	Select,
+	useDisclosure,
+} from "@kvib/react";
 import type { useFunction } from "@/hooks/use-function";
-import type { useMetadata } from "@/hooks/use-metadata";
 import { msalInstance } from "@/services/msal";
 import { InteractionRequiredAuthError } from "@azure/msal-browser";
+import type { useMetadata } from "@/hooks/use-metadata";
+import { DeleteMetadataModal } from "@/components/delete-metadata-modal";
 
 export async function getConfig(): Promise<FriskConfig> {
 	const schemas = await getSchemasFromRegelrett();
@@ -74,34 +84,6 @@ export async function getConfig(): Promise<FriskConfig> {
 					return { displayValue: "Utviklerportalen" };
 				},
 			},
-			...schemas.map(
-				(schema): InputMetadata => ({
-					key: schema.id,
-					type: "text",
-					displayName: schema.name,
-					label: "Regelrett skjema",
-					show: (mode, hasAccess) => mode === "read" && hasAccess,
-					isRequired: false,
-					placeholder: "Sett inn skjema",
-					inheritFromParent: false,
-					getDisplayValue: async (input) => {
-						const contextId = input.value;
-						const searchParams = new URLSearchParams({
-							redirectBackUrl: window.location.href,
-							redirectBackTitle: "Funksjonsregisteret",
-						});
-						const url = `${getregelrettFrontendUrl()}/context/${contextId}?${searchParams.toString()}`;
-						return {
-							displayValue: schema.name,
-							value: url,
-							displayOptions: {
-								type: "url",
-								isExternal: false,
-							},
-						};
-					},
-				}),
-			),
 			{
 				key: "dependencies",
 				type: "select",
@@ -126,6 +108,41 @@ export async function getConfig(): Promise<FriskConfig> {
 				placeholder: "Søk etter funksjoner",
 				inheritFromParent: false,
 			},
+			...schemas.map(
+				(schema): InputMetadata => ({
+					key: schema.id,
+					type: "text",
+					displayName: schema.name,
+					label: "Regelrett skjema",
+					show: (mode, hasAccess) => mode === "read" && hasAccess,
+					isRequired: false,
+					placeholder: "Sett inn skjema",
+					inheritFromParent: false,
+					getDisplayValue: async (input) => {
+						const contextId = input.value;
+						const searchParams = new URLSearchParams({
+							redirectBackUrl: window.location.href,
+							redirectBackTitle: "Funksjonsregisteret",
+						});
+						const url = `${getregelrettFrontendUrl()}/context/${contextId}?${searchParams.toString()}`;
+						return {
+							displayValue: "Skjema",
+							displayOptions: {
+								type: "custom",
+								component: (
+									<SchemaDisplay
+										key={contextId}
+										schema={schema}
+										url={url}
+										functionId={input.functionId}
+										metadataId={input.id}
+									/>
+								),
+							},
+						};
+					},
+				}),
+			),
 		],
 
 		logo: {
@@ -191,7 +208,12 @@ type GeneralMetadataContent = {
 	 * you can use this function to get the display value. Often used together with inputType: "select" since
 	 * selects has both a value, and a name.
 	 */
-	getDisplayValue?: (input: { key: string; value: string }) => Promise<{
+	getDisplayValue?: (input: {
+		key: string;
+		value: string;
+		functionId: number;
+		id: number;
+	}) => Promise<{
 		displayValue: string;
 		value?: string;
 		displayOptions?:
@@ -204,6 +226,10 @@ type GeneralMetadataContent = {
 			| {
 					type: "url";
 					isExternal: boolean;
+			  }
+			| {
+					type: "custom";
+					component: React.ReactNode;
 			  };
 	}>;
 };
@@ -318,6 +344,74 @@ function createSchemaComponent(schemas: RegelrettSchema[]) {
 			</form>
 		);
 	};
+}
+
+type Schema = {
+	id: string;
+	name: string;
+};
+
+type SchemaDisplayProps = {
+	schema: Schema;
+	url: string;
+	functionId: number;
+	metadataId: number;
+};
+
+function SchemaDisplay({
+	schema,
+	url,
+	functionId,
+	metadataId,
+}: SchemaDisplayProps) {
+	const { isOpen, onOpen, onClose } = useDisclosure();
+
+	return (
+		<Flex width="90%" gap={2} alignItems="center">
+			<Button
+				colorScheme="blue"
+				as={Link}
+				href={url}
+				isExternal={false}
+				variant="secondary"
+				borderRadius="md"
+				backgroundColor="white"
+				leftIcon="article"
+				textDecoration="none"
+				size="sm"
+				onClick={(e) => e.stopPropagation()}
+				overflow="hidden"
+				fontWeight="medium"
+				fontSize="sm"
+				justifyContent="start"
+				flex="1"
+			>
+				{schema.name}
+			</Button>
+
+			<IconButton
+				aria-label="Delete schema"
+				icon="delete"
+				variant="tertiary"
+				size="sm"
+				colorScheme="red"
+				borderRadius="md"
+				_hover={{ backgroundColor: "red.50" }}
+				onClick={(e) => {
+					e.stopPropagation();
+					onOpen();
+				}}
+			/>
+			<DeleteMetadataModal
+				onOpen={onOpen}
+				onClose={onClose}
+				isOpen={isOpen}
+				functionId={functionId}
+				metadataId={metadataId}
+				displayValue={schema.name}
+			/>
+		</Flex>
+	);
 }
 
 const REGELRETT_BACKEND_URL = `${getregelrettFrontendUrl()}/api`;

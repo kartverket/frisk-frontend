@@ -53,7 +53,7 @@ export function DeleteMetadataModal({
 							colorScheme="red"
 							leftIcon="delete"
 							onClick={async (e) => {
-								e.preventDefault();
+								e.stopPropagation();
 								removeMetadata.mutateAsync({
 									id: metadataId,
 									functionId: functionId,

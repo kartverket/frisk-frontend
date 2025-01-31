@@ -2,6 +2,7 @@ import { Flex, IconButton, Text, Icon, useTheme } from "@kvib/react";
 import { Route } from "@/routes";
 import { useFunction } from "@/hooks/use-function";
 import { useHasFunctionAccess } from "@/hooks/use-has-function-access";
+import { Droppable } from "./droppable";
 
 export function EditAndSelectButtons({
 	functionId,
@@ -32,28 +33,33 @@ export function EditAndSelectButtons({
 					navigate({ search: { ...search, edit: functionId } });
 				}}
 			/>
-			<Flex
-				border="1px"
-				borderColor="blue.500"
-				borderRadius="5px"
-				alignItems="center"
-				bgColor={selected ? "blue.500" : "white"}
-				p="2px"
-				pl="10px"
-				gap="4px"
-			>
-				<Text
-					fontSize="xs"
-					fontWeight="semibold"
-					color={selected ? "white" : "blue.500"}
-				>
-					{children.data?.length}
-				</Text>
-				<Icon
-					icon={selected ? "arrow_back_ios" : "arrow_forward_ios"}
-					color={selected ? "white" : theme.colors.blue[500]}
-				/>
-			</Flex>
+			<Droppable groupId={functionId} droppableId={`${functionId}-self`}>
+				{({ isOver, setNodeRef }) => (
+					<Flex
+						border="1px"
+						borderColor="blue.500"
+						borderRadius="5px"
+						alignItems="center"
+						bgColor={isOver ? "blue.100" : selected ? "blue.500" : "white"}
+						p="2px"
+						pl="10px"
+						gap="4px"
+						ref={setNodeRef}
+					>
+						<Text
+							fontSize="xs"
+							fontWeight="semibold"
+							color={selected ? "white" : "blue.500"}
+						>
+							{children.data?.length}
+						</Text>
+						<Icon
+							icon={selected ? "arrow_back_ios" : "arrow_forward_ios"}
+							color={selected ? "white" : theme.colors.blue[500]}
+						/>
+					</Flex>
+				)}
+			</Droppable>
 		</Flex>
 	);
 }

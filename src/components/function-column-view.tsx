@@ -59,18 +59,28 @@ export function FunctionColumnView({ path }: FunctionColumnViewProps) {
 	async function handleDragEnd(event: DragEndEvent) {
 		const { active, over } = event;
 		if (
-			over &&
 			active.data.current &&
-			active.data.current.func.parentId !== Number(over.id)
+			over?.data.current &&
+			active.data.current.func.parentId !== Number(over.data.current.group)
 		) {
 			const update = active.data.current.update as ReturnType<
 				typeof useFunction
 			>["updateFunction"];
 
-			await update.mutateAsync({
+			const updatedFunc = await update.mutateAsync({
 				...active.data.current.func,
-				parentId: Number(over.id),
+				parentId: Number(over.data.current.group),
 			});
+
+			if (!selectedFunctionIds.flat().includes(over.data.current.group)) {
+				navigate({
+					search: {
+						path: [...path, updatedFunc.path.split(`.${updatedFunc.id}`)[0]],
+						filters: search.filters,
+						flags: search.flags,
+					},
+				});
+			}
 		}
 	}
 

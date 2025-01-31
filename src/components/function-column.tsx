@@ -142,28 +142,44 @@ function ChildrenGroup({
 				left={0}
 				right={0}
 			>
-				<Droppable id={functionId}>
-					<List display="flex" flexDirection="column" gap={2} marginBottom="2">
-						{children.data?.map((child) => (
-							<ChildrenGroupItem
-								key={child.id + child.name + child.parentId}
-								func={child}
-								selected={selectedFunctionIds.some((idList) =>
-									idList.includes(child.id),
-								)}
-							/>
-						))}
-					</List>
-					<Button
-						leftIcon="add"
-						variant="tertiary"
-						colorScheme="blue"
-						onClick={() => {
-							setSelectedForm(functionId);
-						}}
-					>
-						{config.addButtonName}
-					</Button>
+				<Droppable groupId={functionId} droppableId={functionId.toString()}>
+					{({ isOver, setNodeRef }) => (
+						<Box
+							padding={"8px"}
+							backgroundColor={isOver ? "blue.100" : "gray.200"}
+							borderRadius="md"
+							border="1px"
+							marginBottom={2}
+							ref={setNodeRef}
+						>
+							<List
+								display="flex"
+								flexDirection="column"
+								gap={2}
+								marginBottom="2"
+							>
+								{children.data?.map((child) => (
+									<ChildrenGroupItem
+										key={child.id + child.name + child.parentId}
+										func={child}
+										selected={selectedFunctionIds.some((idList) =>
+											idList.includes(child.id),
+										)}
+									/>
+								))}
+							</List>
+							<Button
+								leftIcon="add"
+								variant="tertiary"
+								colorScheme="blue"
+								onClick={() => {
+									setSelectedForm(functionId);
+								}}
+							>
+								{config.addButtonName}
+							</Button>
+						</Box>
+					)}
 				</Droppable>
 				{selectedForm === functionId && (
 					<CreateFunctionForm
