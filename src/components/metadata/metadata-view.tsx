@@ -41,7 +41,7 @@ export function MetadataView({ metadata, functionId }: Props) {
 			metadataToDisplay?.map((m) => ({
 				queryKey: [functionId, metadata.key, m.value, "getDisplayValue"],
 				queryFn: async () => {
-					return metadata.getDisplayValue?.(m);
+					return metadata.getDisplayValue?.(m) ?? null;
 				},
 			})) ?? [],
 	});
