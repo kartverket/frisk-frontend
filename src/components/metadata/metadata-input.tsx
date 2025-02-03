@@ -290,7 +290,6 @@ function SingleSelect({
 				debounceTime={100}
 				defaultOptions
 				onChange={(newValue) => {
-					console.log(newValue);
 					// @ts-expect-error
 					setCurrentMetadataValue(newValue);
 					// @ts-expect-error
