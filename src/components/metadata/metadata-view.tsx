@@ -6,6 +6,7 @@ import {
 	Link,
 	Skeleton,
 	Text,
+	Textarea,
 	useDisclosure,
 } from "@kvib/react";
 import { useQueries } from "@tanstack/react-query";
@@ -72,6 +73,7 @@ export function MetadataView({ metadata, functionId }: Props) {
 								key={metaDataValue}
 								displayValue={dv.data.displayValue}
 								isLoading={isLoading}
+								isTextArea={metadata.type === "text" && metadata.textArea}
 							/>
 						);
 					case "url":
@@ -109,6 +111,7 @@ export function MetadataView({ metadata, functionId }: Props) {
 										key={metaDataValue}
 										displayValue={dv.data?.displayValue ?? metaDataValue}
 										isLoading={isLoading}
+										isTextArea={metadata.type === "text" && metadata.textArea}
 									/>
 								);
 							case "url":
@@ -142,15 +145,35 @@ export function MetadataView({ metadata, functionId }: Props) {
 type TextViewProps = {
 	displayValue: string | undefined;
 	isLoading: boolean;
+	isTextArea: boolean;
 };
 
-function TextView({ displayValue, isLoading }: TextViewProps) {
+const TextView: React.FC<TextViewProps> = ({
+	displayValue,
+	isLoading,
+	isTextArea,
+}) => {
 	return (
 		<Skeleton isLoaded={!isLoading} fitContent>
-			<Text fontSize="sm">{displayValue ?? "<Ingen tekst>"}</Text>
+			{isTextArea ? (
+				<Textarea
+					backgroundColor="white"
+					variant="filled"
+					readOnly
+					fontSize="sm"
+					value={displayValue ?? ""}
+					size="sm"
+					borderRadius="5px"
+					resize="none"
+					_hover={{ backgroundColor: "white" }}
+					maxWidth="90%"
+				/>
+			) : (
+				<Text fontSize="sm">{displayValue ?? "<Ingen tekst>"}</Text>
+			)}
 		</Skeleton>
 	);
-}
+};
 
 type LinkViewProps = {
 	url: string | undefined;
