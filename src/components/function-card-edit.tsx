@@ -84,7 +84,7 @@ export function FunctionCardEdit({ functionId }: { functionId: number }) {
 				}
 				await Promise.all(promises);
 			} else {
-				if (formElement.value.trim() === "" || formElement.value === "") {
+				if (formElement.value.trim() === "") {
 					if (metaDataKeyExists) {
 						const existingMd = existingMetadata[0];
 						if (existingMd.id) {
