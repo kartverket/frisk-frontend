@@ -322,7 +322,7 @@ function createSchemaComponent(schemas: RegelrettSchema[]) {
 					const response = await createRegelrettContext({
 						name: func.data.name,
 						teamId: teamId,
-						tableId: schemaId,
+						formId: schemaId,
 					});
 					const contextId = response.id;
 					addMetadata.mutateAsync({
@@ -504,8 +504,8 @@ async function fetchFromRegelrett(path: string, options: RequestInit = {}) {
 export async function createRegelrettContext({
 	name,
 	teamId,
-	tableId,
-}: { name: string; teamId: string; tableId: string }) {
+	formId,
+}: { name: string; teamId: string; formId: string }) {
 	const response = await fetchFromRegelrett("/contexts", {
 		method: "POST",
 		headers: {
@@ -514,7 +514,7 @@ export async function createRegelrettContext({
 		body: JSON.stringify({
 			name,
 			teamId,
-			tableId,
+			formId,
 		}),
 	});
 
@@ -525,6 +525,6 @@ export async function createRegelrettContext({
 const RegelrettContext = object({
 	id: string(),
 	name: string(),
-	tableId: string(),
+	formId: string(),
 	teamId: string(),
 });
