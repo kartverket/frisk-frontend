@@ -44,6 +44,8 @@ export function FunctionColumnView({ path }: FunctionColumnViewProps) {
 	const { config } = Route.useLoaderData();
 	const [activeId, setActiveId] = useState<number | null>(null);
 	const selectedFunctionIds = getIdsFromPath(path);
+	const navigate = Route.useNavigate();
+	const search = Route.useSearch();
 
 	const sensors = useSensors(
 		useSensor(MouseSensor, {
@@ -84,6 +86,7 @@ export function FunctionColumnView({ path }: FunctionColumnViewProps) {
 			if (!selectedFunctionIds.flat().includes(over.data.current.group)) {
 				navigate({
 					search: {
+						...search,
 						path: [...path, updatedFunc.path.split(`.${updatedFunc.id}`)[0]],
 						filters: search.filters,
 						flags: search.flags,
