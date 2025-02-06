@@ -47,6 +47,21 @@ async function fetchFromBackend(path: Path, options: RequestInit) {
 	return response;
 }
 
+export async function getIndicators(args: {
+	key: string;
+	value?: string;
+	functionId: number;
+}) {
+	const { key, value, functionId } = args;
+	const funcs = await fetchFromBackend(
+		`/metadata/indicator?key=${key}${value ? `&value=${value}` : ""}&functionId=${functionId}`,
+		{
+			method: "GET",
+		},
+	).then((res) => res.json());
+	return array(BackendFunction).parse(funcs);
+}
+
 export async function getFunctions(search?: string) {
 	const response = await fetchFromBackend(
 		`/functions${search ? `?search=${search}` : ""}`,
