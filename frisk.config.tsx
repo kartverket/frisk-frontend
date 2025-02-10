@@ -1,6 +1,7 @@
 import { useState } from "react";
 import {
 	getFunction,
+	getFunctionMetadata,
 	getFunctions,
 	getMyMicrosoftTeams,
 	getTeam,
@@ -20,7 +21,7 @@ import {
 import type { useFunction } from "@/hooks/use-function";
 import { msalInstance } from "@/services/msal";
 import { InteractionRequiredAuthError } from "@azure/msal-browser";
-import { useMetadata } from "@/hooks/use-metadata";
+import type { useMetadata } from "@/hooks/use-metadata";
 import { DeleteMetadataModal } from "@/components/delete-metadata-modal";
 
 export async function getConfig(): Promise<FriskConfig> {
@@ -41,12 +42,12 @@ export async function getConfig(): Promise<FriskConfig> {
 					}));
 				},
 				onChange: async (input) => {
-					const { metadata } = useMetadata(input.functionId);
+					const metadata = await getFunctionMetadata(input.functionId);
 
-					if (!metadata.data) return;
+					if (!metadata) return;
 
 					const metaMap = new Map(
-						metadata.data.map((meta) => [meta.key, meta.value]),
+						metadata.map((meta) => [meta.key, meta.value]),
 					);
 
 					const matchingSchemas = schemas.filter((schema) =>

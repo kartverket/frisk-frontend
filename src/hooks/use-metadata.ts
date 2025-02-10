@@ -121,7 +121,8 @@ export function useMetadata(functionId: number | undefined) {
 				functionId: number;
 			},
 		) => {
-			await patchMetadataValue(input);
+			const { key, functionId, ...validMetadata } = input;
+			await patchMetadataValue(validMetadata);
 			try {
 				(await getConfig()).metadata
 					?.find((m) => m.key === input.key)
