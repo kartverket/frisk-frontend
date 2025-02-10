@@ -1,11 +1,10 @@
-import { Button } from "@kvib/react";
+import { Flex, Text, Button } from "@kvib/react";
+import type { Metadata } from "frisk.config";
 import { MetadataValue } from "./metadata-value";
 import { Route } from "@/routes";
 import { useFunction } from "@/hooks/use-function";
 import { useMetadata } from "@/hooks/use-metadata";
 import { useIndicators } from "@/hooks/use-indicators";
-import { Flex, Text } from "@kvib/react";
-import type { Metadata } from "../../../frisk.config";
 
 export function MetadataView({
 	metadata,
