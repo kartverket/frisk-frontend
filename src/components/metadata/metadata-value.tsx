@@ -13,6 +13,7 @@ import { useQueries } from "@tanstack/react-query";
 import type { Metadata } from "../../../frisk.config";
 import { DeleteMetadataModal } from "../delete-metadata-modal";
 import { useHasFunctionAccess } from "@/hooks/use-has-function-access";
+import TextareaAutosize from "react-textarea-autosize";
 
 type Props = {
 	metadata: Metadata;
@@ -156,16 +157,22 @@ const TextView: React.FC<TextViewProps> = ({
 		<Skeleton isLoaded={!isLoading} fitContent>
 			{isTextArea ? (
 				<Textarea
-					backgroundColor="white"
-					variant="filled"
+					as={TextareaAutosize}
+					padding={0}
+					variant="unstyled"
 					readOnly
+					resize={"none"}
 					fontSize="sm"
 					value={displayValue ?? ""}
-					size="sm"
 					borderRadius="5px"
-					resize="none"
-					_hover={{ backgroundColor: "white" }}
-					maxWidth="90%"
+					_hover={{ cursor: "inherit" }}
+					maxHeight={"70px"}
+					sx={{
+						minHeight: "auto",
+						"&::-webkit-scrollbar": {
+							display: "none",
+						},
+					}}
 				/>
 			) : (
 				<Text fontSize="sm">{displayValue ?? "<Ingen tekst>"}</Text>
