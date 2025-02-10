@@ -84,7 +84,18 @@ export function FunctionCardEdit({ functionId }: { functionId: number }) {
 				}
 				await Promise.all(promises);
 			} else {
-				const existingMd = existingMetadata[0];
+				if (formElement.value.trim() === "") {
+					if (metaDataKeyExists) {
+						const existingMd = existingMetadata[0];
+						if (existingMd.id) {
+							await removeMetadata.mutateAsync({
+								id: existingMd.id,
+								functionId,
+							});
+						}
+					}
+					continue;
+				}
 				// if metadatakey not exists: addMetadata
 				if (!metaDataKeyExists) {
 					await addMetadata.mutateAsync({
@@ -92,9 +103,8 @@ export function FunctionCardEdit({ functionId }: { functionId: number }) {
 						key: md.key,
 						value: formElement.value,
 					});
-				}
-				// if form key exists in metadata and new value: updatemetadatavalue
-				if (metaDataKeyExists) {
+				} else {
+					const existingMd = existingMetadata[0];
 					if (existingMd.value !== formElement.value) {
 						existingMd.id &&
 							(await updateMetadataValue.mutateAsync({
@@ -102,14 +112,6 @@ export function FunctionCardEdit({ functionId }: { functionId: number }) {
 								value: formElement.value,
 							}));
 					}
-				}
-				// if input field is set to empty: delete
-				if (formElement.value.trim() === "" && metaDataKeyExists) {
-					existingMd.id &&
-						(await removeMetadata.mutateAsync({
-							id: existingMd.id,
-							functionId,
-						}));
 				}
 			}
 		}
