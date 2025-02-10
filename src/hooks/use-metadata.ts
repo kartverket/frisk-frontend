@@ -6,9 +6,12 @@ import {
 	patchMetadataValue,
 } from "@/services/backend";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { getConfig } from "../../frisk.config";
+import { useToast } from "@kvib/react";
 
 export function useMetadata(functionId: number | undefined) {
 	const queryClient = useQueryClient();
+	const toast = useToast();
 	const metadata = useQuery({
 		queryKey: ["functions", functionId, "metadata"],
 		queryFn: async () => {
@@ -112,7 +115,33 @@ export function useMetadata(functionId: number | undefined) {
 	});
 
 	const updateMetadataValue = useMutation({
-		mutationFn: patchMetadataValue,
+		mutationFn: async (
+			input: Parameters<typeof patchMetadataValue>[0] & {
+				key: string;
+				functionId: number;
+			},
+		) => {
+			await patchMetadataValue(input);
+			try {
+				(await getConfig()).metadata
+					?.find((m) => m.key === input.key)
+					?.onChange?.(input);
+			} catch (error) {
+				console.error("Error updating metadata value:", error);
+				const toastId = "update-metadata-value";
+				if (!toast.isActive(toastId)) {
+					toast({
+						id: toastId,
+						title: "Å nei!",
+						description:
+							"Noe gikk galt under endringen av metadata. Prøv gjerne igjen!",
+						status: "error",
+						duration: 5000,
+						isClosable: true,
+					});
+				}
+			}
+		},
 		onMutate: async (updatedMetadata) => {
 			await queryClient.cancelQueries({
 				queryKey: ["functions", functionId, "metadata"],

@@ -20,7 +20,7 @@ import {
 import type { useFunction } from "@/hooks/use-function";
 import { msalInstance } from "@/services/msal";
 import { InteractionRequiredAuthError } from "@azure/msal-browser";
-import type { useMetadata } from "@/hooks/use-metadata";
+import { useMetadata } from "@/hooks/use-metadata";
 import { DeleteMetadataModal } from "@/components/delete-metadata-modal";
 
 export async function getConfig(): Promise<FriskConfig> {
@@ -39,6 +39,29 @@ export async function getConfig(): Promise<FriskConfig> {
 						name: team.displayName,
 						value: team.id,
 					}));
+				},
+				onChange: async (input) => {
+					const { metadata } = useMetadata(input.functionId);
+
+					if (!metadata.data) return;
+
+					const metaMap = new Map(
+						metadata.data.map((meta) => [meta.key, meta.value]),
+					);
+
+					const matchingSchemas = schemas.filter((schema) =>
+						metaMap.has(schema.id),
+					);
+
+					await Promise.all(
+						matchingSchemas.map((schema) =>
+							changeFormTeam({
+								// biome-ignore lint/style/noNonNullAssertion: <explanation>
+								contextId: metaMap.get(schema.id)!,
+								teamId: input.value,
+							}),
+						),
+					);
 				},
 				getDisplayValue: async (input) => {
 					const team = await getTeam(input.value);
@@ -248,6 +271,12 @@ type GeneralMetadataContent = {
 					component: React.ReactNode;
 			  };
 	}>;
+	onChange?: (input: {
+		key: string;
+		value: string;
+		functionId: number;
+		id: number;
+	}) => void;
 };
 
 type GeneralRequiredMetadata = GeneralMetadataContent;
@@ -520,6 +549,23 @@ export async function createRegelrettContext({
 
 	const json = await response.json();
 	return RegelrettContext.parse(json);
+}
+
+async function changeFormTeam({
+	contextId,
+	teamId,
+}: { contextId: string; teamId: string }) {
+	const response = await fetchFromRegelrett(`/contexts/${contextId}/team`, {
+		method: "PATCH",
+		headers: {
+			"Content-Type": "application/json",
+		},
+		body: JSON.stringify({ teamId }),
+	});
+
+	if (!response.ok) {
+		throw new Error(`Backend error: ${response.status} ${response.statusText}`);
+	}
 }
 
 const RegelrettContext = object({
