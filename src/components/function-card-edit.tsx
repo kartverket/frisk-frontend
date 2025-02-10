@@ -110,6 +110,8 @@ export function FunctionCardEdit({ functionId }: { functionId: number }) {
 							(await updateMetadataValue.mutateAsync({
 								id: existingMd.id,
 								value: formElement.value,
+								key: existingMd.key,
+								functionId: existingMd.functionId,
 							}));
 					}
 				}
