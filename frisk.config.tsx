@@ -158,6 +158,16 @@ export async function getConfig(): Promise<FriskConfig> {
 					isRequired: false,
 					placeholder: "Sett inn skjema",
 					inheritFromParent: false,
+					onDelete: async (input) => {
+						const metadata = await getFunctionMetadata(input.functionId);
+						if (!metadata) return;
+
+						const formToDelete = metadata.find((m) => m.key === schema.id);
+
+						if (formToDelete) {
+							await deleteForm(formToDelete.value);
+						}
+					},
 					getDisplayValue: async (input) => {
 						const contextId = input.value;
 						const searchParams = new URLSearchParams({
@@ -275,6 +285,10 @@ type GeneralMetadataContent = {
 	onChange?: (input: {
 		key: string;
 		value: string;
+		functionId: number;
+		id: number;
+	}) => void;
+	onDelete?: (input: {
 		functionId: number;
 		id: number;
 	}) => void;
@@ -568,6 +582,15 @@ async function changeFormTeam({
 		body: JSON.stringify({ teamId }),
 	});
 
+	if (!response.ok) {
+		throw new Error(`Backend error: ${response.status} ${response.statusText}`);
+	}
+}
+
+async function deleteForm(contextId: string) {
+	const response = await fetchFromRegelrett(`/contexts/${contextId}`, {
+		method: "DELETE",
+	});
 	if (!response.ok) {
 		throw new Error(`Backend error: ${response.status} ${response.statusText}`);
 	}
