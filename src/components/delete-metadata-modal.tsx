@@ -28,7 +28,9 @@ export function DeleteMetadataModal({
 	metadataId,
 	displayValue,
 }: Props) {
-	const { removeMetadata } = useMetadata(functionId);
+	const { removeMetadata, metadata } = useMetadata(functionId);
+
+	const metadataToDelete = metadata.data?.find((m) => m.id === metadataId);
 
 	return (
 		<Modal onClose={onClose} isOpen={isOpen} isCentered>
@@ -57,6 +59,7 @@ export function DeleteMetadataModal({
 								removeMetadata.mutateAsync({
 									id: metadataId,
 									functionId: functionId,
+									key: metadataToDelete?.key ?? "",
 								});
 							}}
 							isLoading={removeMetadata.isPending}

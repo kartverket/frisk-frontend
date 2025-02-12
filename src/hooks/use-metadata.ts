@@ -72,8 +72,32 @@ export function useMetadata(functionId: number | undefined) {
 	});
 
 	const removeMetadata = useMutation({
-		mutationFn: (args: { id: number; functionId: number }) =>
-			deleteFunctionMetadata(args.id),
+		mutationFn: async (args: {
+			id: number;
+			functionId: number;
+			key: string;
+		}) => {
+			try {
+				(await getConfig()).metadata
+					?.find((m) => m.key === args.key)
+					?.onDelete?.({ id: args.id, functionId: args.functionId });
+				await deleteFunctionMetadata(args.id);
+			} catch (error) {
+				console.error("Error deleting metadata: ", error);
+				const toastId = "delete-metadata";
+				if (!toast.isActive(toastId)) {
+					toast({
+						id: toastId,
+						title: "Å nei!",
+						description:
+							"Noe gikk galt under sletting av metadata. Prøv gjerne igjen!",
+						status: "error",
+						duration: 5000,
+						isClosable: true,
+					});
+				}
+			}
+		},
 		onMutate: async (deletedMetadata) => {
 			await queryClient.cancelQueries({
 				queryKey: ["functions", deletedMetadata.functionId, "metadata"],
