@@ -67,6 +67,20 @@ function Index() {
 						edit: undefined,
 					},
 				});
+			} else if (func.isSuccess) {
+				if (
+					search.path.length === 1 &&
+					search.path[0].split(".").length === 1 &&
+					search.path[0] !== "1"
+				) {
+					navigate({
+						search: {
+							...search,
+							path: [functions[0].data?.path],
+							edit: undefined,
+						},
+					});
+				}
 			}
 		});
 	}, [functions, navigate, idArrays, search]);
