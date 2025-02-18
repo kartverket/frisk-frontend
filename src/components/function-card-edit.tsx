@@ -69,6 +69,7 @@ export function FunctionCardEdit({ functionId }: { functionId: number }) {
 							removeMetadata.mutateAsync({
 								id: md.id,
 								functionId,
+								key: md.key,
 							}),
 						);
 					}
@@ -91,6 +92,7 @@ export function FunctionCardEdit({ functionId }: { functionId: number }) {
 							await removeMetadata.mutateAsync({
 								id: existingMd.id,
 								functionId,
+								key: existingMd.key,
 							});
 						}
 					}
