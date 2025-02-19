@@ -7,11 +7,24 @@ assignees: ''
 
 ---
 
-### Brukerhistorie
-Som en ...
-Ønsker jeg ...
-Slik at ...
+🧍 **Brukerhistorie**
 
-### Detaljer
+Som en
+Ønsker jeg
+Slik at
 
-### Forslag til løsning
+(Evt inkl hva en bruker ikke skal ha mulighet til å gjøre - sikkerhet)
+
+🎯 **Løsningsbeskrivelse**
+
+⚙️ **Akseptansekriterier**
+
+Gitt at […] så skal:
+
+[…]
+
+ 🔒 **Sikkerhets- og risikovurdering**
+
+- **Potensielle risikoer:** \[f.eks. eksponering av sensitive data, tilgangsstyring, XSS\]
+- **Tiltak:** \[f.eks. logging/monitorering, kryptering, inputvalidering\]
+- **Trusselaktører:** \[interne/eksterne, hvilke roller kan misbruke funksjonen?\]
