@@ -14,7 +14,7 @@ export function FunctionCard({
 	lowlighted,
 }: { functionId: number; selected: boolean; lowlighted: boolean }) {
 	// const { config } = Route.useLoaderData();
-	const { func } = useFunction(functionId);
+	const { func, access } = useFunction(functionId, { includeAccess: true });
 	const search = Route.useSearch();
 	const navigate = Route.useNavigate();
 
@@ -171,7 +171,7 @@ export function FunctionCard({
 						minWidth={0}
 						flex-wrap="wrap"
 					>
-						{search.edit === functionId ? (
+						{search.edit === functionId && access ? (
 							<FunctionCardEdit functionId={functionId} />
 						) : selected ? (
 							<FunctionCardSelectedView functionId={functionId} />
@@ -183,7 +183,7 @@ export function FunctionCard({
 									variant="ghost"
 									aria-label="drag"
 									icon="drag_indicator"
-									isDisabled={false}
+									isDisabled={!access}
 									{...listeners}
 								/>
 								<Skeleton isLoaded={!func.isLoading} flex="1" minWidth={0}>
