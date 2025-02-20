@@ -8,16 +8,13 @@ type DraggableProps = {
 	children: (props: {
 		listeners: SyntheticListenerMap | undefined;
 	}) => React.ReactNode;
-	hasAccess?: boolean;
 };
 
-export function Draggable({
-	functionId,
-	children,
-	hasAccess = true,
-}: DraggableProps) {
+export function Draggable({ functionId, children }: DraggableProps) {
 	const { edit } = Route.useSearch();
-	const { func, updateFunction } = useFunction(functionId);
+	const { func, access, updateFunction } = useFunction(functionId, {
+		includeAccess: true,
+	});
 
 	const { isDragging, attributes, listeners, setNodeRef } = useDraggable({
 		id: functionId,
@@ -25,7 +22,7 @@ export function Draggable({
 			func: func.data,
 			update: updateFunction,
 		},
-		disabled: edit === functionId || !hasAccess,
+		disabled: edit === functionId || !access,
 	});
 
 	const dragableStyle = isDragging

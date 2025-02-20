@@ -5,7 +5,6 @@ import { FunctionCardEdit } from "./function-card-edit";
 import { FunctionCardSelectedView } from "./function-card-selected-view";
 import { EditAndSelectButtons } from "./edit-and-select-buttons";
 import { useEffect, useState } from "react";
-import { useHasFunctionAccess } from "@/hooks/use-has-function-access";
 import { Draggable } from "./draggable";
 import { css, keyframes } from "@emotion/react";
 
@@ -78,11 +77,8 @@ export function FunctionCard({
 	}
   `;
 
-	const hasAccess = useHasFunctionAccess(functionId);
-	// const isDraggable = config.enableEntra ? hasAccess : true;
-
 	return (
-		<Draggable functionId={functionId} hasAccess={true /* isDraggable */}>
+		<Draggable functionId={functionId}>
 			{({ listeners }) => (
 				<Card
 					id={functionId.toString()}
@@ -175,7 +171,7 @@ export function FunctionCard({
 						minWidth={0}
 						flex-wrap="wrap"
 					>
-						{search.edit === functionId && hasAccess ? (
+						{search.edit === functionId ? (
 							<FunctionCardEdit functionId={functionId} />
 						) : selected ? (
 							<FunctionCardSelectedView functionId={functionId} />

@@ -3,6 +3,7 @@ import {
 	type BackendFunction,
 	createFunction,
 	deleteFunction,
+	getAccess,
 	getChildren,
 	getFunction,
 	putFunction,
@@ -10,6 +11,7 @@ import {
 
 type UseFunctionOpts = {
 	includeChildren?: boolean;
+	includeAccess?: boolean;
 };
 
 export function useFunction(functionId: number, opts?: UseFunctionOpts) {
@@ -39,6 +41,15 @@ export function useFunction(functionId: number, opts?: UseFunctionOpts) {
 			return children;
 		},
 		enabled: opts?.includeChildren === true,
+	});
+
+	const access = useQuery({
+		queryKey: ["functions", functionId, "access"],
+		queryFn: async () => {
+			const accessData = await getAccess(functionId);
+			return accessData;
+		},
+		enabled: opts?.includeAccess === true,
 	});
 
 	const addFunction = useMutation({
@@ -271,6 +282,7 @@ export function useFunction(functionId: number, opts?: UseFunctionOpts) {
 	return {
 		func,
 		children,
+		access: access.data,
 		addFunction,
 		updateFunction,
 		removeFunction,

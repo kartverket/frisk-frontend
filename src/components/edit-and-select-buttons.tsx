@@ -1,7 +1,6 @@
 import { Flex, IconButton, Text, Icon, useTheme } from "@kvib/react";
 import { Route } from "@/routes";
 import { useFunction } from "@/hooks/use-function";
-import { useHasFunctionAccess } from "@/hooks/use-has-function-access";
 import { Droppable } from "./droppable";
 
 export function EditAndSelectButtons({
@@ -11,16 +10,15 @@ export function EditAndSelectButtons({
 	const theme = useTheme();
 	const search = Route.useSearch();
 	const navigate = Route.useNavigate();
-	const { children } = useFunction(functionId, {
+	const { children, access } = useFunction(functionId, {
 		includeChildren: true,
+		includeAccess: true,
 	});
-
-	const hasAccess = useHasFunctionAccess(functionId);
 
 	return (
 		<Flex gap="2px">
 			<IconButton
-				isDisabled={!hasAccess}
+				isDisabled={!access}
 				type="button"
 				colorScheme="gray"
 				variant="ghost"
