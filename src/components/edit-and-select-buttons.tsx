@@ -10,7 +10,7 @@ export function EditAndSelectButtons({
 	const theme = useTheme();
 	const search = Route.useSearch();
 	const navigate = Route.useNavigate();
-	const { children, access } = useFunction(functionId, {
+	const { children, functionAccess } = useFunction(functionId, {
 		includeChildren: true,
 		includeAccess: true,
 	});
@@ -18,7 +18,7 @@ export function EditAndSelectButtons({
 	return (
 		<Flex gap="2px">
 			<IconButton
-				isDisabled={!access}
+				isDisabled={!functionAccess}
 				type="button"
 				colorScheme="gray"
 				variant="ghost"

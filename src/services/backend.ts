@@ -89,12 +89,12 @@ export async function getChildren(id: number) {
 	return array(BackendFunction).parse(json);
 }
 
-export async function getAccess(id: number) {
+export async function getFunctionAccess(id: number) {
 	const response = await fetchFromBackend(`/functions/${id}/access`, {
 		method: "GET",
 	});
 	const json = await response.json();
-	return FunctionAccess.parse(json);
+	return Access.parse(json);
 }
 
 export async function createFunction(
@@ -148,6 +148,14 @@ export async function getFunctionMetadata(functionId: number) {
 	});
 	const json = await response.json();
 	return array(FunctionMetadata).parse(json);
+}
+
+export async function getMetadataAccess(id: number) {
+	const response = await fetchFromBackend(`/functions/${id}/metadata/access`, {
+		method: "GET",
+	});
+	const json = await response.json();
+	return Access.parse(json);
 }
 
 export async function createFunctionMetadata(
@@ -247,4 +255,4 @@ export type MicrosoftTeam = z.infer<typeof MicrosoftTeam>;
 
 type Path = `/${string}`;
 
-const FunctionAccess = boolean();
+const Access = boolean();

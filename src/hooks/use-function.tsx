@@ -3,7 +3,7 @@ import {
 	type BackendFunction,
 	createFunction,
 	deleteFunction,
-	getAccess,
+	getFunctionAccess,
 	getChildren,
 	getFunction,
 	putFunction,
@@ -46,7 +46,7 @@ export function useFunction(functionId: number, opts?: UseFunctionOpts) {
 	const access = useQuery({
 		queryKey: ["functions", functionId, "access"],
 		queryFn: async () => {
-			const accessData = await getAccess(functionId);
+			const accessData = await getFunctionAccess(functionId);
 			return accessData;
 		},
 		enabled: opts?.includeAccess === true,
@@ -282,7 +282,7 @@ export function useFunction(functionId: number, opts?: UseFunctionOpts) {
 	return {
 		func,
 		children,
-		access: access.data,
+		functionAccess: access.data,
 		addFunction,
 		updateFunction,
 		removeFunction,

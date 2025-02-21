@@ -12,7 +12,7 @@ type DraggableProps = {
 
 export function Draggable({ functionId, children }: DraggableProps) {
 	const { edit } = Route.useSearch();
-	const { func, access, updateFunction } = useFunction(functionId, {
+	const { func, functionAccess, updateFunction } = useFunction(functionId, {
 		includeAccess: true,
 	});
 
@@ -22,7 +22,7 @@ export function Draggable({ functionId, children }: DraggableProps) {
 			func: func.data,
 			update: updateFunction,
 		},
-		disabled: edit === functionId || !access,
+		disabled: edit === functionId || !functionAccess,
 	});
 
 	const dragableStyle = isDragging
