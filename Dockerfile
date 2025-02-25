@@ -6,7 +6,7 @@ RUN bun install --frozen-lockfile
 COPY . .
 RUN bun run build
 
-FROM nginx:1.27
+FROM nginx:stable-alpine
 COPY ./nginx/nginx.conf /etc/nginx/nginx.conf
 COPY ./nginx/main.js /etc/nginx/main.js
 COPY --from=build /react-app/dist /usr/share/nginx/html
