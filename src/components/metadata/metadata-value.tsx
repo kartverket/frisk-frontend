@@ -12,7 +12,6 @@ import {
 import { useQueries } from "@tanstack/react-query";
 import type { Metadata } from "../../../frisk.config";
 import { DeleteMetadataModal } from "../delete-metadata-modal";
-import { useHasFunctionAccess } from "@/hooks/use-has-function-access";
 import TextareaAutosize from "react-textarea-autosize";
 
 type Props = {
@@ -24,15 +23,15 @@ type Props = {
 export function MetadataValue({ metadata, functionId, isIndicator }: Props) {
 	const {
 		metadata: { data: currentMetadata, isPending: isCurrentMetadataLoading },
+		metadataAccess,
 	} = useMetadata(functionId);
-	const hasAccess = useHasFunctionAccess(functionId);
 
 	// metadata is deletable if it is not required, and only shows in read mode, and you have access
 	const isDeletable =
 		!metadata.isRequired &&
-		metadata.show("read", hasAccess) &&
-		!metadata.show("update", hasAccess) &&
-		!metadata.show("create", hasAccess);
+		metadata.show("read", !metadataAccess) &&
+		!metadata.show("update", !metadataAccess) &&
+		!metadata.show("create", !metadataAccess);
 
 	const metadataToDisplay = currentMetadata?.filter(
 		(m) => metadata.key === m.key,

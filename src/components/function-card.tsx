@@ -5,7 +5,6 @@ import { FunctionCardEdit } from "./function-card-edit";
 import { FunctionCardSelectedView } from "./function-card-selected-view";
 import { EditAndSelectButtons } from "./edit-and-select-buttons";
 import { useEffect, useState } from "react";
-import { useHasFunctionAccess } from "@/hooks/use-has-function-access";
 import { Draggable } from "./draggable";
 import { css, keyframes } from "@emotion/react";
 
@@ -15,7 +14,9 @@ export function FunctionCard({
 	lowlighted,
 }: { functionId: number; selected: boolean; lowlighted: boolean }) {
 	// const { config } = Route.useLoaderData();
-	const { func } = useFunction(functionId);
+	const { func, functionAccess } = useFunction(functionId, {
+		includeAccess: true,
+	});
 	const search = Route.useSearch();
 	const navigate = Route.useNavigate();
 
@@ -78,11 +79,8 @@ export function FunctionCard({
 	}
   `;
 
-	const hasAccess = useHasFunctionAccess(functionId);
-	// const isDraggable = config.enableEntra ? hasAccess : true;
-
 	return (
-		<Draggable functionId={functionId} hasAccess={true /* isDraggable */}>
+		<Draggable functionId={functionId}>
 			{({ listeners }) => (
 				<Card
 					id={functionId.toString()}
@@ -175,7 +173,7 @@ export function FunctionCard({
 						minWidth={0}
 						flex-wrap="wrap"
 					>
-						{search.edit === functionId && hasAccess ? (
+						{search.edit === functionId && functionAccess ? (
 							<FunctionCardEdit functionId={functionId} />
 						) : selected ? (
 							<FunctionCardSelectedView functionId={functionId} />
@@ -187,7 +185,7 @@ export function FunctionCard({
 									variant="ghost"
 									aria-label="drag"
 									icon="drag_indicator"
-									isDisabled={false}
+									isDisabled={!functionAccess}
 									{...listeners}
 								/>
 								<Skeleton isLoaded={!func.isLoading} flex="1" minWidth={0}>

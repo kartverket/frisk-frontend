@@ -3,6 +3,7 @@ import {
 	deleteFunctionMetadata,
 	type FunctionMetadata,
 	getFunctionMetadata,
+	getMetadataAccess,
 	patchMetadataValue,
 } from "@/services/backend";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -18,6 +19,16 @@ export function useMetadata(functionId: number | undefined) {
 			// biome-ignore lint/style/noNonNullAssertion: We know that functionId is not undefined here since the qury is disabled if it is
 			const functionMetadata = await getFunctionMetadata(functionId!);
 			return functionMetadata;
+		},
+		enabled: !!functionId,
+	});
+
+	const access = useQuery({
+		queryKey: ["functions", functionId, "metadata-access"],
+		queryFn: async () => {
+			// biome-ignore lint/style/noNonNullAssertion: We know that functionId is not undefined here since the qury is disabled if it is
+			const accessData = await getMetadataAccess(functionId!);
+			return accessData;
 		},
 		enabled: !!functionId,
 	});
@@ -205,5 +216,11 @@ export function useMetadata(functionId: number | undefined) {
 		},
 	});
 
-	return { metadata, addMetadata, removeMetadata, updateMetadataValue };
+	return {
+		metadata,
+		metadataAccess: access.data,
+		addMetadata,
+		removeMetadata,
+		updateMetadataValue,
+	};
 }
