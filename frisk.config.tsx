@@ -181,7 +181,7 @@ export async function getConfig(): Promise<FriskConfig> {
 							await fetchFromRegelrett(`contexts/${contextId}`);
 						} catch (error) {
 							await deleteFunctionMetadata(input.id);
-							return { displayValue: null as unknown as string };
+							return { displayValue: undefined };
 						}
 
 						return {
@@ -273,7 +273,7 @@ type GeneralMetadataContent = {
 		functionId: number;
 		id: number;
 	}) => Promise<{
-		displayValue: string;
+		displayValue?: string;
 		value?: string;
 		displayOptions?:
 			| {
