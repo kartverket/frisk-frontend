@@ -1,4 +1,4 @@
-import { array, number, object, string, type z } from "zod";
+import { array, boolean, number, object, string, type z } from "zod";
 import { msalInstance, scopes } from "./msal";
 import { InteractionRequiredAuthError } from "@azure/msal-browser";
 import { getBackendUrl } from "@/config";
@@ -89,6 +89,14 @@ export async function getChildren(id: number) {
 	return array(BackendFunction).parse(json);
 }
 
+export async function getFunctionAccess(id: number) {
+	const response = await fetchFromBackend(`/functions/${id}/access`, {
+		method: "GET",
+	});
+	const json = await response.json();
+	return Access.parse(json);
+}
+
 export async function createFunction(
 	newFunction: BackendFunctionWithMetadataCreate,
 ) {
@@ -140,6 +148,14 @@ export async function getFunctionMetadata(functionId: number) {
 	});
 	const json = await response.json();
 	return array(FunctionMetadata).parse(json);
+}
+
+export async function getMetadataAccess(id: number) {
+	const response = await fetchFromBackend(`/functions/${id}/metadata/access`, {
+		method: "GET",
+	});
+	const json = await response.json();
+	return Access.parse(json);
 }
 
 export async function createFunctionMetadata(
@@ -238,3 +254,5 @@ const MicrosoftTeam = object({
 export type MicrosoftTeam = z.infer<typeof MicrosoftTeam>;
 
 type Path = `/${string}`;
+
+const Access = boolean();
