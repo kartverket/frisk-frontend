@@ -9,9 +9,11 @@ import { useIndicators } from "@/hooks/use-indicators";
 export function MetadataView({
 	metadata,
 	functionId,
+	showTitle,
 }: {
 	metadata: Metadata;
 	functionId: number;
+	showTitle: boolean;
 }) {
 	const search = Route.useSearch();
 	const indicator = search.indicators?.metadata.find(
@@ -40,7 +42,7 @@ export function MetadataView({
 
 	return (
 		<Flex key={metadata.key} flexDirection="column">
-			{metadata.title && (
+			{showTitle && metadata.title && (
 				<Text fontSize="sm" fontWeight="700">
 					{metadata.title}:
 				</Text>
