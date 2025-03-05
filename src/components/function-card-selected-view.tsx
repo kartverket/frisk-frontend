@@ -11,6 +11,7 @@ export function FunctionCardSelectedView({
 	const { func } = useFunction(functionId);
 	const { metadata, addMetadata } = useMetadata(functionId);
 	const { config } = Route.useLoaderData();
+	const displayedTitles = new Set<string>();
 
 	return (
 		<Stack pl="10px" w="100%" overflow="hidden">
@@ -28,9 +29,19 @@ export function FunctionCardSelectedView({
 				</Skeleton>
 				<EditAndSelectButtons functionId={functionId} selected />
 			</Flex>
-			{config.metadata?.map((meta) => (
-				<MetadataView key={meta.key} metadata={meta} functionId={functionId} />
-			))}
+			{config.metadata?.map((meta) => {
+				const hasMetadata = metadata.data?.some((m) => m.key === meta.key);
+				const showTitle = meta.title ? !displayedTitles.has(meta.title) : false;
+				if (meta.title && hasMetadata) displayedTitles.add(meta.title);
+				return (
+					<MetadataView
+						key={meta.key}
+						metadata={meta}
+						functionId={functionId}
+						showTitle={showTitle}
+					/>
+				);
+			})}
 			{config.functionCardComponents.map((Component) => (
 				<Component
 					key={Component.toString()}
