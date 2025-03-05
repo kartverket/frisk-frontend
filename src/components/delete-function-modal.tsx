@@ -62,6 +62,7 @@ export function DeleteFunctionModal({ onClose, isOpen, functionId }: Props) {
 												? deletedFunctionParentPath
 												: pathString,
 										) ?? ["1"],
+										edit: undefined,
 									},
 								});
 							}}
