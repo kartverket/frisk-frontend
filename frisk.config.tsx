@@ -1,5 +1,6 @@
 import { useState } from "react";
 import {
+	deleteFunctionMetadata,
 	getFunction,
 	getFunctionMetadata,
 	getFunctions,
@@ -175,6 +176,14 @@ export async function getConfig(): Promise<FriskConfig> {
 							redirectBackTitle: "Funksjonsregisteret",
 						});
 						const url = `${getregelrettFrontendUrl()}/context/${contextId}?${searchParams.toString()}`;
+						//Check if the context exists in regelrett and delete metadata if it does not exist
+						try {
+							await fetchFromRegelrett(`contexts/${contextId}`);
+						} catch (error) {
+							await deleteFunctionMetadata(input.id);
+							return { displayValue: undefined };
+						}
+
 						return {
 							displayValue: schema.name,
 							displayOptions: {
@@ -264,7 +273,7 @@ type GeneralMetadataContent = {
 		functionId: number;
 		id: number;
 	}) => Promise<{
-		displayValue: string;
+		displayValue?: string;
 		value?: string;
 		displayOptions?:
 			| {
