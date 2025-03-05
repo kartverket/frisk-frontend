@@ -151,6 +151,7 @@ export async function getConfig(): Promise<FriskConfig> {
 			...schemas.map(
 				(schema): InputMetadata => ({
 					key: schema.id,
+					title: "Sikkerhetsskjema",
 					type: "text",
 					textArea: false,
 					displayName: schema.name,
