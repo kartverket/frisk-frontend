@@ -8,6 +8,7 @@ import {
 	getFunction,
 	putFunction,
 } from "@/services/backend";
+import { useToast } from "@kvib/react";
 
 type UseFunctionOpts = {
 	includeChildren?: boolean;
@@ -16,6 +17,7 @@ type UseFunctionOpts = {
 
 export function useFunction(functionId: number, opts?: UseFunctionOpts) {
 	const queryClient = useQueryClient();
+	const toast = useToast();
 
 	const func = useQuery({
 		refetchOnMount: false,
@@ -91,6 +93,17 @@ export function useFunction(functionId: number, opts?: UseFunctionOpts) {
 				["functions", newFunction.function.parentId, "children"],
 				context?.previousChildren ?? [],
 			);
+			const toastId = "add-function";
+			if (!toast.isActive(toastId))
+				toast({
+					id: toastId,
+					title: "Å nei!",
+					description:
+						"Noe gikk galt under opprettelsen av funksjonen. Prøv gjerne igjen!",
+					status: "error",
+					duration: 5000,
+					isClosable: true,
+				});
 		},
 		onSettled: (newFunction) => {
 			queryClient.invalidateQueries({
@@ -199,6 +212,18 @@ export function useFunction(functionId: number, opts?: UseFunctionOpts) {
 				["functions", vars.id],
 				context?.oldFunction,
 			);
+
+			const toastId = "update-function";
+			if (!toast.isActive(toastId))
+				toast({
+					id: toastId,
+					title: "Å nei!",
+					description:
+						"Noe gikk galt under oppdateringen av funksjonen. Prøv gjerne igjen!",
+					status: "error",
+					duration: 5000,
+					isClosable: true,
+				});
 		},
 		onSettled: (_, __, req, context) => {
 			if (
@@ -261,6 +286,18 @@ export function useFunction(functionId: number, opts?: UseFunctionOpts) {
 				["functions", deletedFunctionId, "children"],
 				context?.previousChildren ?? [],
 			);
+
+			const toastId = "remove-function";
+			if (!toast.isActive(toastId))
+				toast({
+					id: toastId,
+					title: "Å nei!",
+					description:
+						"Noe gikk galt under sletting av funksjonen. Prøv gjerne igjen!",
+					status: "error",
+					duration: 5000,
+					isClosable: true,
+				});
 		},
 		onSettled: (_, __, deletedFunctionId) => {
 			const deletedFunction = queryClient.getQueryData<BackendFunction>([

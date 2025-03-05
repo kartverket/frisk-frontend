@@ -74,6 +74,19 @@ export function useMetadata(functionId: number | undefined) {
 				["functions", vars.functionId, "metadata"],
 				context?.previousMetadata,
 			);
+
+			const toastId = "add-metadata";
+			if (!toast.isActive(toastId)) {
+				toast({
+					id: toastId,
+					title: "Å nei!",
+					description:
+						"Noe gikk galt under lagring av metadata. Prøv gjerne igjen!",
+					status: "error",
+					duration: 5000,
+					isClosable: true,
+				});
+			}
 		},
 		onSettled: (_, __, newMetadata) => {
 			queryClient.invalidateQueries({
