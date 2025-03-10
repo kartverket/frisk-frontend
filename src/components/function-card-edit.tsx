@@ -202,18 +202,6 @@ export function FunctionCardEdit({ functionId }: { functionId: number }) {
 								isLoading={isMutating > 0}
 							/>
 						</Tooltip>
-						<Tooltip label="Kopier lenke" placement="top">
-							<IconButton
-								aria-label="Copy link"
-								variant="tertiary"
-								icon="content_copy"
-								colorScheme="blue"
-								onClick={() => {
-									const permalink = `${window.location.origin}?path=%5B%22${functionId}%22%5D`;
-									navigator.clipboard.writeText(permalink);
-								}}
-							/>
-						</Tooltip>
 					</Flex>
 				</Stack>
 			</form>
