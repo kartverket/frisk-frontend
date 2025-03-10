@@ -2,7 +2,7 @@ import { useFunction } from "@/hooks/use-function";
 import { MetadataView } from "./metadata/metadata-view";
 import { useMetadata } from "@/hooks/use-metadata";
 import { Route } from "@/routes";
-import { Flex, Skeleton, Stack, Text } from "@kvib/react";
+import { Button, Flex, Skeleton, Stack, Text } from "@kvib/react";
 import { EditAndSelectButtons } from "./edit-and-select-buttons";
 
 export function FunctionCardSelectedView({
@@ -50,6 +50,22 @@ export function FunctionCardSelectedView({
 					addMetadata={addMetadata}
 				/>
 			))}
+			<Button
+				aria-label="Copy link"
+				padding="0"
+				justifyContent="left"
+				variant="tertiary"
+				leftIcon="content_copy"
+				colorScheme="blue"
+				fontSize="sm"
+				onClick={(e) => {
+					e.stopPropagation();
+					const permalink = `${window.location.origin}?path=%5B%22${func.data?.id}%22%5D`;
+					navigator.clipboard.writeText(permalink);
+				}}
+			>
+				Kopier lenke til funksjonskort
+			</Button>
 		</Stack>
 	);
 }
