@@ -2,7 +2,7 @@ import { getIdsFromPath } from "@/lib/utils";
 import { Route } from "@/routes";
 import { Box, Button, Flex, List, ListItem, Skeleton, Text } from "@kvib/react";
 import { FunctionCard } from "./function-card";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { Droppable } from "./droppable";
 import { CreateFunctionForm } from "./create-function-form";
 import { useFunction } from "@/hooks/use-function";
@@ -103,6 +103,46 @@ function ChildrenGroup({
 	const [functionPosition, setFunctionPosition] = useState(0);
 	const [selectedForm, setSelectedForm] = useState<number | null>(null);
 
+	const [hasAllMetadataInFilter, setHasAllMetadataInFilter] = useState<
+		{ functionId: number; hasAllMetadataInFilter: boolean }[]
+	>(
+		children.data?.map((child) => ({
+			functionId: child.id,
+			hasAllMetadataInFilter: false,
+		})) ?? [],
+	);
+
+	const updateFilterResult = useCallback(
+		(functionId: number, hasAllMetadataInFilter: boolean) => {
+			setHasAllMetadataInFilter((prev) => {
+				const existing = prev.find((item) => item.functionId === functionId);
+				if (existing?.hasAllMetadataInFilter === hasAllMetadataInFilter) {
+					return prev;
+				}
+				return [
+					...prev.filter((item) => item.functionId !== functionId),
+					{ functionId, hasAllMetadataInFilter },
+				];
+			});
+		},
+		[],
+	);
+
+	const sortedChildren = children.data
+		?.sort((a, b) => a.orderIndex - b.orderIndex)
+		.sort((a, b) => {
+			const aHasAllMetadata = hasAllMetadataInFilter.find(
+				(item) => item.functionId === a.id,
+			)?.hasAllMetadataInFilter;
+			const bHasAllMetadata = hasAllMetadataInFilter.find(
+				(item) => item.functionId === b.id,
+			)?.hasAllMetadataInFilter;
+
+			if (aHasAllMetadata === bHasAllMetadata) return 0;
+			if (aHasAllMetadata) return -1;
+			return 1;
+		});
+
 	useEffect(() => {
 		function getPosition() {
 			const top = document.getElementById("topBox");
@@ -158,13 +198,14 @@ function ChildrenGroup({
 								gap={2}
 								marginBottom="2"
 							>
-								{children.data?.map((child) => (
+								{sortedChildren?.map((child) => (
 									<ChildrenGroupItem
 										key={child.id + child.name + child.parentId}
 										func={child}
 										selected={selectedFunctionIds.some((idList) =>
 											idList.includes(child.id),
 										)}
+										updateFilterResult={updateFilterResult}
 									/>
 								))}
 							</List>
@@ -195,34 +236,50 @@ function ChildrenGroup({
 function ChildrenGroupItem({
 	func,
 	selected,
-}: { func: BackendFunction; selected: boolean }) {
+	updateFilterResult,
+}: {
+	func: BackendFunction;
+	selected: boolean;
+	updateFilterResult: (
+		functionId: number,
+		hasAllMetadataInFilter: boolean,
+	) => void;
+}) {
 	const { metadata } = useMetadata(func.id);
 	const { filters } = Route.useSearch();
+
+	const hasAllMetadataInFilter = useMemo(() => {
+		if (!metadata.data || !filters) return false;
+
+		return filters.metadata.every((filter) =>
+			metadata.data.some(
+				(m) =>
+					m.key === filter.key &&
+					(filter.value === undefined ||
+						m.value === filter.value ||
+						(filter.value &&
+							typeof filter.value === "object" &&
+							"value" in filter.value &&
+							filter.value.value === m.value) ||
+						(Array.isArray(filter.value) &&
+							filter.value.every((v) =>
+								metadata.data.some(
+									(m) =>
+										m.key === filter.key &&
+										m.value === (v as MultiSelectOption).value,
+								),
+							))),
+			),
+		);
+	}, [metadata.data, filters]);
+
+	useEffect(() => {
+		updateFilterResult(func.id, hasAllMetadataInFilter);
+	}, [hasAllMetadataInFilter, updateFilterResult, func.id]);
 
 	// Tillater at alle funksjoner kan flyttes på inntil videre
 	//const hasAccess = useHasFunctionAccess(func.id);
 	//const isDraggable = config.enableEntra ? hasAccess : true;
-
-	const hasAllMetadataInFilter = filters?.metadata.every((filter) =>
-		metadata.data?.some(
-			(m) =>
-				m.key === filter.key &&
-				(filter.value === undefined ||
-					m.value === filter.value ||
-					(filter.value &&
-						typeof filter.value === "object" &&
-						"value" in filter.value &&
-						filter.value.value === m.value) ||
-					(Array.isArray(filter.value) &&
-						filter.value.every((v) =>
-							metadata.data?.some(
-								(m) =>
-									m.key === filter.key &&
-									m.value === (v as MultiSelectOption).value,
-							),
-						))),
-		),
-	);
 
 	return (
 		<Skeleton fitContent isLoaded={!filters || !metadata.isLoading}>
