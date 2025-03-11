@@ -410,7 +410,7 @@ function createSchemaComponent(schemas: RegelrettSchema[]) {
 					colorScheme="blue"
 					size="sm"
 					width="fit-content"
-					my="16px"
+					mt="16px"
 					onClick={(e) => e.stopPropagation()}
 					isDisabled={!selectedSchema}
 				>
