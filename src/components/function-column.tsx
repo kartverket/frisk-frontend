@@ -246,7 +246,6 @@ function ChildrenGroupItem({
 	lowLighted: boolean;
 	isLoading: boolean;
 }) {
-	//const { metadata } = useMetadata(func.id);
 
 	// Tillater at alle funksjoner kan flyttes på inntil videre
 	//const hasAccess = useHasFunctionAccess(func.id);
