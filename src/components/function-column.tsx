@@ -2,13 +2,13 @@ import { getIdsFromPath } from "@/lib/utils";
 import { Route } from "@/routes";
 import { Box, Button, Flex, List, ListItem, Skeleton, Text } from "@kvib/react";
 import { FunctionCard } from "./function-card";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Droppable } from "./droppable";
 import { CreateFunctionForm } from "./create-function-form";
 import { useFunction } from "@/hooks/use-function";
-import { useMetadata } from "@/hooks/use-metadata";
-import type { BackendFunction } from "@/services/backend";
+import type { BackendFunction, FunctionMetadata } from "@/services/backend";
 import type { MultiSelectOption } from "./metadata/metadata-input";
+import { useMetadataList } from "@/hooks/use-metadata-list.ts";
 
 type FunctionFolderProps = {
 	functionIds: number[];
@@ -35,6 +35,7 @@ export function FunctionColumn({ functionIds }: FunctionFolderProps) {
 				return total + children.getBoundingClientRect().height;
 			}, 0);
 		}
+
 		setColumnHeight(getColumnHeight());
 
 		const observer = new MutationObserver(() => {
@@ -95,6 +96,7 @@ function ChildrenGroup({
 }) {
 	const { config } = Route.useLoaderData();
 	const { path } = Route.useSearch();
+	const { filters } = Route.useSearch();
 	const selectedFunctionIds = getIdsFromPath(path);
 
 	const { children } = useFunction(functionId, {
@@ -102,6 +104,39 @@ function ChildrenGroup({
 	});
 	const [functionPosition, setFunctionPosition] = useState(0);
 	const [selectedForm, setSelectedForm] = useState<number | null>(null);
+
+	const childIds = children.data?.map((child) => child.id) ?? [];
+	const { metadataList } = useMetadataList(childIds, {
+		hasFunctionIds: childIds.length > 0,
+	});
+	const metadataIsLoading = metadataList.some((query) => query.isLoading);
+
+	const hasAllMetadataInFilter = useMemo(() => {
+		if (metadataIsLoading) return [];
+
+		return childIds.map((id, index) => ({
+			functionId: id,
+			hasAllMetadataInFilter: checkHasAllMetadataInFilter(
+				filters,
+				metadataList[index]?.data,
+			),
+		}));
+	}, [metadataList, childIds, filters]);
+
+	const sortedChildren = children.data
+		?.sort((a, b) => a.orderIndex - b.orderIndex)
+		.sort((a, b) => {
+			const aHasAllMetadata = hasAllMetadataInFilter.find(
+				(item) => item.functionId === a.id,
+			)?.hasAllMetadataInFilter;
+			const bHasAllMetadata = hasAllMetadataInFilter.find(
+				(item) => item.functionId === b.id,
+			)?.hasAllMetadataInFilter;
+
+			if (aHasAllMetadata === bHasAllMetadata) return 0;
+			if (aHasAllMetadata) return -1;
+			return 1;
+		});
 
 	useEffect(() => {
 		function getPosition() {
@@ -112,6 +147,7 @@ function ChildrenGroup({
 				parent.getBoundingClientRect().top - top.getBoundingClientRect().bottom
 			);
 		}
+
 		setFunctionPosition(getPosition());
 
 		const observer = new MutationObserver(() => {
@@ -158,13 +194,20 @@ function ChildrenGroup({
 								gap={2}
 								marginBottom="2"
 							>
-								{children.data?.map((child) => (
+								{sortedChildren?.map((child) => (
 									<ChildrenGroupItem
 										key={child.id + child.name + child.parentId}
 										func={child}
 										selected={selectedFunctionIds.some((idList) =>
 											idList.includes(child.id),
 										)}
+										lowLighted={
+											!!filters &&
+											!hasAllMetadataInFilter.find(
+												(item) => item.functionId === child.id,
+											)?.hasAllMetadataInFilter
+										}
+										isLoading={metadataIsLoading}
 									/>
 								))}
 							</List>
@@ -195,16 +238,44 @@ function ChildrenGroup({
 function ChildrenGroupItem({
 	func,
 	selected,
-}: { func: BackendFunction; selected: boolean }) {
-	const { metadata } = useMetadata(func.id);
-	const { filters } = Route.useSearch();
+	lowLighted,
+	isLoading,
+}: {
+	func: BackendFunction;
+	selected: boolean;
+	lowLighted: boolean;
+	isLoading: boolean;
+}) {
 
 	// Tillater at alle funksjoner kan flyttes på inntil videre
 	//const hasAccess = useHasFunctionAccess(func.id);
 	//const isDraggable = config.enableEntra ? hasAccess : true;
 
-	const hasAllMetadataInFilter = filters?.metadata.every((filter) =>
-		metadata.data?.some(
+	return (
+		<Skeleton fitContent isLoaded={!isLoading}>
+			<ListItem>
+				<FunctionCard
+					functionId={func.id}
+					selected={selected}
+					lowlighted={lowLighted}
+				/>
+			</ListItem>
+		</Skeleton>
+	);
+}
+
+function checkHasAllMetadataInFilter(
+	filters:
+		| {
+				metadata: { key: string; value?: unknown }[];
+		  }
+		| undefined,
+	metadata: FunctionMetadata[] = [],
+) {
+	if (!filters) return false;
+
+	return filters.metadata.every((filter) =>
+		metadata.some(
 			(m) =>
 				m.key === filter.key &&
 				(filter.value === undefined ||
@@ -215,24 +286,12 @@ function ChildrenGroupItem({
 						filter.value.value === m.value) ||
 					(Array.isArray(filter.value) &&
 						filter.value.every((v) =>
-							metadata.data?.some(
+							metadata.some(
 								(m) =>
 									m.key === filter.key &&
 									m.value === (v as MultiSelectOption).value,
 							),
 						))),
 		),
-	);
-
-	return (
-		<Skeleton fitContent isLoaded={!filters || !metadata.isLoading}>
-			<ListItem>
-				<FunctionCard
-					functionId={func.id}
-					selected={selected}
-					lowlighted={!!filters && !hasAllMetadataInFilter}
-				/>
-			</ListItem>
-		</Skeleton>
 	);
 }
