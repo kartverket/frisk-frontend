@@ -15,7 +15,6 @@ export function SearchField() {
 				<SearchAsync
 					size="sm"
 					debounceTime={300}
-					defaultOptions
 					loadOptions={async (inputValue, callback) => {
 						const functions = await getFunctions(inputValue.trim());
 
