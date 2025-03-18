@@ -10,8 +10,6 @@ RUN bun install --frozen-lockfile
 RUN bun run build:skip
 
 FROM nginx:stable-alpine
-# Update to exact version to keep image "mostly" stable
-RUN apk upgrade libxml2-2.13.4-r5
 RUN apk add --no-cache nginx-mod-http-js
 # Can be removed once nginx:stable-alpine updates libxml2
 RUN apk upgrade libxml2
