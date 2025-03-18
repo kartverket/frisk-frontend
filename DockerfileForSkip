@@ -13,6 +13,8 @@ FROM nginx:stable-alpine
 RUN apk add --no-cache nginx-mod-http-js
 # Can be removed once nginx:stable-alpine updates libxml2
 RUN apk upgrade libxml2
+RUN apk upgrade libxslt
+RUN apk upgrade libexpat
 
 COPY ./nginx/nginx.conf /etc/nginx/nginx.conf
 COPY ./nginx/main.js /etc/nginx/main.js
