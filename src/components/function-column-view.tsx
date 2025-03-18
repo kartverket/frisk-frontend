@@ -33,8 +33,8 @@ import {
 	type MultiSelectOption,
 } from "./metadata/metadata-input";
 import { SearchField } from "./search-field";
-import { useState } from "react";
 import { FunctionCard } from "./function-card";
+import { useState } from "react";
 
 type FunctionColumnViewProps = {
 	path: string[];
@@ -342,35 +342,39 @@ function Filters(props: {
 									);
 								})}
 						</Select>
-						<MetadataInput
-							hideLabel
-							value={filterMeta.value as string | MultiSelectOption[]}
-							onChange={(value) => {
-								navigate({
-									search: {
-										...search,
-										...(search[props.type]
-											? {
-													[props.type]: {
-														metadata: search[props.type]?.metadata.map((m) => {
-															if (m.key === filterMeta.key) {
-																return {
-																	key: filterMeta.key,
-																	value: value !== "" ? value : undefined,
-																};
-															}
-															return m;
-														}),
-													},
-												}
-											: {}),
-									},
-								});
-							}}
-							metadata={metadata}
-							functionId={undefined}
-							parentFunctionId={undefined}
-						/>
+						{metadata.type === "select" && (
+							<MetadataInput
+								hideLabel
+								value={filterMeta.value as string | MultiSelectOption[]}
+								onChange={(value) => {
+									navigate({
+										search: {
+											...search,
+											...(search[props.type]
+												? {
+														[props.type]: {
+															metadata: search[props.type]?.metadata.map(
+																(m) => {
+																	if (m.key === filterMeta.key) {
+																		return {
+																			key: filterMeta.key,
+																			value: value !== "" ? value : undefined,
+																		};
+																	}
+																	return m;
+																},
+															),
+														},
+													}
+												: {}),
+										},
+									});
+								}}
+								metadata={metadata}
+								functionId={undefined}
+								parentFunctionId={undefined}
+							/>
+						)}
 						<IconButton
 							aria-label="Remove filter"
 							onClick={() => {
