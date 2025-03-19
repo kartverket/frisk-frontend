@@ -17,7 +17,7 @@ export function FunctionCardSelectedView({
 	return (
 		<Stack pl="10px" w="100%" overflow="hidden">
 			<Flex alignItems="center" w="100%" flex-wrap="wrap">
-				<Skeleton isLoaded={!func.isLoading} flex={1} minWidth={10}>
+				<Skeleton isLoaded={!func.isLoading} flex={1} minWidth={0}>
 					<Text
 						fontWeight="bold"
 						as="span"
