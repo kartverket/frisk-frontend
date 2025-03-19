@@ -3,7 +3,7 @@ import { Route } from "@/routes";
 import { Card, Flex, IconButton, Skeleton, Text } from "@kvib/react";
 import { FunctionCardEdit } from "./function-card-edit";
 import { FunctionCardSelectedView } from "./function-card-selected-view";
-import { EditAndSelectButtons } from "./edit-and-select-buttons";
+import { SelectButton } from "./buttons/select-button.tsx";
 import { useEffect, useState } from "react";
 import { Draggable } from "./draggable";
 import { css, keyframes } from "@emotion/react";
@@ -188,7 +188,7 @@ export function FunctionCard({
 									isDisabled={!functionAccess}
 									{...listeners}
 								/>
-								<Skeleton isLoaded={!func.isLoading} flex="1" minWidth={0}>
+								<Skeleton isLoaded={!func.isLoading} flex="1" paddingRight={1}>
 									<Text
 										fontWeight="bold"
 										as="span"
@@ -199,11 +199,7 @@ export function FunctionCard({
 										{func.data?.name ?? "<Det skjedde en feil>"}
 									</Text>
 								</Skeleton>
-
-								<EditAndSelectButtons
-									functionId={functionId}
-									selected={false}
-								/>
+								<SelectButton functionId={functionId} selected={false} />
 							</>
 						)}
 					</Flex>
