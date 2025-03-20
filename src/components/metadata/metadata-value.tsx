@@ -164,12 +164,20 @@ const TextView: React.FC<TextViewProps> = ({
 					fontSize="sm"
 					value={displayValue ?? ""}
 					borderRadius="5px"
-					_hover={{ cursor: "inherit" }}
+					_hover={{ cursor: "inherit", overflowY: "auto" }}
 					maxHeight={"70px"}
+					minHeight={"auto"}
+					overflowY={"hidden"}
 					sx={{
-						minHeight: "auto",
 						"&::-webkit-scrollbar": {
-							display: "none",
+							width: "6px",
+						},
+						"&::-webkit-scrollbar-thumb": {
+							backgroundColor: "gray.400",
+							borderRadius: "3px",
+						},
+						"&::-webkit-scrollbar-track": {
+							background: "transparent",
 						},
 					}}
 				/>
