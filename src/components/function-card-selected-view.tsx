@@ -3,7 +3,8 @@ import { MetadataView } from "./metadata/metadata-view";
 import { useMetadata } from "@/hooks/use-metadata";
 import { Route } from "@/routes";
 import { Button, Flex, Icon, Skeleton, Stack, Text } from "@kvib/react";
-import { EditAndSelectButtons } from "./edit-and-select-buttons";
+import { SelectButton } from "./buttons/select-button.tsx";
+import { EditButton } from "@/components/buttons/edit-button.tsx";
 import { useState } from "react";
 
 export function FunctionCardSelectedView({
@@ -29,7 +30,10 @@ export function FunctionCardSelectedView({
 						{func.data?.name ?? "<Det skjedde en feil>"}
 					</Text>
 				</Skeleton>
-				<EditAndSelectButtons functionId={functionId} selected />
+				<Flex gap={1}>
+					<EditButton functionId={functionId} />
+					<SelectButton functionId={functionId} selected={true} />
+				</Flex>
 			</Flex>
 			{config.metadata?.map((meta) => {
 				const hasMetadata = metadata.data?.some((m) => m.key === meta.key);

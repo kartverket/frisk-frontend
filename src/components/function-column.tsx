@@ -56,7 +56,7 @@ export function FunctionColumn({ functionIds }: FunctionFolderProps) {
 	}, [currentLevel]);
 
 	return (
-		<Flex flexDirection="column" width="380px">
+		<Flex flexDirection="column" width="380px" minWidth="300px">
 			<Box
 				bgColor="gray.200"
 				border="1px"
@@ -246,7 +246,6 @@ function ChildrenGroupItem({
 	lowLighted: boolean;
 	isLoading: boolean;
 }) {
-
 	// Tillater at alle funksjoner kan flyttes på inntil videre
 	//const hasAccess = useHasFunctionAccess(func.id);
 	//const isDraggable = config.enableEntra ? hasAccess : true;
