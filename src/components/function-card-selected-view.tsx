@@ -30,7 +30,7 @@ export function FunctionCardSelectedView({
 				</Skeleton>
 				<Flex gap={1}>
 					<EditButton functionId={functionId} />
-					<SelectButton functionId={functionId} selected={false} />
+					<SelectButton functionId={functionId} selected={true} />
 				</Flex>
 			</Flex>
 			{config.metadata?.map((meta) => {
