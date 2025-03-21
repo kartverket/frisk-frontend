@@ -1,5 +1,8 @@
 import { useQueries, useQueryClient } from "@tanstack/react-query";
-import { type FunctionMetadata, getFunctionMetadata } from "@/services/backend.ts";
+import {
+	type FunctionMetadata,
+	getFunctionMetadata,
+} from "@/services/backend.ts";
 
 type UseMetadataListOpts = {
 	hasFunctionIds: boolean;
