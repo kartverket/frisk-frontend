@@ -5,6 +5,7 @@ import { Route } from "@/routes";
 import { Button, Flex, Skeleton, Stack, Text } from "@kvib/react";
 import { SelectButton } from "./buttons/select-button.tsx";
 import { EditButton } from "@/components/buttons/edit-button.tsx";
+import { useState } from "react";
 
 export function FunctionCardSelectedView({
 	functionId,
@@ -13,6 +14,7 @@ export function FunctionCardSelectedView({
 	const { metadata, addMetadata } = useMetadata(functionId);
 	const { config } = Route.useLoaderData();
 	const displayedTitles = new Set<string>();
+	const [showCopiedTextMessage, setShowCopiedTextMessage] = useState(false);
 
 	return (
 		<Stack pl="10px" w="100%" overflow="hidden">
@@ -54,22 +56,46 @@ export function FunctionCardSelectedView({
 					addMetadata={addMetadata}
 				/>
 			))}
-			<Button
-				aria-label="Copy link"
-				padding="0"
-				justifyContent="left"
-				variant="tertiary"
-				leftIcon="content_copy"
-				colorScheme="blue"
-				fontSize="sm"
-				onClick={(e) => {
-					e.stopPropagation();
-					const permalink = `${window.location.origin}?path=%5B%22${func.data?.id}%22%5D`;
-					navigator.clipboard.writeText(permalink);
-				}}
-			>
-				Kopier lenke til funksjonskort
-			</Button>
+			{!showCopiedTextMessage ? (
+				<Button
+					aria-label="Copy link"
+					padding="0"
+					justifyContent="left"
+					variant="tertiary"
+					leftIcon="content_copy"
+					colorScheme="blue"
+					fontSize="sm"
+					onClick={(e) => {
+						e.stopPropagation();
+						const permalink = `${window.location.origin}?path=%5B%22${func.data?.id}%22%5D`;
+						navigator.clipboard.writeText(permalink);
+						setShowCopiedTextMessage(true);
+						setTimeout(() => {
+							setShowCopiedTextMessage(false);
+						}, 3000);
+					}}
+				>
+					Kopier lenke til funksjonskort
+				</Button>
+			) : (
+				<Flex alignItems={"center"} gap={1} paddingTop={2} paddingBottom={2}>
+					<Icon
+						color="var(--kvib-colors-blue-500)"
+						grade={0}
+						icon="check"
+						size={24}
+						weight={300}
+					/>
+					<Text
+						fontSize={"sm"}
+						color="var(--kvib-colors-blue-500)"
+						align={"center"}
+						fontWeight={"600"}
+					>
+						Kopiert til utklippstavlen
+					</Text>
+				</Flex>
+			)}
 		</Stack>
 	);
 }
