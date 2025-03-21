@@ -2,7 +2,7 @@ import { useFunction } from "@/hooks/use-function";
 import { MetadataView } from "./metadata/metadata-view";
 import { useMetadata } from "@/hooks/use-metadata";
 import { Route } from "@/routes";
-import { Button, Flex, Skeleton, Stack, Text } from "@kvib/react";
+import { Button, Flex, Icon, Skeleton, Stack, Text } from "@kvib/react";
 import { SelectButton } from "./buttons/select-button.tsx";
 import { EditButton } from "@/components/buttons/edit-button.tsx";
 import { useState } from "react";

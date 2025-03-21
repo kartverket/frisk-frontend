@@ -188,7 +188,12 @@ export function FunctionCard({
 									isDisabled={!functionAccess}
 									{...listeners}
 								/>
-								<Skeleton isLoaded={!func.isLoading} flex="1" minWidth={0} paddingRight={1}>
+								<Skeleton
+									isLoaded={!func.isLoading}
+									flex="1"
+									minWidth={0}
+									paddingRight={1}
+								>
 									<Text
 										fontWeight="bold"
 										as="span"
