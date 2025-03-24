@@ -61,7 +61,6 @@ export function CreateFunctionForm({
 		await addFunction.mutateAsync({
 			function: {
 				name: nameElement.value,
-				description: null,
 				parentId: functionId,
 			},
 			metadata: metadata,
