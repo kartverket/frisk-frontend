@@ -25,6 +25,7 @@ export function SelectButton({
 					pl="10px"
 					gap="4px"
 					ref={setNodeRef}
+					height="40px"
 				>
 					<Text
 						fontSize="xs"
