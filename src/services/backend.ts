@@ -223,7 +223,6 @@ export async function getTeam(id: string) {
 const BackendFunction = object({
 	id: number().int(),
 	name: string(),
-	description: string().nullable(),
 	path: string(),
 	parentId: number().int().nullable(),
 	orderIndex: number().int(),
