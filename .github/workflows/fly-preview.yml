@@ -31,6 +31,7 @@ jobs:
         with:
           dockerfile: ./Dockerfile
           name: frisk-pr-${{ github.event.number }}
+          org: FRISK
 
       - name: Update image
         if: ${{ github.event.action == 'opened' || github.event.action == 'reopened' || github.event.action == 'synchronize' }}
