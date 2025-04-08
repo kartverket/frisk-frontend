@@ -27,12 +27,11 @@ jobs:
 
       - name: Deploy
         id: deploy
-        uses: codemancers/fly-pr-review-apps@main
+        uses: superfly/fly-pr-review-apps@main
         with:
           dockerfile: ./Dockerfile
           name: frisk-pr-${{ github.event.number }}
           org: FRISK
-          postgres: ""
 
       - name: Update image
         if: ${{ github.event.action == 'opened' || github.event.action == 'reopened' || github.event.action == 'synchronize' }}
