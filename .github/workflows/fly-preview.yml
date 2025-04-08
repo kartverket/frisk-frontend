@@ -32,6 +32,16 @@ jobs:
           dockerfile: ./Dockerfile
           name: frisk-pr-${{ github.event.number }}
           org: FRISK
+      
+      - name: Set secrets in Fly
+        if: ${{ github.event.action == 'opened' || github.event.action == 'reopened' || github.event.action == 'synchronize' }}
+        run: |
+          flyctl secrets set -a frisk-pr-${{ github.event.number }} \
+          VITE_CLIENT_ID=3e09bdb6-734c-473e-ab69-1238057dfc5d \
+          VITE_AUTHORITY=https://login.microsoftonline.com/7531b79e-fd42-4826-bff2-131d82c7b557/v2.0 \
+          VITE_LOGIN_REDIRECT_URI=https://frisk-pr-${{ github.event.number }}.fly.dev \
+          VITE_BACKEND_URL=https://frisk-backend.fly.dev \
+          VITE_REGELRETT_FRONTEND_URL=https://regelrett-frontend-1024826672490.europe-north1.run.app \
 
       - name: Update image
         if: ${{ github.event.action == 'opened' || github.event.action == 'reopened' || github.event.action == 'synchronize' }}
