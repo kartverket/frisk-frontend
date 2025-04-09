@@ -9,9 +9,21 @@ on:
   pull_request:
     branches:
       - main
+    paths-ignore:
+      - README.md
+      - .github/CODEOWNERS
+      - '.security/**'
+      - '.vscode/**'
+      - '.gitignore'
   push:
     branches:
       - main
+    paths-ignore:
+      - README.md
+      - .github/CODEOWNERS
+      - '.security/**'
+      - '.vscode/**'
+      - '.gitignore'
 
 permissions:
   id-token: write
