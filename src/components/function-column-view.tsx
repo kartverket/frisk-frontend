@@ -231,7 +231,12 @@ function Filters(props: {
 				</Text>
 				{props.type === "indicators" && (
 					<Tooltip label="Viser indikatorer om metadata finnes på under-/overfunksjoner">
-						<Box as="span" display="inline-flex" alignItems="center">
+						<Box
+							as="span"
+							display="inline-flex"
+							alignItems="center"
+							tabIndex={0}
+						>
 							<Icon
 								aria-label="info"
 								icon="info"
