@@ -51,7 +51,7 @@ jobs:
 
       - name: Clean up GitHub environment
         uses: strumwolf/delete-deployment-environment@v2
-        if: ${{ github.event.action == 'closed' }}
+        if: ${{ github.event.action == 'synchronize' }}
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.FRISK_FRONTEND_PAT }}
           environment: frisk-pr-${{ github.event.number }}
