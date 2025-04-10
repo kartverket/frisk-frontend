@@ -56,7 +56,7 @@ export function FunctionColumn({ functionIds }: FunctionFolderProps) {
 	}, [currentLevel]);
 
 	return (
-		<Flex flexDirection="column" width="380px" minWidth="300px">
+		<Flex flexDirection="column" width="380px" minWidth="340px">
 			<Box
 				bgColor="gray.200"
 				border="1px"

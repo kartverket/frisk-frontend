@@ -6,6 +6,7 @@ import { Button, Flex, Icon, Skeleton, Stack, Text } from "@kvib/react";
 import { SelectButton } from "./buttons/select-button.tsx";
 import { EditButton } from "@/components/buttons/edit-button.tsx";
 import { useState } from "react";
+import { IndicatorPointer } from "@/components/indicator-pointer.tsx";
 
 export function FunctionCardSelectedView({
 	functionId,
@@ -13,7 +14,6 @@ export function FunctionCardSelectedView({
 	const { func } = useFunction(functionId);
 	const { metadata, addMetadata } = useMetadata(functionId);
 	const { config } = Route.useLoaderData();
-	const displayedTitles = new Set<string>();
 	const [showCopiedTextMessage, setShowCopiedTextMessage] = useState(false);
 
 	return (
@@ -30,23 +30,25 @@ export function FunctionCardSelectedView({
 						{func.data?.name ?? "<Det skjedde en feil>"}
 					</Text>
 				</Skeleton>
-				<Flex gap={1}>
+				<Flex alignItems={"center"}>
 					<EditButton functionId={functionId} />
+					<IndicatorPointer functionId={functionId} />
 					<SelectButton functionId={functionId} selected={true} />
 				</Flex>
 			</Flex>
 			{config.metadata?.map((meta) => {
-				const hasMetadata = metadata.data?.some((m) => m.key === meta.key);
-				const showTitle = meta.title ? !displayedTitles.has(meta.title) : false;
-				if (meta.title && hasMetadata) displayedTitles.add(meta.title);
-				return (
-					<MetadataView
-						key={meta.key}
-						metadata={meta}
-						functionId={functionId}
-						showTitle={showTitle}
-					/>
+				const metadataForConfigKey = metadata.data?.filter(
+					(m) => m.key === meta.key,
 				);
+				if (metadataForConfigKey?.length !== 0) {
+					return (
+						<MetadataView
+							key={meta.key}
+							metadataConfig={meta}
+							functionId={functionId}
+						/>
+					);
+				}
 			})}
 			{config.functionCardComponents.map((Component) => (
 				<Component
