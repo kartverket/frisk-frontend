@@ -17,10 +17,9 @@ import TextareaAutosize from "react-textarea-autosize";
 type Props = {
 	metadata: Metadata;
 	functionId: number;
-	isIndicator?: boolean;
 };
 
-export function MetadataValue({ metadata, functionId, isIndicator }: Props) {
+export function MetadataValue({ metadata, functionId }: Props) {
 	const {
 		metadata: { data: currentMetadata, isPending: isCurrentMetadataLoading },
 		metadataAccess,
@@ -61,9 +60,6 @@ export function MetadataValue({ metadata, functionId, isIndicator }: Props) {
 				const isNoMetadata = !currentMetadata && !isCurrentMetadataLoading;
 
 				if (isNoMetadata) return null;
-
-				if (isIndicator)
-					return dv.data?.displayValue ?? metadataToDisplay?.[i]?.value;
 
 				switch (dv.data?.displayOptions?.type) {
 					case "text":
