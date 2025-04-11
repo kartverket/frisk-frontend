@@ -2,18 +2,22 @@ import { Route } from "@/routes";
 import { useIndicators } from "@/hooks/use-indicators.ts";
 import { useFunction } from "@/hooks/use-function.tsx";
 import type { BackendFunction } from "@/services/backend.ts";
-import { Flex, Icon } from "@kvib/react";
+import { Flex, Icon, Tooltip } from "@kvib/react";
+import { Metadata } from "../../frisk.config.tsx";
 
 export function IndicatorPointer({
 	functionId,
 }: {
 	functionId: number;
 }) {
-	const { func } = useFunction(functionId, {
-		includeAccess: true,
-	});
+	const { func } = useFunction(functionId);
 	const search = Route.useSearch();
+	const { config } = Route.useLoaderData();
 	const indicatorMetadataKey = search.indicators?.metadata.find((m) => m.key);
+	const selectedIndicator = config.metadata?.find(
+		(m) => m.key === indicatorMetadataKey?.key,
+	);
+	//console.log("selectedIndicator", selectedIndicator)
 
 	const indicators = useIndicators(
 		indicatorMetadataKey
@@ -28,66 +32,145 @@ export function IndicatorPointer({
 	const indicatorPointers = getIndicatorPointers(indicators.data, func.data);
 
 	return (
-		<Flex
-			justifyContent="center"
-			alignItems="center"
-			direction="row"
-			backgroundColor="blue.100"
-			borderRadius="12px"
-			width="44px"
-			height="20px"
-			marginRight="12px"
+		<Tooltip
+			label={
+				<TooltipIndicatorPointer
+					indicatorPointers={indicatorPointers}
+					selectedIndicator={selectedIndicator}
+				/>
+			}
 		>
-			<Flex margin="0px" width="20px" style={{ rotate: "180deg" }}>
-				<Icon
-					aria-label="indicator_in_parent"
-					icon="play_arrow"
-					size={20}
-					color={
-						indicatorPointers.hasIndicatorInParent
-							? "var(--kvib-colors-blue-500)"
-							: "var(--kvib-colors-blue-50)"
-					}
-					isFilled={true}
-					weight={400}
-				/>
+			<Flex
+				justifyContent="center"
+				alignItems="center"
+				direction="row"
+				backgroundColor="blue.100"
+				borderRadius="12px"
+				width="44px"
+				height="20px"
+				marginRight="12px"
+			>
+				<Flex margin="0px" width="20px" style={{ rotate: "180deg" }}>
+					<Icon
+						aria-label="indicator_in_parent"
+						icon="play_arrow"
+						size={20}
+						color={
+							indicatorPointers.hasIndicatorInParent
+								? "var(--kvib-colors-blue-500)"
+								: "var(--kvib-colors-blue-50)"
+						}
+						isFilled={true}
+						weight={400}
+					/>
+				</Flex>
+				<Flex margin="0px -8px" width="20px">
+					<Icon
+						aria-label="indicator_here"
+						icon="fiber_manual_record"
+						size={20}
+						color={
+							indicatorPointers.hasIndicatorInSameLevel
+								? "var(--kvib-colors-blue-500)"
+								: "var(--kvib-colors-blue-50)"
+						}
+						isFilled={true}
+						weight={400}
+					/>
+				</Flex>
+				<Flex margin="0px" width="20px">
+					<Icon
+						aria-label="indicator_in_child"
+						icon="play_arrow"
+						size={20}
+						color={
+							indicatorPointers.hasIndicatorInChild
+								? "var(--kvib-colors-blue-500)"
+								: "var(--kvib-colors-blue-50)"
+						}
+						isFilled={true}
+						weight={400}
+					/>
+				</Flex>
 			</Flex>
-			<Flex margin="0px -8px" width="20px">
-				<Icon
-					aria-label="indicator_here"
-					icon="fiber_manual_record"
-					size={20}
-					color={
-						indicatorPointers.hasIndicatorInSameLevel
-							? "var(--kvib-colors-blue-500)"
-							: "var(--kvib-colors-blue-50)"
-					}
-					isFilled={true}
-					weight={400}
-				/>
-			</Flex>
-			<Flex margin="0px" width="20px">
-				<Icon
-					aria-label="indicator_in_child"
-					icon="play_arrow"
-					size={20}
-					color={
-						indicatorPointers.hasIndicatorInChild
-							? "var(--kvib-colors-blue-500)"
-							: "var(--kvib-colors-blue-50)"
-					}
-					isFilled={true}
-					weight={400}
-				/>
-			</Flex>
-		</Flex>
+		</Tooltip>
 	);
 }
+
+export function TooltipIndicatorPointer({
+	indicatorPointers,
+	selectedIndicator,
+}: {
+	indicatorPointers: IndicatorPointers;
+	selectedIndicator: Metadata | undefined;
+}) {
+	const parent = indicatorPointers.hasIndicatorInParent ? (
+		<span>
+			på et <b>høyere</b> funksjonsnivå
+		</span>
+	) : null;
+	const here = indicatorPointers.hasIndicatorInSameLevel ? (
+		<span>
+			på <b>dette</b> funksjonsnivået
+		</span>
+	) : null;
+	const child = indicatorPointers.hasIndicatorInChild ? (
+		<span>
+			på et <b>lavere</b> funksjonsnivå
+		</span>
+	) : null;
+
+	const activeLevels = [parent, here, child].filter(Boolean);
+	const selectedIndicatorText =
+		selectedIndicator?.displayName ?? selectedIndicator?.key;
+	const formatedSelectedIndicatorText = (
+		<i>{selectedIndicatorText?.toLowerCase()}</i>
+	);
+
+	if (activeLevels.length === 0) {
+		return (
+			<span>
+				Denne funksjonen har <b>ingen</b> relasjon til metadata{" "}
+				{formatedSelectedIndicatorText}.
+			</span>
+		);
+	}
+
+	if (activeLevels.length === 1) {
+		return (
+			<span>
+				Funksjonen har metadata {formatedSelectedIndicatorText}{" "}
+				{activeLevels[0]}.
+			</span>
+		);
+	}
+
+	if (activeLevels.length >= 2) {
+		return (
+			<span>
+				Funksjonen har metadata {formatedSelectedIndicatorText}:
+				<ul style={{ margin: "0 0 0 1.2em" }}>
+					{activeLevels.map((item, index) => (
+						<li key={index}>{item}</li>
+					))}
+				</ul>
+			</span>
+		);
+	}
+
+	return null;
+}
+
+export type IndicatorPointers = {
+	hasIndicatorInParent: boolean;
+	hasIndicatorInSameLevel: boolean;
+	hasIndicatorInChild: boolean;
+};
 
 function getIndicatorPointers(
 	indicators: BackendFunction[] | undefined,
 	functionData: BackendFunction | undefined,
-) {
+): IndicatorPointers {
 	const functionPositionLength = functionData?.path.split(".").length ?? 0;
 	const hasIndicatorInParent =
 		indicators?.some(
