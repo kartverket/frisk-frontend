@@ -3,7 +3,7 @@ import { useIndicators } from "@/hooks/use-indicators.ts";
 import { useFunction } from "@/hooks/use-function.tsx";
 import type { BackendFunction } from "@/services/backend.ts";
 import { Flex, Icon, Tooltip } from "@kvib/react";
-import { Metadata } from "../../frisk.config.tsx";
+import type { Metadata } from "../../frisk.config.tsx";
 
 export function IndicatorPointer({
 	functionId,
@@ -17,7 +17,6 @@ export function IndicatorPointer({
 	const selectedIndicator = config.metadata?.find(
 		(m) => m.key === indicatorMetadataKey?.key,
 	);
-	//console.log("selectedIndicator", selectedIndicator)
 
 	const indicators = useIndicators(
 		indicatorMetadataKey
