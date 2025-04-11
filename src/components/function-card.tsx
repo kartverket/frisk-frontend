@@ -19,6 +19,7 @@ export function FunctionCard({
 	});
 	const search = Route.useSearch();
 	const navigate = Route.useNavigate();
+	const indicatorSelected = search.indicators?.metadata.find((m) => m.key);
 
 	const [bottomMargin, setBottomMargin] = useState(0);
 
@@ -204,7 +205,9 @@ export function FunctionCard({
 										{func.data?.name ?? "<Det skjedde en feil>"}
 									</Text>
 								</Skeleton>
-								<IndicatorPointer functionId={functionId} />
+								{indicatorSelected && (
+									<IndicatorPointer functionId={functionId} />
+								)}
 								<SelectButton functionId={functionId} selected={false} />
 							</>
 						)}

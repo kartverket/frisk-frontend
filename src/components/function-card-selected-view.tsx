@@ -15,6 +15,8 @@ export function FunctionCardSelectedView({
 	const { metadata, addMetadata } = useMetadata(functionId);
 	const { config } = Route.useLoaderData();
 	const [showCopiedTextMessage, setShowCopiedTextMessage] = useState(false);
+	const search = Route.useSearch();
+	const indicatorSelected = search.indicators?.metadata.find((m) => m.key);
 
 	return (
 		<Stack pl="10px" w="100%" overflow="hidden">
@@ -32,7 +34,7 @@ export function FunctionCardSelectedView({
 				</Skeleton>
 				<Flex alignItems={"center"}>
 					<EditButton functionId={functionId} />
-					<IndicatorPointer functionId={functionId} />
+					{indicatorSelected && <IndicatorPointer functionId={functionId} />}
 					<SelectButton functionId={functionId} selected={true} />
 				</Flex>
 			</Flex>
