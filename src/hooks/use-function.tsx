@@ -109,6 +109,9 @@ export function useFunction(functionId: number, opts?: UseFunctionOpts) {
 			queryClient.invalidateQueries({
 				queryKey: ["functions", newFunction?.parentId, "children"],
 			});
+			queryClient.invalidateQueries({
+				queryKey: ["indicators"],
+			});
 		},
 	});
 
@@ -312,6 +315,9 @@ export function useFunction(functionId: number, opts?: UseFunctionOpts) {
 			}
 			queryClient.invalidateQueries({
 				queryKey: ["functions", deletedFunctionId],
+			});
+			queryClient.invalidateQueries({
+				queryKey: ["indicators"],
 			});
 		},
 	});

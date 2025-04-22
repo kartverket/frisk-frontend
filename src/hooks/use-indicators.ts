@@ -11,7 +11,7 @@ export function useIndicators(
 		| undefined,
 ) {
 	const indicators = useQuery({
-		queryKey: ["indicators", args],
+		queryKey: ["indicators", args?.key, args?.value, args?.functionId],
 		// biome-ignore lint/style/noNonNullAssertion: <explanation>
 		queryFn: () => getIndicators(args!),
 		enabled: !!args,
