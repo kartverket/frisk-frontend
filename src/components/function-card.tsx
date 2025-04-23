@@ -7,18 +7,19 @@ import { SelectButton } from "./buttons/select-button.tsx";
 import { useEffect, useState } from "react";
 import { Draggable } from "./draggable";
 import { css, keyframes } from "@emotion/react";
+import { IndicatorPointer } from "@/components/indicator-pointer.tsx";
 
 export function FunctionCard({
 	functionId,
 	selected,
 	lowlighted,
 }: { functionId: number; selected: boolean; lowlighted: boolean }) {
-	// const { config } = Route.useLoaderData();
 	const { func, functionAccess } = useFunction(functionId, {
 		includeAccess: true,
 	});
 	const search = Route.useSearch();
 	const navigate = Route.useNavigate();
+	const indicatorSelected = search.indicators?.metadata.find((m) => m.key);
 
 	const [bottomMargin, setBottomMargin] = useState(0);
 
@@ -204,6 +205,9 @@ export function FunctionCard({
 										{func.data?.name ?? "<Det skjedde en feil>"}
 									</Text>
 								</Skeleton>
+								{indicatorSelected && (
+									<IndicatorPointer functionId={functionId} />
+								)}
 								<SelectButton functionId={functionId} selected={false} />
 							</>
 						)}

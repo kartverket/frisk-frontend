@@ -92,6 +92,9 @@ export function useMetadata(functionId: number | undefined) {
 			queryClient.invalidateQueries({
 				queryKey: ["functions", newMetadata.functionId, "metadata"],
 			});
+			queryClient.invalidateQueries({
+				queryKey: ["indicators", newMetadata.key],
+			});
 		},
 	});
 
@@ -159,6 +162,9 @@ export function useMetadata(functionId: number | undefined) {
 			queryClient.invalidateQueries({
 				queryKey: ["functions", deletedMetadata.functionId, "metadata"],
 			});
+			queryClient.invalidateQueries({
+				queryKey: ["indicators", deletedMetadata.key],
+			});
 		},
 	});
 
@@ -222,9 +228,12 @@ export function useMetadata(functionId: number | undefined) {
 				context?.previousMetadata,
 			);
 		},
-		onSettled: (_updatedMetadataValue) => {
+		onSettled: (_, __, updatedMetadata) => {
 			queryClient.invalidateQueries({
 				queryKey: ["functions", functionId, "metadata"],
+			});
+			queryClient.invalidateQueries({
+				queryKey: ["indicators", updatedMetadata.key],
 			});
 		},
 	});
