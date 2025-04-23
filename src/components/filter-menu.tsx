@@ -267,6 +267,7 @@ function Indicators(props: {
 						size="sm"
 						backgroundColor="white"
 						placeholder="Velg indikator"
+						width="280px"
 						value={
 							selectedIndicatorMetadata
 								? selectedIndicatorMetadata.key
