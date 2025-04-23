@@ -2,7 +2,7 @@ import { Route } from "@/routes";
 import { useIndicators } from "@/hooks/use-indicators.ts";
 import { useFunction } from "@/hooks/use-function.tsx";
 import type { BackendFunction } from "@/services/backend.ts";
-import { Flex, Icon, Tooltip } from "@kvib/react";
+import { Flex, Icon, Tooltip, useTheme } from "@kvib/react";
 import type { Metadata } from "../../frisk.config.tsx";
 
 export function IndicatorPointer({
@@ -10,6 +10,7 @@ export function IndicatorPointer({
 }: {
 	functionId: number;
 }) {
+	const theme = useTheme();
 	const { func } = useFunction(functionId);
 	const search = Route.useSearch();
 	const { config } = Route.useLoaderData();
@@ -56,8 +57,8 @@ export function IndicatorPointer({
 						size={20}
 						color={
 							indicatorPointers.hasIndicatorInParent
-								? "var(--kvib-colors-blue-500)"
-								: "var(--kvib-colors-blue-50)"
+								? theme.colors.blue[500]
+								: theme.colors.blue[50]
 						}
 						isFilled={true}
 						weight={400}
@@ -70,8 +71,8 @@ export function IndicatorPointer({
 						size={20}
 						color={
 							indicatorPointers.hasIndicatorInSameLevel
-								? "var(--kvib-colors-blue-500)"
-								: "var(--kvib-colors-blue-50)"
+								? theme.colors.blue[500]
+								: theme.colors.blue[50]
 						}
 						isFilled={true}
 						weight={400}
@@ -84,8 +85,8 @@ export function IndicatorPointer({
 						size={20}
 						color={
 							indicatorPointers.hasIndicatorInChild
-								? "var(--kvib-colors-blue-500)"
-								: "var(--kvib-colors-blue-50)"
+								? theme.colors.blue[500]
+								: theme.colors.blue[50]
 						}
 						isFilled={true}
 						weight={400}
