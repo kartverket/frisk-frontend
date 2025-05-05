@@ -20,6 +20,7 @@ import {
 	Select,
 	useDisclosure,
 	Text,
+	Tooltip,
 } from "@kvib/react";
 import type { useFunction } from "@/hooks/use-function";
 import { msalInstance } from "@/services/msal";
@@ -192,11 +193,13 @@ export async function getConfig(): Promise<FriskConfig> {
 								displayOptions: {
 									type: "custom",
 									component: (
-										<Flex width="90%" gap={2} alignItems="center">
-											<Icon size={20} icon="article" />
-											<Text fontSize={"sm"}>{schema.name}</Text>
-											<Icon size={16} icon="lock" isFilled />
-										</Flex>
+										<Tooltip label="Brukeren din har ikke tilgang til denne funksjonen, derfor kan du ikke se eller endre sikkerhetsskjema for den.">
+											<Flex width="90%" gap={2} alignItems="center" as="span">
+												<Icon size={20} icon="article" />
+												<Text fontSize={"sm"}>{schema.name}</Text>
+												<Icon size={16} icon="lock" isFilled />
+											</Flex>
+										</Tooltip>
 									),
 								},
 							};
@@ -369,14 +372,23 @@ type FunctionCardComponentProps = {
 	func: ReturnType<typeof useFunction>["func"];
 	metadata: ReturnType<typeof useMetadata>["metadata"];
 	addMetadata: ReturnType<typeof useMetadata>["addMetadata"];
+	hasAccess: boolean;
 };
 
 function createSchemaComponent(schemas: RegelrettSchema[]) {
-	return ({ func, metadata, addMetadata }: FunctionCardComponentProps) => {
+	return ({
+		func,
+		metadata,
+		addMetadata,
+		hasAccess,
+	}: FunctionCardComponentProps) => {
 		const [selectedSchema, setSelectedSchema] = useState("");
 		const availableSchemas = schemas.filter(
 			(schema) => !metadata.data?.find((m) => m.key === schema.id),
 		);
+
+		if (availableSchemas.length < 1) return;
+		if (!hasAccess) return;
 		return (
 			<form
 				onSubmit={async (e) => {
@@ -402,7 +414,7 @@ function createSchemaComponent(schemas: RegelrettSchema[]) {
 					});
 				}}
 			>
-				<FormControl isRequired={true} style={{ width: "fit-content" }}>
+				<FormControl style={{ width: "fit-content" }}>
 					<FormLabel style={{ fontSize: "14px" }}>
 						Opprett sikkerhetsskjema
 					</FormLabel>

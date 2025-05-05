@@ -51,7 +51,7 @@ export function MetadataValue({ metadata, functionId }: Props) {
 	}
 
 	return (
-		<Box my={1}>
+		<Box mb={1}>
 			{displayValues.map((dv, i) => {
 				const isDisplayValueLoading = dv.isLoading;
 				const metaDataValue = dv.data?.value ?? metadataToDisplay?.[i]?.value;
