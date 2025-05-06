@@ -196,8 +196,10 @@ export async function getConfig(): Promise<FriskConfig> {
 										<Tooltip label="Brukeren din har ikke tilgang til denne funksjonen, derfor kan du ikke se eller endre sikkerhetsskjema for den.">
 											<Flex width="90%" gap={2} alignItems="center" as="span">
 												<Icon size={20} icon="article" />
-												<Text fontSize={"sm"}>{schema.name}</Text>
-												<Icon size={16} icon="lock" isFilled />
+												<Flex alignItems="center">
+													<Text fontSize={"sm"}>{schema.name}</Text>
+													<Icon size={16} icon="lock" isFilled />
+												</Flex>
 											</Flex>
 										</Tooltip>
 									),
