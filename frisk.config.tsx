@@ -14,16 +14,20 @@ import {
 	Flex,
 	FormControl,
 	FormLabel,
+	Icon,
 	IconButton,
 	Link,
 	Select,
 	useDisclosure,
+	Text,
+	Tooltip,
 } from "@kvib/react";
 import type { useFunction } from "@/hooks/use-function";
 import { msalInstance } from "@/services/msal";
 import { InteractionRequiredAuthError } from "@azure/msal-browser";
 import type { useMetadata } from "@/hooks/use-metadata";
 import { DeleteMetadataModal } from "@/components/delete-metadata-modal";
+import type React from "react";
 
 export async function getConfig(): Promise<FriskConfig> {
 	const schemas = await getSchemasFromRegelrett();
@@ -178,13 +182,30 @@ export async function getConfig(): Promise<FriskConfig> {
 						});
 						const url = `${getregelrettFrontendUrl()}/context/${contextId}?${searchParams.toString()}`;
 						//Check if the context exists in regelrett and delete metadata if it does not exist
-						try {
-							await fetchFromRegelrett(`contexts/${contextId}`);
-						} catch (error) {
+						const response = await fetchFromRegelrett(`contexts/${contextId}`);
+						if (response.status === 404) {
 							await deleteFunctionMetadata(input.id);
 							return { displayValue: undefined };
 						}
-
+						if (response.status === 403) {
+							return {
+								displayValue: schema.name,
+								displayOptions: {
+									type: "custom",
+									component: (
+										<Tooltip label="Brukeren din har ikke tilgang til denne funksjonen, derfor kan du ikke se eller endre sikkerhetsskjema for den.">
+											<Flex width="90%" gap={2} alignItems="center" as="span">
+												<Icon size={20} icon="article" />
+												<Flex alignItems="center">
+													<Text fontSize={"sm"}>{schema.name}</Text>
+													<Icon size={16} icon="lock" isFilled />
+												</Flex>
+											</Flex>
+										</Tooltip>
+									),
+								},
+							};
+						}
 						return {
 							displayValue: schema.name,
 							displayOptions: {
@@ -353,14 +374,23 @@ type FunctionCardComponentProps = {
 	func: ReturnType<typeof useFunction>["func"];
 	metadata: ReturnType<typeof useMetadata>["metadata"];
 	addMetadata: ReturnType<typeof useMetadata>["addMetadata"];
+	hasAccess: boolean;
 };
 
 function createSchemaComponent(schemas: RegelrettSchema[]) {
-	return ({ func, metadata, addMetadata }: FunctionCardComponentProps) => {
+	return ({
+		func,
+		metadata,
+		addMetadata,
+		hasAccess,
+	}: FunctionCardComponentProps) => {
 		const [selectedSchema, setSelectedSchema] = useState("");
 		const availableSchemas = schemas.filter(
 			(schema) => !metadata.data?.find((m) => m.key === schema.id),
 		);
+
+		if (availableSchemas.length < 1) return;
+		if (!hasAccess) return;
 		return (
 			<form
 				onSubmit={async (e) => {
@@ -386,7 +416,7 @@ function createSchemaComponent(schemas: RegelrettSchema[]) {
 					});
 				}}
 			>
-				<FormControl isRequired={true} style={{ width: "fit-content" }}>
+				<FormControl style={{ width: "fit-content" }}>
 					<FormLabel style={{ fontSize: "14px" }}>
 						Opprett sikkerhetsskjema
 					</FormLabel>
@@ -541,18 +571,20 @@ async function getRegelrettTokens() {
 }
 
 async function fetchFromRegelrett(path: string, options: RequestInit = {}) {
-	const tokens = await getRegelrettTokens();
-	const response = await fetch(`${REGELRETT_BACKEND_URL}/${path}`, {
-		...options,
-		headers: {
-			...options.headers,
-			Authorization: `Bearer ${tokens.accessToken}`,
-		},
-	});
-	if (!response.ok) {
-		throw new Error(`Backend error: ${response.status} ${response.statusText}`);
+	try {
+		const tokens = await getRegelrettTokens();
+		const response = await fetch(`${REGELRETT_BACKEND_URL}/${path}`, {
+			...options,
+			headers: {
+				...options.headers,
+				Authorization: `Bearer ${tokens.accessToken}`,
+			},
+		});
+		return response;
+	} catch (error) {
+		console.error("Fetch from Regelrett error:", error);
+		throw error;
 	}
-	return response;
 }
 
 export async function createRegelrettContext({
