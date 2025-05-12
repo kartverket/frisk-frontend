@@ -24,7 +24,12 @@ export function IndicatorPointer({
 			? {
 					functionId,
 					key: indicatorMetadataKey.key,
-					value: indicatorMetadataKey.value as string,
+					value:
+						indicatorMetadataKey.value &&
+						typeof indicatorMetadataKey.value === "object" &&
+						"value" in indicatorMetadataKey.value
+							? (indicatorMetadataKey.value.value as string)
+							: undefined,
 				}
 			: undefined,
 	);
