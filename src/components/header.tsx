@@ -1,6 +1,6 @@
 import { Route } from "@/routes";
 import { useMsal } from "@azure/msal-react";
-import { Button, Text } from "@kvib/react";
+import { Button, Flex, Icon, Text } from "@kvib/react";
 
 export function Header() {
 	const { config } = Route.useLoaderData();
@@ -14,17 +14,23 @@ export function Header() {
 				<a href={config.logo.logoLink ?? "/"}>
 					<img src={config.logo.imageSource} alt="logo" />
 				</a>
-				<Button
-					variant="tertiary"
-					leftIcon="logout"
-					onClick={() => {
-						msal.instance.logout({
-							account,
-						});
-					}}
-				>
-					<Text>Logg ut</Text>
-				</Button>
+				<Flex align="center" gap="8px">
+					<Flex gap="4px">
+						<Icon icon="account_circle" />
+						<Text>{account.name}</Text>
+					</Flex>
+					<Button
+						variant="tertiary"
+						leftIcon="logout"
+						onClick={() => {
+							msal.instance.logout({
+								account,
+							});
+						}}
+					>
+						<Text>Logg ut</Text>
+					</Button>
+				</Flex>
 			</CustomHeader>
 		</header>
 	);
