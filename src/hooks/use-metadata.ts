@@ -103,15 +103,27 @@ export function useMetadata(functionId: number | undefined) {
 			id: number;
 			functionId: number;
 			key: string;
+			displayValue?: string;
 		}) => {
+			const toastId = "delete-metadata";
 			try {
 				(await getConfig()).metadata
 					?.find((m) => m.key === args.key)
 					?.onDelete?.({ id: args.id, functionId: args.functionId });
 				await deleteFunctionMetadata(args.id);
+				if (!toast.isActive(toastId)) {
+					toast({
+						id: toastId,
+						description: args.displayValue
+							? `Sikkerhetsskjemaet ${args.displayValue} ble slettet.`
+							: "Sikkerhetsskjemaet ble slettet.",
+						status: "success",
+						duration: 5000,
+						isClosable: true,
+					});
+				}
 			} catch (error) {
 				console.error("Error deleting metadata: ", error);
-				const toastId = "delete-metadata";
 				if (!toast.isActive(toastId)) {
 					toast({
 						id: toastId,

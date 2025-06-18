@@ -60,6 +60,7 @@ export function DeleteMetadataModal({
 									id: metadataId,
 									functionId: functionId,
 									key: metadataToDelete?.key ?? "",
+									displayValue: displayValue,
 								});
 							}}
 							isLoading={removeMetadata.isPending}

@@ -21,6 +21,7 @@ import {
 	useDisclosure,
 	Text,
 	Tooltip,
+	useToast,
 } from "@kvib/react";
 import type { useFunction } from "@/hooks/use-function";
 import { msalInstance } from "@/services/msal";
@@ -529,12 +530,12 @@ function SchemaNotFoundDisplay({schema, functionId, metadataId}: SchemaNotFoundD
 	const { isOpen, onOpen, onClose } = useDisclosure();
 
 	return (
-		<Flex gap={2} alignItems="center">
+		<Flex width="90%" gap={2} alignItems="center">
 			<Tooltip label="Vi klarte ikke å finne dette sikkerhetsskjemaet i Regelrett. Vanligvis skyldes det at skjemaet har blitt slettet der. Hvis du vet det stemmer, er det trygt å slette det her også.">
 				<Flex gap={2} alignItems="center">
 					<Icon icon="warning" isFilled={true} color="var(--kvib-colors-orange-600)"/>
 					<Icon size={20} icon="article" />
-					<Text>{schema.name}</Text>
+					<Text fontSize="sm">{schema.name}</Text>
 				</Flex>
 			</Tooltip>
 			<IconButton 
