@@ -1,6 +1,5 @@
 import { useState } from "react";
 import {
-	deleteFunctionMetadata,
 	getFunction,
 	getFunctionMetadata,
 	getFunctions,
@@ -21,7 +20,6 @@ import {
 	useDisclosure,
 	Text,
 	Tooltip,
-	useToast,
 } from "@kvib/react";
 import type { useFunction } from "@/hooks/use-function";
 import { msalInstance } from "@/services/msal";
