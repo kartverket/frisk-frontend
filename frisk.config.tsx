@@ -1,6 +1,5 @@
 import { useState } from "react";
 import {
-	deleteFunctionMetadata,
 	getFunction,
 	getFunctionMetadata,
 	getFunctions,
@@ -181,11 +180,14 @@ export async function getConfig(): Promise<FriskConfig> {
 							redirectBackTitle: "Funksjonsregisteret",
 						});
 						const url = `${getregelrettFrontendUrl()}/context/${contextId}?${searchParams.toString()}`;
-						//Check if the context exists in regelrett and delete metadata if it does not exist
 						const response = await fetchFromRegelrett(`contexts/${contextId}`);
 						if (response.status === 404) {
-							await deleteFunctionMetadata(input.id);
-							return { displayValue: undefined };
+							return { displayValue: schema.name, displayOptions: {
+								type: "custom",
+								component: (
+									<SchemaNotFoundDisplay schema={schema} functionId={input.functionId} metadataId={input.id}/>
+								)
+							} };
 						}
 						if (response.status === 403) {
 							return {
@@ -195,7 +197,7 @@ export async function getConfig(): Promise<FriskConfig> {
 									component: (
 										<Tooltip label="Brukeren din har ikke tilgang til denne funksjonen, derfor kan du ikke se eller endre sikkerhetsskjema for den.">
 											<Flex width="90%" gap={2} alignItems="center" as="span">
-												<Icon size={20} icon="article" />
+												<Icon icon="article" />
 												<Flex alignItems="center">
 													<Text fontSize={"sm"}>{schema.name}</Text>
 													<Icon size={16} icon="lock" isFilled />
@@ -231,7 +233,7 @@ export async function getConfig(): Promise<FriskConfig> {
 		},
 		title: "Funksjonsregisteret",
 		description:
-			"Smell opp noen bra funksjoner og få den oversikten du fortjener",
+			"Funksjonsregisteret (FRISK) lar deg visualisere funksjoner i et hierarki. Her kan man blant annet definere kritikalitet, ansvarlig team og avhengigheter. Du kan også opprette sikkerhetsskjemaer koblet til Regelrett.",
 		rootNodeName: "Kartverket",
 		columnName: "Funksjon",
 		addButtonName: "Legg til funksjon",
@@ -463,6 +465,7 @@ type SchemaDisplayProps = {
 	metadataId: number;
 };
 
+
 function SchemaDisplay({
 	schema,
 	url,
@@ -498,7 +501,7 @@ function SchemaDisplay({
 				aria-label="Delete schema"
 				icon="delete"
 				variant="tertiary"
-				size="sm"
+				size="xs"
 				colorScheme="red"
 				borderRadius="md"
 				_hover={{ backgroundColor: "red.50" }}
@@ -517,6 +520,45 @@ function SchemaDisplay({
 			/>
 		</Flex>
 	);
+}
+
+type SchemaNotFoundDisplayProps = Omit<SchemaDisplayProps, "url">
+
+function SchemaNotFoundDisplay({schema, functionId, metadataId}: SchemaNotFoundDisplayProps) {
+	const { isOpen, onOpen, onClose } = useDisclosure();
+
+	return (
+		<Flex width="90%" gap={2} alignItems="center">
+			<Tooltip label="Vi klarte ikke å finne dette sikkerhetsskjemaet i Regelrett. Vanligvis skyldes det at skjemaet har blitt slettet der. Hvis du vet det stemmer, er det trygt å slette det her også.">
+				<Flex gap={2} alignItems="center">
+					<Icon icon="warning" isFilled={true} color="var(--kvib-colors-orange-600)"/>
+					<Icon size={20} icon="article" />
+					<Text fontSize="sm">{schema.name}</Text>
+				</Flex>
+			</Tooltip>
+			<IconButton 
+				aria-label="Delete schema"
+				icon="delete"
+				variant="tertiary"
+				size="xs"
+				colorScheme="red"
+				borderRadius="md"
+				_hover={{ backgroundColor: "red.50" }}
+				onClick={(e) => {
+					e.stopPropagation();
+					onOpen();
+				}}
+			/>
+			<DeleteMetadataModal
+				onOpen={onOpen}
+				onClose={onClose}
+				isOpen={isOpen}
+				functionId={functionId}
+				metadataId={metadataId}
+				displayValue={schema.name}
+			/>
+		</Flex>
+	)
 }
 
 const REGELRETT_BACKEND_URL = `${getregelrettFrontendUrl()}/api`;

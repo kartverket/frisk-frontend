@@ -126,7 +126,7 @@ export function FunctionColumnView({ path }: FunctionColumnViewProps) {
 			<Text fontSize="2xl" fontWeight="700" marginBottom="3">
 				{config.title}
 			</Text>
-			<Text fontSize="xs" marginBottom="38">
+			<Text fontSize="sm" marginBottom="38">
 				{config.description}
 			</Text>
 			<Button
