@@ -115,8 +115,8 @@ export function useMetadata(functionId: number | undefined) {
 					toast({
 						id: toastId,
 						description: args.displayValue
-							? `Sikkerhetsskjemaet ${args.displayValue} ble slettet.`
-							: "Sikkerhetsskjemaet ble slettet.",
+							? `Slettet ${args.displayValue}.`
+							: "Slettet metadata.",
 						status: "success",
 						duration: 5000,
 						isClosable: true,
