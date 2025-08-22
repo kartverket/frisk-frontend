@@ -29,7 +29,13 @@ import { DeleteMetadataModal } from "@/components/delete-metadata-modal";
 import type React from "react";
 
 export async function getConfig(): Promise<FriskConfig> {
-	const schemas = await getSchemasFromRegelrett();
+	let schemas: Schema[] = [];
+	try {
+		schemas = await getSchemasFromRegelrett();
+	} catch (e) {
+		console.error("Failed to fetch schemas from Regelrett:", e);
+	}
+	
 	return {
 		metadata: [
 			{
@@ -238,7 +244,7 @@ export async function getConfig(): Promise<FriskConfig> {
 		columnName: "Funksjon",
 		addButtonName: "Legg til funksjon",
 		enableEntra: true,
-		functionCardComponents: [createSchemaComponent(schemas)],
+		functionCardComponents: [createSchemaComponent(schemas ?? [])],
 	};
 }
 
@@ -564,13 +570,17 @@ function SchemaNotFoundDisplay({schema, functionId, metadataId}: SchemaNotFoundD
 const REGELRETT_BACKEND_URL = `${getregelrettFrontendUrl()}/api`;
 
 async function getSchemasFromRegelrett() {
-	const response = await fetch(`${REGELRETT_BACKEND_URL}/schemas`);
-	if (!response.ok) {
-		throw new Error(`Backend error: ${response.status} ${response.statusText}`);
+	try {
+		const response = await fetch(`${REGELRETT_BACKEND_URL}/schemas`);
+		if (!response.ok) {
+			throw new Error(`Backend error: ${response.status} ${response.statusText}`);
 	}
+		const json = await response.json();
+		return array(RegelrettSchema).parse(json);
 
-	const json = await response.json();
-	return array(RegelrettSchema).parse(json);
+	} catch (e) {
+		throw new Error("Could not connect to Regelrett backend")
+	}
 }
 
 const RegelrettSchema = object({
