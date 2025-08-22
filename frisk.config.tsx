@@ -35,7 +35,7 @@ export async function getConfig(): Promise<FriskConfig> {
 	} catch (e) {
 		console.error("Failed to fetch schemas from Regelrett:", e);
 	}
-	
+
 	return {
 		metadata: [
 			{
@@ -244,7 +244,7 @@ export async function getConfig(): Promise<FriskConfig> {
 		columnName: "Funksjon",
 		addButtonName: "Legg til funksjon",
 		enableEntra: true,
-		functionCardComponents: [createSchemaComponent(schemas ?? [])],
+		functionCardComponents: [createSchemaComponent(schemas)],
 	};
 }
 

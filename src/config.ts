@@ -21,7 +21,7 @@ const defaultConfig: IConfig = {
 		import.meta.env.VITE_BACKEND_URL ?? "https://frisk-backend.fly.dev",
 	regelrett_frontend_url:
 		import.meta.env.VITE_REGLERRETT_FRONTEND_URL ??
-		"https://regelrett-1024826672490.europe-north1.run.app",
+		"https://regelrett-frontend-1024826672490.europe-north1.run.app",
 	regelrett_client_id: import.meta.env.REGELRETT_CLIENT_ID ?? "",
 };
 
