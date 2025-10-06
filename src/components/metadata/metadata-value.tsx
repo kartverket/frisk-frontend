@@ -1,6 +1,7 @@
 import { useMetadata } from "@/hooks/use-metadata";
 import {
 	Box,
+	Button,
 	Flex,
 	IconButton,
 	Link,
@@ -13,6 +14,7 @@ import { useQueries } from "@tanstack/react-query";
 import type { Metadata } from "../../../frisk.config";
 import { DeleteMetadataModal } from "../delete-metadata-modal";
 import TextareaAutosize from "react-textarea-autosize";
+import { Route } from "@/routes";
 
 type Props = {
 	metadata: Metadata;
@@ -90,6 +92,7 @@ export function MetadataValue({ metadata, functionId }: Props) {
 							<PillView
 								key={metaDataValue}
 								displayValue={dv.data.displayValue}
+								funcPath={dv.data.displayOptions.path}
 								isLoading={isLoading}
 							/>
 						);
@@ -247,24 +250,55 @@ function LinkView({
 
 type PillViewProps = {
 	displayValue: string | undefined;
+	funcPath: string;
 	isLoading: boolean;
 };
 
-function PillView({ displayValue, isLoading }: PillViewProps) {
+function PillView({ displayValue, funcPath, isLoading }: PillViewProps) {
+	const search = Route.useSearch();
+	const navigate = Route.useNavigate();
 	return (
 		<Skeleton isLoaded={!isLoading} fitContent>
-			<Box
-				bg="#BAD7F8"
-				paddingRight={1}
-				paddingLeft={1}
-				borderRadius="md"
-				w="fit-content"
-				my={1}
+			<Button
+				variant="ghost"
+				padding={0}
+				margin={0}
+				minWidth={0}
+				height="auto"
+				onClick={(e) => {
+					e.stopPropagation();
+					const filteredPath = search.path.filter(
+						(path) => !funcPath.startsWith(path),
+					);
+					const newPath = filteredPath.includes(funcPath)
+						? filteredPath
+						: [...filteredPath, funcPath];
+					navigate({
+						search: {
+							...search,
+							path: newPath,
+						},
+					});
+				}}
 			>
-				<Text fontSize="sm" fontWeight="500">
-					{displayValue ?? "<Ingen verdi>"}
-				</Text>
-			</Box>
+				<Box
+					bg="#BAD7F8"
+					paddingRight={1}
+					paddingLeft={1}
+					borderRadius="md"
+					w="fit-content"
+					my={1}
+					transition="box-shadow 0.2s"
+					_hover={{
+						boxShadow: "md",
+						cursor: "pointer",
+					}}
+				>
+					<Text fontSize="sm" fontWeight="500">
+						{displayValue ?? "<Ingen verdi>"}
+					</Text>
+				</Box>
+			</Button>
 		</Skeleton>
 	);
 }
