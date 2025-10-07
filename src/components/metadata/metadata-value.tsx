@@ -277,6 +277,7 @@ function PillView({ displayValue, funcPath, isLoading }: PillViewProps) {
 						search: {
 							...search,
 							path: newPath,
+							highlighted: Number(funcPath.split(".").slice(-1)[0] ?? "1"),
 						},
 					});
 				}}
