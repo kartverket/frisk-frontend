@@ -136,8 +136,8 @@ export async function getConfig(): Promise<FriskConfig> {
 			{
 				key: "dependencies",
 				type: "select",
-				title: "Funksjonsavhengigheter",
-				displayName: "Funksjonsavhengigheter",
+				title: "Avhengigheter",
+				displayName: "Avhengigheter",
 				label: "Velg andre funksjoner denne funksjonen er avhengig av",
 				getOptions: async () => {
 					const functions = await getFunctions();
@@ -149,7 +149,14 @@ export async function getConfig(): Promise<FriskConfig> {
 				getDisplayValue: async (input) => {
 					const functionId = Number.parseInt(input.value);
 					const func = await getFunction(functionId);
-					return { displayValue: func.name, displayOptions: { type: "pill" } };
+					return {
+						displayValue: func.name,
+						displayOptions: {
+							type: "pill",
+							displayValue: func.name,
+							path: func.path,
+						},
+					};
 				},
 				selectMode: "multi",
 				show: () => true,
@@ -188,12 +195,19 @@ export async function getConfig(): Promise<FriskConfig> {
 						const url = `${getregelrettFrontendUrl()}/context/${contextId}?${searchParams.toString()}`;
 						const response = await fetchFromRegelrett(`contexts/${contextId}`);
 						if (response.status === 404) {
-							return { displayValue: schema.name, displayOptions: {
-								type: "custom",
-								component: (
-									<SchemaNotFoundDisplay schema={schema} functionId={input.functionId} metadataId={input.id}/>
-								)
-							} };
+							return {
+								displayValue: schema.name,
+								displayOptions: {
+									type: "custom",
+									component: (
+										<SchemaNotFoundDisplay
+											schema={schema}
+											functionId={input.functionId}
+											metadataId={input.id}
+										/>
+									),
+								},
+							};
 						}
 						if (response.status === 403) {
 							return {
@@ -311,6 +325,7 @@ type GeneralMetadataContent = {
 			  }
 			| {
 					type: "pill";
+					path: string;
 			  }
 			| {
 					type: "url";
@@ -428,32 +443,34 @@ function createSchemaComponent(schemas: RegelrettSchema[]) {
 					<FormLabel style={{ fontSize: "14px" }}>
 						Opprett sikkerhetsskjema
 					</FormLabel>
-					<Select
-						name="schema"
-						onClick={(e) => e.stopPropagation()}
-						onChange={(e) => setSelectedSchema(e.target.value)}
-						placeholder="Velg sikkerhetsskjema"
-						size={"sm"}
-					>
-						{availableSchemas.map((schema) => (
-							<option key={schema.id} value={schema.id}>
-								{schema.name}
-							</option>
-						))}
-					</Select>
+					<Flex alignItems="center" gap={2}>
+						<Select
+							name="schema"
+							onClick={(e) => e.stopPropagation()}
+							onChange={(e) => setSelectedSchema(e.target.value)}
+							placeholder="Velg sikkerhetsskjema"
+							size={"sm"}
+							cursor={"pointer"}
+						>
+							{availableSchemas.map((schema) => (
+								<option key={schema.id} value={schema.id}>
+									{schema.name}
+								</option>
+							))}
+						</Select>
+						<Button
+							type="submit"
+							variant="primary"
+							colorScheme="blue"
+							size="sm"
+							width="fit-content"
+							onClick={(e) => e.stopPropagation()}
+							isDisabled={!selectedSchema}
+						>
+							Opprett
+						</Button>
+					</Flex>
 				</FormControl>
-				<Button
-					type="submit"
-					variant="primary"
-					colorScheme="blue"
-					size="sm"
-					width="fit-content"
-					mt="16px"
-					onClick={(e) => e.stopPropagation()}
-					isDisabled={!selectedSchema}
-				>
-					Opprett skjema
-				</Button>
 			</form>
 		);
 	};
@@ -470,7 +487,6 @@ type SchemaDisplayProps = {
 	functionId: number;
 	metadataId: number;
 };
-
 
 function SchemaDisplay({
 	schema,
@@ -528,21 +544,29 @@ function SchemaDisplay({
 	);
 }
 
-type SchemaNotFoundDisplayProps = Omit<SchemaDisplayProps, "url">
+type SchemaNotFoundDisplayProps = Omit<SchemaDisplayProps, "url">;
 
-function SchemaNotFoundDisplay({schema, functionId, metadataId}: SchemaNotFoundDisplayProps) {
+function SchemaNotFoundDisplay({
+	schema,
+	functionId,
+	metadataId,
+}: SchemaNotFoundDisplayProps) {
 	const { isOpen, onOpen, onClose } = useDisclosure();
 
 	return (
 		<Flex width="90%" gap={2} alignItems="center">
 			<Tooltip label="Vi klarte ikke å finne dette sikkerhetsskjemaet i Regelrett. Vanligvis skyldes det at skjemaet har blitt slettet der. Hvis du vet det stemmer, er det trygt å slette det her også.">
 				<Flex gap={2} alignItems="center">
-					<Icon icon="warning" isFilled={true} color="var(--kvib-colors-orange-600)"/>
+					<Icon
+						icon="warning"
+						isFilled={true}
+						color="var(--kvib-colors-orange-600)"
+					/>
 					<Icon size={20} icon="article" />
 					<Text fontSize="sm">{schema.name}</Text>
 				</Flex>
 			</Tooltip>
-			<IconButton 
+			<IconButton
 				aria-label="Delete schema"
 				icon="delete"
 				variant="tertiary"
@@ -564,7 +588,7 @@ function SchemaNotFoundDisplay({schema, functionId, metadataId}: SchemaNotFoundD
 				displayValue={schema.name}
 			/>
 		</Flex>
-	)
+	);
 }
 
 const REGELRETT_BACKEND_URL = `${getregelrettFrontendUrl()}/api`;
@@ -573,13 +597,14 @@ async function getSchemasFromRegelrett() {
 	try {
 		const response = await fetch(`${REGELRETT_BACKEND_URL}/schemas`);
 		if (!response.ok) {
-			throw new Error(`Backend error: ${response.status} ${response.statusText}`);
-	}
+			throw new Error(
+				`Backend error: ${response.status} ${response.statusText}`,
+			);
+		}
 		const json = await response.json();
 		return array(RegelrettSchema).parse(json);
-
 	} catch (e) {
-		throw new Error("Could not connect to Regelrett backend")
+		throw new Error("Could not connect to Regelrett backend");
 	}
 }
 
