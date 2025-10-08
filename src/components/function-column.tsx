@@ -199,7 +199,7 @@ function ChildrenGroup({
 										droppableId={child.id.toString()}
 										orderIndex={i}
 									>
-										{({ isOver, setNodeRef }) => (
+										{({ setNodeRef }) => (
 											<Box
 												ref={setNodeRef}
 												paddingTop={3}
