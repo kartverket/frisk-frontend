@@ -55,11 +55,7 @@ export function FunctionColumnView({ path }: FunctionColumnViewProps) {
 
 	async function handleDragEnd(event: DragEndEvent) {
 		const { active, over } = event;
-		if (
-			active.data.current &&
-			over?.data.current &&
-			active.data.current.func.parentId !== Number(over.data.current.group)
-		) {
+		if (active.data.current && over?.data.current) {
 			const update = active.data.current.update as ReturnType<
 				typeof useFunction
 			>["updateFunction"];
@@ -67,6 +63,7 @@ export function FunctionColumnView({ path }: FunctionColumnViewProps) {
 			const updatedFunc = await update.mutateAsync({
 				...active.data.current.func,
 				parentId: Number(over.data.current.group),
+				orderIndex: over.data.current.order,
 			});
 
 			if (!selectedFunctionIds.flat().includes(over.data.current.group)) {
