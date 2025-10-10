@@ -13,7 +13,11 @@ export function SelectButton({
 	});
 
 	return (
-		<Droppable groupId={functionId} droppableId={`${functionId}-self`}>
+		<Droppable
+			groupId={functionId}
+			droppableId={`${functionId}-self`}
+			orderIndex={children.data?.length ?? 0}
+		>
 			{({ isOver, setNodeRef }) => (
 				<Flex
 					border="1px"

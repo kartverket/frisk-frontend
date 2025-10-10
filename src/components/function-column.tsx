@@ -178,37 +178,51 @@ function ChildrenGroup({
 				left={0}
 				right={0}
 			>
-				<Droppable groupId={functionId} droppableId={functionId.toString()}>
+				<Droppable
+					groupId={functionId}
+					droppableId={`${functionId}-last`}
+					orderIndex={sortedChildren?.length ?? 0}
+				>
 					{({ isOver, setNodeRef }) => (
 						<Box
-							padding={"8px"}
 							backgroundColor={isOver ? "blue.100" : "gray.200"}
 							borderRadius="md"
 							border="1px"
 							marginBottom={2}
 							ref={setNodeRef}
 						>
-							<List
-								display="flex"
-								flexDirection="column"
-								gap={2}
-								marginBottom="2"
-							>
-								{sortedChildren?.map((child) => (
-									<ChildrenGroupItem
-										key={child.id + child.name + child.parentId}
-										func={child}
-										selected={selectedFunctionIds.some((idList) =>
-											idList.includes(child.id),
+							<List display="flex" flexDirection="column" marginBottom="2">
+								{sortedChildren?.map((child, i) => (
+									<Droppable
+										key={child.id}
+										groupId={functionId}
+										droppableId={child.id.toString()}
+										orderIndex={i}
+									>
+										{({ setNodeRef }) => (
+											<Box
+												ref={setNodeRef}
+												paddingTop={3}
+												paddingX="8px"
+												borderRadius="md"
+											>
+												<ChildrenGroupItem
+													key={child.id + child.name + child.parentId}
+													func={child}
+													selected={selectedFunctionIds.some((idList) =>
+														idList.includes(child.id),
+													)}
+													lowLighted={
+														!!filters &&
+														!hasAllMetadataInFilter.find(
+															(item) => item.functionId === child.id,
+														)?.hasAllMetadataInFilter
+													}
+													isLoading={metadataIsLoading}
+												/>
+											</Box>
 										)}
-										lowLighted={
-											!!filters &&
-											!hasAllMetadataInFilter.find(
-												(item) => item.functionId === child.id,
-											)?.hasAllMetadataInFilter
-										}
-										isLoading={metadataIsLoading}
-									/>
+									</Droppable>
 								))}
 							</List>
 							<Button
@@ -218,6 +232,7 @@ function ChildrenGroup({
 								onClick={() => {
 									setSelectedForm(functionId);
 								}}
+								marginBottom={"8px"}
 							>
 								{config.addButtonName}
 							</Button>
