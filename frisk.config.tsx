@@ -619,7 +619,7 @@ async function getRegelrettTokens() {
 	const REGELRETT_CLIENT_ID = getRegelrettClientId();
 	const regelrettScope =
 		import.meta.env.MODE === "skip"
-			? `api://${REGELRETT_CLIENT_ID}/regelrett`
+			? `api://${REGELRETT_CLIENT_ID}/.default`
 			: "api://e9dc946b-6fef-44ab-82f1-c0ec2e402903/.default";
 
 	const accounts = msalInstance.getAllAccounts();
