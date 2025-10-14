@@ -1,0 +1,22 @@
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: frisk-frontend
+  tags:
+    - internal
+spec:
+  type: website
+  lifecycle: production
+  owner: skvis
+  system: funksjon-skjema-register
+
+---
+apiVersion: backstage.io/v1alpha1
+kind: API
+metadata:
+  name: frisk-api
+spec:
+  type: api
+  owner: skvis
+  lifecycle: production
+  system: funksjon-skjema-register
