@@ -130,8 +130,6 @@ export async function getConfig(): Promise<FriskConfig> {
 				placeholder: "Sett inn lenke",
 				inheritFromParent: false,
 				getDisplayValue: async (input) => {
-					console.log(input.value);
-
 					const backstageType = input.value.match(
 						/default\/([^\/]+)\/([^\/]+)/,
 					);
