@@ -136,7 +136,7 @@ export async function getConfig(): Promise<FriskConfig> {
 					return {
 						displayValue: backstageType
 							? `${backstageType[1].charAt(0).toUpperCase() + backstageType[1].slice(1)}: ${backstageType[2]}`
-							: "Utviklerportalen",
+							: "Kartverket.dev",
 					};
 				},
 			},
