@@ -129,8 +129,15 @@ export async function getConfig(): Promise<FriskConfig> {
 				isRequired: false,
 				placeholder: "Sett inn lenke",
 				inheritFromParent: false,
-				getDisplayValue: async () => {
-					return { displayValue: "Utviklerportalen" };
+				getDisplayValue: async (input) => {
+					const backstageType = input.value.match(
+						/default\/([^\/]+)\/([^\/]+)/,
+					);
+					return {
+						displayValue: backstageType
+							? `${backstageType[1].charAt(0).toUpperCase() + backstageType[1].slice(1)}: ${backstageType[2]}`
+							: "Kartverket.dev",
+					};
 				},
 			},
 			{
