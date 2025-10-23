@@ -260,7 +260,7 @@ export async function getConfig(): Promise<FriskConfig> {
 		},
 		title: "Funksjonsregisteret",
 		description:
-			"Funksjonsregisteret (FRISK) lar deg visualisere funksjoner i et hierarki. Her kan man blant annet definere kritikalitet, ansvarlig team og avhengigheter. Du kan også opprette sikkerhetsskjemaer koblet til Regelrett.",
+			"Funksjonsregisteret (FRISK) lar deg visualisere et hierarki. Her kan man blant annet definere kritikalitet, ansvarlig team og avhengigheter. Du kan også opprette sikkerhetsskjemaer koblet til Regelrett.",
 		rootNodeName: "Kartverket",
 		columnName: "Funksjon",
 		addButtonName: "Legg til funksjon",
