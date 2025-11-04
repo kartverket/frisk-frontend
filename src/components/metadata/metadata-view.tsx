@@ -11,6 +11,8 @@ export function MetadataView({
 	functionId: number;
 }) {
 	const { config } = Route.useLoaderData();
+	if (!metadataConfig.show("read", true)) return null;
+
 	const ducplicateTitleAlreadyDisplayed = config.metadata
 		?.slice(
 			0,

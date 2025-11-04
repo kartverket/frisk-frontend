@@ -104,6 +104,7 @@ export function MetadataValue({ metadata, functionId }: Props) {
 							case "select":
 							case "number":
 							case "text":
+							case "color":
 								return (
 									<TextView
 										key={metaDataValue}

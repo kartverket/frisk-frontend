@@ -58,6 +58,7 @@ export function MetadataInput({
 			);
 		case "text":
 		case "number":
+		case "color":
 		case "url":
 			return (
 				<InputField
@@ -438,7 +439,10 @@ function InputField({
 					name={metadata.key}
 					defaultValue={
 						currentMetadataValue ??
-						(metadata.inheritFromParent ? parentMetadataValue : undefined)
+						(metadata.inheritFromParent
+							? (parentMetadataValue ??
+								(metadata.type === "color" ? "#1A589F" : undefined))
+							: undefined)
 					}
 					onChange={(e) => {
 						onChange?.(e.target.value);

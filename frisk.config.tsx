@@ -3,7 +3,6 @@ import {
 	getFunction,
 	getFunctionMetadata,
 	getFunctions,
-	getMetadata,
 	getMyMicrosoftTeams,
 	getTeam,
 } from "@/services/backend";
@@ -174,7 +173,17 @@ export async function getConfig(): Promise<FriskConfig> {
 				placeholder: "Søk etter funksjoner",
 				inheritFromParent: false,
 			},
-
+			{
+				key: "card-color",
+				type: "color",
+				label: "Velg bakgrunnsfargen til kortet",
+				show: (mode) => mode === "create" || mode === "update",
+				title: undefined,
+				getDisplayValue: undefined,
+				isRequired: false,
+				placeholder: "velg farge",
+				inheritFromParent: true,
+			},
 			...schemas.map(
 				(schema): InputMetadata => ({
 					key: schema.id,
@@ -393,6 +402,10 @@ export type InputMetadata = GeneralMetadata &
 				placeholder: string;
 				isExternal: boolean;
 		  }
+		| {
+				type: "color";
+				placeholder: string;
+		  }
 	);
 
 export type Metadata = SelectMetadata | InputMetadata;
@@ -415,13 +428,7 @@ type FunctionCardComponentProps = {
 };
 
 function dependants() {
-	return ({
-		func,
-		metadata,
-		addMetadata,
-		hasAccess,
-		getMetadataByKeyAndValue,
-	}: FunctionCardComponentProps) => {
+	return ({ func, getMetadataByKeyAndValue }: FunctionCardComponentProps) => {
 		const funcId = func.data?.id.toString() ?? "";
 		const meta = getMetadataByKeyAndValue("dependencies", funcId);
 		const { functions } = useFunctions(

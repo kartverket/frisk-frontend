@@ -8,6 +8,7 @@ import { useEffect, useState } from "react";
 import { Draggable } from "./draggable";
 import { css, keyframes } from "@emotion/react";
 import { IndicatorPointer } from "@/components/indicator-pointer.tsx";
+import { useMetadata } from "@/hooks/use-metadata.ts";
 
 export function FunctionCard({
 	functionId,
@@ -17,6 +18,7 @@ export function FunctionCard({
 	const { func, functionAccess } = useFunction(functionId, {
 		includeAccess: true,
 	});
+	const { metadata } = useMetadata(functionId);
 	const search = Route.useSearch();
 	const navigate = Route.useNavigate();
 	const indicatorSelected = search.indicators?.metadata.find((m) => m.key);
@@ -91,7 +93,10 @@ export function FunctionCard({
 						}
 					}}
 					marginBottom={bottomMargin}
-					borderColor="blue.500"
+					borderColor={
+						metadata.data?.find((m) => m.key === "card-color")?.value ??
+						"blue.500"
+					}
 					opacity={lowlighted ? 0.5 : 1}
 					borderWidth={1}
 					css={
