@@ -254,9 +254,10 @@ type PillViewProps = {
 	isLoading: boolean;
 };
 
-function PillView({ displayValue, funcPath, isLoading }: PillViewProps) {
+export function PillView({ displayValue, funcPath, isLoading }: PillViewProps) {
 	const search = Route.useSearch();
 	const navigate = Route.useNavigate();
+
 	return (
 		<Skeleton isLoaded={!isLoading} fitContent>
 			<Button

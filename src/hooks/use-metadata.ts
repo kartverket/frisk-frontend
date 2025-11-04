@@ -3,6 +3,7 @@ import {
 	deleteFunctionMetadata,
 	type FunctionMetadata,
 	getFunctionMetadata,
+	getMetadata,
 	getMetadataAccess,
 	patchMetadataValue,
 } from "@/services/backend";
@@ -22,6 +23,16 @@ export function useMetadata(functionId: number | undefined) {
 		},
 		enabled: !!functionId,
 	});
+
+	const metadataByKeyAndValue = (key: string, value: string) =>
+		useQuery({
+			queryKey: ["key/value", key, value, "metadata"],
+			queryFn: async () => {
+				// biome-ignore lint/style/noNonNullAssertion: We know that functionId is not undefined here since the qury is disabled if it is
+				const metadata = await getMetadata(key!, value!);
+				return metadata;
+			},
+		});
 
 	const access = useQuery({
 		queryKey: ["functions", functionId, "metadata-access"],
@@ -252,6 +263,7 @@ export function useMetadata(functionId: number | undefined) {
 
 	return {
 		metadata,
+		metadataByKeyAndValue,
 		metadataAccess: access.data,
 		addMetadata,
 		removeMetadata,
