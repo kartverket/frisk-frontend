@@ -259,6 +259,13 @@ export function PillView({ displayValue, funcPath, isLoading }: PillViewProps) {
 	const search = Route.useSearch();
 	const navigate = Route.useNavigate();
 
+	const { metadata } = useMetadata(
+		Number(funcPath.split(".").slice(-1)[0] ?? "0"),
+	);
+
+	const color =
+		metadata.data?.find((m) => m.key === "card-color")?.value ?? "blue.500";
+
 	return (
 		<Skeleton isLoaded={!isLoading} fitContent>
 			<Button
@@ -285,7 +292,7 @@ export function PillView({ displayValue, funcPath, isLoading }: PillViewProps) {
 				}}
 			>
 				<Box
-					bg="#BAD7F8"
+					bg={color}
 					paddingRight={1}
 					paddingLeft={1}
 					borderRadius="md"
@@ -297,7 +304,7 @@ export function PillView({ displayValue, funcPath, isLoading }: PillViewProps) {
 						cursor: "pointer",
 					}}
 				>
-					<Text fontSize="sm" fontWeight="500">
+					<Text fontSize="sm" fontWeight="500" color={"white"}>
 						{displayValue ?? "<Ingen verdi>"}
 					</Text>
 				</Box>
