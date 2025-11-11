@@ -28,7 +28,7 @@ export function useMetadata(functionId: number | undefined) {
 		useQuery({
 			queryKey: ["key/value", key, value, "metadata"],
 			queryFn: async () => {
-				// biome-ignore lint/style/noNonNullAssertion: We know that functionId is not undefined here since the qury is disabled if it is
+				// biome-ignore lint/style/noNonNullAssertion: We know that functionId is not undefined here since the query is disabled if it is
 				const metadata = await getMetadata(key!, value!);
 				return metadata;
 			},
