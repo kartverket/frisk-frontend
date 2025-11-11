@@ -21,12 +21,14 @@ import {
 	Text,
 	Tooltip,
 } from "@kvib/react";
-import type { useFunction } from "@/hooks/use-function";
+import { useFunctions } from "@/hooks/use-functions";
 import { msalInstance } from "@/services/msal";
 import { InteractionRequiredAuthError } from "@azure/msal-browser";
 import type { useMetadata } from "@/hooks/use-metadata";
 import { DeleteMetadataModal } from "@/components/delete-metadata-modal";
 import type React from "react";
+import { PillView } from "@/components/metadata/metadata-value";
+import type { useFunction } from "@/hooks/use-function";
 
 export async function getConfig(): Promise<FriskConfig> {
 	let schemas: Schema[] = [];
@@ -171,6 +173,17 @@ export async function getConfig(): Promise<FriskConfig> {
 				placeholder: "Søk etter funksjoner",
 				inheritFromParent: false,
 			},
+			{
+				key: "card-color",
+				type: "color",
+				label: "Velg bakgrunnsfargen til kortet",
+				show: (mode) => mode === "create" || mode === "update",
+				title: undefined,
+				getDisplayValue: undefined,
+				isRequired: false,
+				placeholder: "velg farge",
+				inheritFromParent: true,
+			},
 			...schemas.map(
 				(schema): InputMetadata => ({
 					key: schema.id,
@@ -265,7 +278,7 @@ export async function getConfig(): Promise<FriskConfig> {
 		columnName: "Funksjon",
 		addButtonName: "Legg til funksjon",
 		enableEntra: true,
-		functionCardComponents: [createSchemaComponent(schemas)],
+		functionCardComponents: [dependants(), createSchemaComponent(schemas)],
 	};
 }
 
@@ -389,6 +402,10 @@ export type InputMetadata = GeneralMetadata &
 				placeholder: string;
 				isExternal: boolean;
 		  }
+		| {
+				type: "color";
+				placeholder: string;
+		  }
 	);
 
 export type Metadata = SelectMetadata | InputMetadata;
@@ -405,7 +422,50 @@ type FunctionCardComponentProps = {
 	metadata: ReturnType<typeof useMetadata>["metadata"];
 	addMetadata: ReturnType<typeof useMetadata>["addMetadata"];
 	hasAccess: boolean;
+	getMetadataByKeyAndValue: ReturnType<
+		typeof useMetadata
+	>["metadataByKeyAndValue"];
 };
+
+function dependants() {
+	return ({ func, getMetadataByKeyAndValue }: FunctionCardComponentProps) => {
+		const funcId = func.data?.id.toString() ?? "";
+		const meta = getMetadataByKeyAndValue("dependencies", funcId);
+		const { functions } = useFunctions(
+			meta.data?.map((m) => m.functionId) ?? [],
+		);
+
+		if (!meta.data) return;
+		if (meta.data.length < 1) return;
+		const isLoading = functions.some((f) => f.isLoading);
+
+		if (isLoading) {
+			return <Text>Laster...</Text>;
+		}
+
+		return (
+			<>
+				{functions && functions.length > 0 && (
+					<>
+						<Text fontSize="sm" fontWeight="700">
+							Avhengig av meg:
+						</Text>
+						{functions.map((f) => {
+							return (
+								<PillView
+									key={`dependant-${f.data?.id}`}
+									displayValue={f.data?.name}
+									funcPath={f.data?.path ?? "1"}
+									isLoading={false}
+								/>
+							);
+						})}
+					</>
+				)}
+			</>
+		);
+	};
+}
 
 function createSchemaComponent(schemas: RegelrettSchema[]) {
 	return ({

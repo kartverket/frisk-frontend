@@ -150,6 +150,17 @@ export async function getFunctionMetadata(functionId: number) {
 	return array(FunctionMetadata).parse(json);
 }
 
+export async function getMetadata(key: string, value: string) {
+	const response = await fetchFromBackend(
+		`/metadata?key=${key}&value=${value}`,
+		{
+			method: "GET",
+		},
+	);
+	const json = await response.json();
+	return array(FunctionMetadata).parse(json);
+}
+
 export async function getMetadataAccess(id: number) {
 	const response = await fetchFromBackend(`/functions/${id}/metadata/access`, {
 		method: "GET",

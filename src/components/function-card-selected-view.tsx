@@ -12,7 +12,8 @@ export function FunctionCardSelectedView({
 	functionId,
 }: { functionId: number }) {
 	const { func } = useFunction(functionId);
-	const { metadata, addMetadata, metadataAccess } = useMetadata(functionId);
+	const { metadata, addMetadata, metadataAccess, metadataByKeyAndValue } =
+		useMetadata(functionId);
 	const { config } = Route.useLoaderData();
 	const [showCopiedTextMessage, setShowCopiedTextMessage] = useState(false);
 	const search = Route.useSearch();
@@ -59,6 +60,7 @@ export function FunctionCardSelectedView({
 					metadata={metadata}
 					addMetadata={addMetadata}
 					hasAccess={!!metadataAccess}
+					getMetadataByKeyAndValue={metadataByKeyAndValue}
 				/>
 			))}
 			{!showCopiedTextMessage ? (

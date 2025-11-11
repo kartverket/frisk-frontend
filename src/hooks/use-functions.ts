@@ -20,6 +20,7 @@ export function useFunctions(functionIds: number[], opts?: UseFunctionOpts) {
 				const functionData = await getFunction(id);
 				return functionData;
 			},
+			enabled: functionIds.length > 0,
 		})),
 	});
 
