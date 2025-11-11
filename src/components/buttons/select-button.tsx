@@ -15,7 +15,7 @@ export function SelectButton({
 
 	const { metadata } = useMetadata(functionId);
 
-	const unselectedColor =
+	const darkColor =
 		metadata?.data?.find((m) => m.key === "card-color")?.value ||
 		theme.colors.blue[500];
 
