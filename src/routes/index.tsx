@@ -39,7 +39,7 @@ export const Route = createFileRoute("/")({
 	component: Index,
 	validateSearch: zodSearchValidator(functionSearchSchema),
 	loader: async () => {
-		return { config: await getConfig() };
+		return { config: getConfig() };
 	},
 });
 

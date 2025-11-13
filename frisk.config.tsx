@@ -28,7 +28,7 @@ import type { useMetadata } from "@/hooks/use-metadata";
 import { DeleteMetadataModal } from "@/components/delete-metadata-modal";
 import type React from "react";
 
-export async function getConfig(): Promise<FriskConfig> {
+export function getConfig(): FriskConfig {
 	const schemas: Schema[] = [
 		{
 			id: "570e9285-3228-4396-b82b-e9752e23cd73",
