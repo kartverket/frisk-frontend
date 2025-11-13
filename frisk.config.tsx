@@ -7,7 +7,7 @@ import {
 	getTeam,
 } from "@/services/backend";
 import { getRegelrettClientId, getregelrettFrontendUrl } from "@/config";
-import { object, string, array, type z } from "zod";
+import { object, string, type z } from "zod";
 import {
 	Button,
 	Flex,
@@ -30,13 +30,25 @@ import type React from "react";
 import { PillView } from "@/components/metadata/metadata-value";
 import type { useFunction } from "@/hooks/use-function";
 
-export async function getConfig(): Promise<FriskConfig> {
-	let schemas: Schema[] = [];
-	try {
-		schemas = await getSchemasFromRegelrett();
-	} catch (e) {
-		console.error("Failed to fetch schemas from Regelrett:", e);
-	}
+export function getConfig(): FriskConfig {
+	const schemas: Schema[] = [
+		{
+			id: "570e9285-3228-4396-b82b-e9752e23cd73",
+			name: "Sikkerhetskontrollere",
+		},
+		{
+			id: "816cc808-9188-44a9-8f4b-5642fc2932c4",
+			name: "Tjenestenivå og driftskontinuitet",
+		},
+		{
+			id: "248f16c3-9c0e-4177-bf57-aa7d10d2671c",
+			name: "IP og DPIA (BETA – UNDER ARBEID)",
+		},
+		{
+			id: "e3ab7a6c-c54e-4240-8314-45990e1d7cf1",
+			name: "Datasettvurdering",
+		},
+	];
 
 	return {
 		metadata: [
@@ -659,21 +671,6 @@ function SchemaNotFoundDisplay({
 }
 
 const REGELRETT_BACKEND_URL = `${getregelrettFrontendUrl()}/api`;
-
-async function getSchemasFromRegelrett() {
-	try {
-		const response = await fetch(`${REGELRETT_BACKEND_URL}/schemas`);
-		if (!response.ok) {
-			throw new Error(
-				`Backend error: ${response.status} ${response.statusText}`,
-			);
-		}
-		const json = await response.json();
-		return array(RegelrettSchema).parse(json);
-	} catch (e) {
-		throw new Error("Could not connect to Regelrett backend");
-	}
-}
 
 const RegelrettSchema = object({
 	id: string(),
