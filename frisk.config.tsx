@@ -7,7 +7,7 @@ import {
 	getTeam,
 } from "@/services/backend";
 import { getRegelrettClientId, getregelrettFrontendUrl } from "@/config";
-import { object, string, array, type z } from "zod";
+import { object, string, type z } from "zod";
 import {
 	Button,
 	Flex,
