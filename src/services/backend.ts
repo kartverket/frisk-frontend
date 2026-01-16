@@ -223,6 +223,14 @@ export async function getMyMicrosoftTeams() {
 	return array(MicrosoftTeam).parse(json);
 }
 
+export async function getAllMicrosoftTeams(){
+	const response = await fetchFromBackend("/microsoft/allTeams", {
+		method: "GET",
+	});
+	const json = await response.json();
+	return array(MicrosoftTeam).parse(json);
+}
+
 export async function getTeam(id: string) {
 	const response = await fetchFromBackend(`/microsoft/teams/${id}`, {
 		method: "GET",

@@ -15,7 +15,7 @@ import {
 	useSensors,
 } from "@dnd-kit/core";
 import type { useFunction } from "@/hooks/use-function";
-import { getFunctionsCSVDump, getMyMicrosoftTeams } from "@/services/backend";
+import { getAllMicrosoftTeams, getFunctionsCSVDump } from "@/services/backend";
 import { Route } from "@/routes";
 import { SearchField } from "./search-field";
 import { FunctionCard } from "./function-card";
@@ -85,7 +85,7 @@ export function FunctionColumnView({ path }: FunctionColumnViewProps) {
 			const csvData = await getFunctionsCSVDump();
 
 			if (downloadTeamNames) {
-				const teamCSVdata = await getMyMicrosoftTeams();
+				const teamCSVdata = await getAllMicrosoftTeams();
 
 				const csvRows = [];
 
