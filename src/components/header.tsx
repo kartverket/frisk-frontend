@@ -53,7 +53,7 @@ function DeprecationBanner() {
 			<Text style={{ color: "#856404", margin: 0 }}>
 				<strong>Viktig melding:</strong> Frisk er nå kun tilgjengelig i
 				lesemodus og vil snart bli avviklet helt. Funksjonshierarkiet er flyttet
-				Kartverket.dev som skal erstatte Frisk.
+				til Kartverket.dev som skal erstatte Frisk.
 			</Text>
 		</div>
 	);
