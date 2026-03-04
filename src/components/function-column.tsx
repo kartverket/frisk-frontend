@@ -233,6 +233,7 @@ function ChildrenGroup({
 									setSelectedForm(functionId);
 								}}
 								marginBottom={"8px"}
+								isDisabled={true}
 							>
 								{config.addButtonName}
 							</Button>
