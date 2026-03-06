@@ -10,6 +10,7 @@ export function Header() {
 
 	return (
 		<header>
+			<DeprecationBanner />
 			<CustomHeader>
 				<a href={config.logo.logoLink ?? "/"}>
 					<img src={config.logo.imageSource} alt="logo" />
@@ -33,6 +34,28 @@ export function Header() {
 				</Flex>
 			</CustomHeader>
 		</header>
+	);
+}
+
+function DeprecationBanner() {
+	return (
+		<div
+			style={{
+				backgroundColor: "#fff3cd",
+				borderBottom: "2px solid #ffc107",
+				padding: "10px 30px",
+				display: "flex",
+				alignItems: "center",
+				gap: "10px",
+			}}
+		>
+			<Icon icon="warning" style={{ color: "#856404" }} />
+			<Text style={{ color: "#856404", margin: 0 }}>
+				<strong>Viktig melding:</strong> Frisk er nå kun tilgjengelig i
+				lesemodus og vil snart bli avviklet helt. Funksjonshierarkiet er flyttet
+				til Kartverket.dev som skal erstatte Frisk.
+			</Text>
+		</div>
 	);
 }
 
