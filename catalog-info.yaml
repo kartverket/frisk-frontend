@@ -1,12 +1,11 @@
-# nonk8s
-apiVersion: "backstage.io/v1alpha1"
-kind: "Component"
+apiVersion: backstage.io/v1alpha1
+kind: Component
 metadata:
-  name: "frisk-frontend"
+  name: frisk-frontend
   tags:
-  - "internal"
+    - internal
 spec:
-  type: "website"
-  lifecycle: "production"
-  owner: "skvis"
-  system: "funksjon-skjema-register"
+  type: website
+  lifecycle: deprecated
+  owner: skvis
+  system: system:default/funksjon-skjema-register
